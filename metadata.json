@@ -1,0 +1,8 @@
+{
+  "name": "Remix: MotoScope Pro",
+  "description": "Aplicativo de diagnóstico com osciloscópio para mecânicos de motos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
