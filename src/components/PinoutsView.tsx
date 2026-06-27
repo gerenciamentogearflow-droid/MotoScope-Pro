@@ -3,6 +3,7 @@ import { ArrowLeft, ChevronDown, Share2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { hondaPinouts } from "../data/hondaPinouts";
 import { yamahaPinouts } from "../data/yamahaPinouts";
+import { shinerayPinouts } from "../data/shinerayPinouts";
 
 interface PinoutsViewProps {
   brand: string;
@@ -57,6 +58,7 @@ export function PinoutsView({ brand, onBack }: PinoutsViewProps) {
     switch (brand) {
       case "Honda": return hondaPinouts;
       case "Yamaha": return yamahaPinouts;
+      case "Shineray": return shinerayPinouts;
       default: return [];
     }
   };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { User, ComponentData, DiagnosticModel } from "../types";
 import { componentsDB } from "../data/componentsDB";
 import {
@@ -12,7 +12,9 @@ import {
   Zap,
   SlidersHorizontal,
   Share2,
-  ArrowLeft
+  ArrowLeft,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { RealSignalsList } from "./RealSignalsList";
@@ -24,6 +26,8 @@ import { PinoutsView } from "./PinoutsView";
 import { shinerayModels } from "../data/shinerayModels";
 import { hondaParameters } from "../data/hondaParameters";
 import { yamahaParameters } from "../data/yamahaParameters";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
 
 interface DashboardProps {
   user: User;
@@ -52,6 +56,28 @@ export function Dashboard({
 
   const [selectedBrandPinouts, setSelectedBrandPinouts] =
     useState<string | null>(null);
+  
+  const [hiddenBrands, setHiddenBrands] = useState<string[]>([]);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "app_settings", "visibility"), (docSnap) => {
+      if (docSnap.exists()) {
+        setHiddenBrands(docSnap.data().hiddenBrands || []);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  const toggleBrandVisibility = async (brand: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    let newHidden = [...hiddenBrands];
+    if (hiddenBrands.includes(brand)) {
+      newHidden = newHidden.filter(b => b !== brand);
+    } else {
+      newHidden.push(brand);
+    }
+    await setDoc(doc(db, "app_settings", "visibility"), { hiddenBrands: newHidden }, { merge: true });
+  };
 
   const filteredComponents = componentsDB.filter(
     (c) =>
@@ -135,12 +161,15 @@ export function Dashboard({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={onAdminClick}
-              className="p-2.5 rounded-full hover:bg-white/5 text-zinc-400 hover:text-white transition-colors"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
+            {user.role === "admin" && (
+              <button
+                onClick={onAdminClick}
+                className="p-2.5 rounded-full hover:bg-white/5 text-zinc-400 hover:text-white transition-colors"
+                title="Painel Admin"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+            )}
             <button
               onClick={onLogout}
               className="p-2.5 rounded-full hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-colors"
@@ -493,28 +522,45 @@ export function Dashboard({
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {["Honda", "Yamaha", "Shineray"].map((brand, idx) => (
-                  <motion.button
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    key={brand}
-                    onClick={() => setSelectedBrandParameters(brand)}
-                    className="group text-left w-full bg-zinc-900/40 hover:bg-zinc-800/60 border border-white/5 hover:border-white/10 rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98]"
-                  >
-                    <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-white/5 p-1 border border-white/10 group-hover:scale-105 transition-transform">
-                      <BrandLogo brand={brand} className="w-full h-full object-contain" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg text-white group-hover:text-purple-100 transition-colors">
-                        {brand}
-                      </h3>
-                      <p className="text-sm text-zinc-500 mt-0.5">
-                        Consulte {brand}
-                      </p>
-                    </div>
-                  </motion.button>
-                ))}
+                {["Honda", "Yamaha", "Shineray"]
+                  .filter((brand) => user.role === "admin" || !hiddenBrands.includes(brand))
+                  .map((brand, idx) => {
+                    const isHidden = hiddenBrands.includes(brand);
+                    return (
+                      <motion.button
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        key={brand}
+                        onClick={() => setSelectedBrandParameters(brand)}
+                        className={`group relative text-left w-full bg-zinc-900/40 hover:bg-zinc-800/60 border border-white/5 hover:border-white/10 rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
+                      >
+                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-white/5 p-1 border border-white/10 group-hover:scale-105 transition-transform">
+                          <BrandLogo brand={brand} className="w-full h-full object-contain" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg text-white group-hover:text-purple-100 transition-colors">
+                            {brand}
+                          </h3>
+                          <p className="text-sm text-zinc-500 mt-0.5">
+                            Consulte {brand}
+                          </p>
+                        </div>
+                        {user.role === "admin" && (
+                          <div 
+                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors z-10"
+                            onClick={(e) => toggleBrandVisibility(brand, e)}
+                          >
+                            {isHidden ? (
+                              <EyeOff className="w-5 h-5 text-zinc-400 hover:text-white" />
+                            ) : (
+                              <Eye className="w-5 h-5 text-zinc-400 hover:text-white" />
+                            )}
+                          </div>
+                        )}
+                      </motion.button>
+                    );
+                  })}
               </div>
             </motion.div>
           ) : activeTab === "pinouts" ? (
@@ -540,28 +586,45 @@ export function Dashboard({
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {["Honda", "Yamaha", "Shineray"].map((brand, idx) => (
-                  <motion.button
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    key={brand}
-                    onClick={() => setSelectedBrandPinouts(brand)}
-                    className="group text-left w-full bg-zinc-900/40 hover:bg-zinc-800/60 border border-white/5 hover:border-white/10 rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] grayscale hover:grayscale-0"
-                  >
-                    <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-white/5 p-1 border border-white/10 group-hover:scale-105 transition-transform">
-                      <BrandLogo brand={brand} className="w-full h-full object-contain" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg text-white group-hover:text-rose-100 transition-colors">
-                        {brand}
-                      </h3>
-                      <p className="text-sm text-zinc-500 mt-0.5">
-                        Verifique {brand}
-                      </p>
-                    </div>
-                  </motion.button>
-                ))}
+                {["Honda", "Yamaha", "Shineray"]
+                  .filter((brand) => user.role === "admin" || !hiddenBrands.includes(brand))
+                  .map((brand, idx) => {
+                    const isHidden = hiddenBrands.includes(brand);
+                    return (
+                      <motion.button
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        key={brand}
+                        onClick={() => setSelectedBrandPinouts(brand)}
+                        className={`group relative text-left w-full bg-zinc-900/40 hover:bg-zinc-800/60 border border-white/5 hover:border-white/10 rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
+                      >
+                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-white/5 p-1 border border-white/10 group-hover:scale-105 transition-transform">
+                          <BrandLogo brand={brand} className="w-full h-full object-contain" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg text-white group-hover:text-rose-100 transition-colors">
+                            {brand}
+                          </h3>
+                          <p className="text-sm text-zinc-500 mt-0.5">
+                            Verifique {brand}
+                          </p>
+                        </div>
+                        {user.role === "admin" && (
+                          <div 
+                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors z-10"
+                            onClick={(e) => toggleBrandVisibility(brand, e)}
+                          >
+                            {isHidden ? (
+                              <EyeOff className="w-5 h-5 text-zinc-400 hover:text-white" />
+                            ) : (
+                              <Eye className="w-5 h-5 text-zinc-400 hover:text-white" />
+                            )}
+                          </div>
+                        )}
+                      </motion.button>
+                    );
+                  })}
               </div>
             </motion.div>
           ) : null}

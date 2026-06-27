@@ -6,6 +6,7 @@ import { Dashboard } from "./components/Dashboard";
 import { AdminPanel } from "./components/AdminPanel";
 import { ComponentDetail } from "./components/ComponentDetail";
 import { InstallPrompt } from "./components/InstallPrompt";
+import { OfflineStatus } from "./components/OfflineStatus";
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -59,7 +60,7 @@ export default function App() {
       return <LoginForm onSuccess={handleLogin} />;
     }
 
-    if (view === "admin" && user) {
+    if (view === "admin" && user?.role === "admin") {
       return <AdminPanel adminUser={user} onBack={() => setView("dashboard")} onUserUpdate={(updatedUser) => setUser(updatedUser)} />;
     }
 
@@ -90,6 +91,8 @@ export default function App() {
     <>
       {renderView()}
       <InstallPrompt />
+      <OfflineStatus />
     </>
   );
 }
+
