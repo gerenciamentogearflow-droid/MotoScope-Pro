@@ -7,6 +7,7 @@ import { AdminPanel } from "./components/AdminPanel";
 import { ComponentDetail } from "./components/ComponentDetail";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { OfflineStatus } from "./components/OfflineStatus";
+import { PwaUpdatePrompt } from "./components/PwaUpdatePrompt";
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -90,6 +91,7 @@ export default function App() {
   return (
     <>
       {renderView()}
+      <PwaUpdatePrompt />
       <InstallPrompt />
       <OfflineStatus />
     </>
