@@ -78,9 +78,9 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
   const waves = getWaves();
 
   return (
-    <div className="bg-gradient-to-b from-[#1a1c23] to-[#121318] p-3 sm:p-5 rounded-3xl shadow-2xl mx-auto w-full max-w-4xl flex flex-col sm:flex-row gap-3 sm:gap-5 border border-white/10 ring-1 ring-black/50">
+    <div className="bg-gradient-to-b from-[#1a1c23] to-[#121318] p-3 sm:p-5 rounded-3xl shadow-2xl mx-auto w-full max-w-4xl flex flex-col sm:flex-row gap-3 sm:gap-5 border border-black/10 ring-1 ring-black/50">
       {/* Screen Section */}
-      <div className="flex-1 bg-[#050608] rounded-xl overflow-hidden flex flex-col font-mono text-xs text-white border-[8px] border-[#0a0a0c] shadow-[inset_0_0_40px_rgba(0,0,0,1)] relative aspect-[4/3] sm:aspect-auto sm:h-[360px] ring-1 ring-white/5">
+      <div className="flex-1 bg-[#050608] rounded-xl overflow-hidden flex flex-col font-mono text-xs text-zinc-400 border-[8px] border-[#0a0a0c] shadow-[inset_0_0_40px_rgba(0,0,0,1)] relative aspect-[4/3] sm:aspect-auto sm:h-[360px] ring-1 ring-white/5">
         {/* Top Bar */}
         <div className="flex justify-between items-center px-4 py-2 bg-[#0a0a0c]/80 border-b border-white/5 z-10 text-[#00FF00]">
           <div className="flex items-center gap-2">
@@ -108,7 +108,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
             {[...Array(9)].map((_, i) => (
               <div
                 key={`h-${i}`}
-                className={`w-full h-[1px] ${i === 4 ? "bg-white/20" : "bg-white/5 border-t border-dotted border-white/5"}`}
+                className={`w-full h-[1px] ${i === 4 ? "bg-white/20" : "bg-transparent border-t border-dotted border-white/10"}`}
               />
             ))}
           </div>
@@ -116,7 +116,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
             {[...Array(13)].map((_, i) => (
               <div
                 key={`v-${i}`}
-                className={`h-full w-[1px] ${i === 6 ? "bg-white/20" : "bg-white/5 border-l border-dotted border-white/5"}`}
+                className={`h-full w-[1px] ${i === 6 ? "bg-white/20" : "bg-transparent border-l border-dotted border-white/10"}`}
               />
             ))}
           </div>
@@ -183,7 +183,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
         </div>
 
         {/* Bottom Status Bar */}
-        <div className="w-full bg-[#0a0a0c]/80 border-t border-white/5 px-4 py-2 flex justify-between items-center text-white/80 text-[10px] sm:text-xs z-10 min-h-[36px]">
+        <div className="w-full bg-[#0a0a0c]/80 border-t border-white/5 px-4 py-2 flex justify-between items-center text-zinc-500 text-[10px] sm:text-xs z-10 min-h-[36px]">
           <span
             className="font-bold tracking-widest truncate max-w-[50%] mr-2 text-[#00FF00]/90"
             title={component.oscilloscopeSetup.voltageDiv}
@@ -199,10 +199,10 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
             </span>
             <span className="font-semibold tracking-wider sm:hidden">AUTO</span>
             <ArrowUp
-              className={`w-3.5 h-3.5 ${component.oscilloscopeSetup.triggerEdge.includes("Descida") ? "rotate-180 text-cyan-400" : "text-cyan-400"}`}
+              className={`w-3.5 h-3.5 ${component.oscilloscopeSetup.triggerEdge.includes("Descida") ? "rotate-180 text-red-600" : "text-red-600"}`}
             />
-            <span className="font-bold tracking-wider text-zinc-500">X10</span>
-            <span className="font-bold tracking-wider text-zinc-500">DC</span>
+            <span className="font-bold tracking-wider text-gray-600">X10</span>
+            <span className="font-bold tracking-wider text-gray-600">DC</span>
           </div>
         </div>
       </div>
@@ -210,7 +210,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
       {/* Hardware Buttons Panel */}
       <div className="grid grid-cols-5 sm:flex sm:flex-col gap-2.5 sm:gap-3 sm:w-[80px] sm:py-2">
         {["AUTO", "MODE", <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5 mx-auto" key="up" />, <ArrowDown className="w-4 h-4 sm:w-5 sm:h-5 mx-auto" key="down" />, "RUN"].map((label, idx) => (
-          <button key={idx} className="bg-gradient-to-b from-zinc-800 to-zinc-900 hover:from-zinc-700 hover:to-zinc-800 text-zinc-300 text-[9px] sm:text-[10px] font-bold rounded-lg shadow-[0_4px_0_#000,0_5px_10px_rgba(0,0,0,0.5)] active:translate-y-[4px] active:shadow-[0_0px_0_#000,0_1px_2px_rgba(0,0,0,0.5)] h-12 sm:h-14 flex items-center justify-center border border-white/10 transition-all uppercase tracking-widest">
+          <button key={idx} className="bg-gradient-to-b from-white to-gray-100 hover:from-gray-50 hover:to-gray-200 text-gray-700 text-[9px] sm:text-[10px] font-bold rounded-lg shadow-[0_4px_0_#e5e7eb,0_5px_10px_rgba(0,0,0,0.1)] active:translate-y-[4px] active:shadow-[0_0px_0_#e5e7eb,0_1px_2px_rgba(0,0,0,0.1)] h-12 sm:h-14 flex items-center justify-center border border-gray-200 transition-all uppercase tracking-widest">
             {label}
           </button>
         ))}

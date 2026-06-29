@@ -169,20 +169,20 @@ export function RealSignalsList({
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={onBack}
-          className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-zinc-300 hover:text-white transition-all active:scale-95"
+          className="p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200/60 shadow-sm text-gray-700 hover:text-gray-900 transition-all active:scale-95"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-white">{component.name}</h2>
-          <p className="text-xs uppercase tracking-widest font-bold text-emerald-400 mt-1">Sinais Reais da Comunidade</p>
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900">{component.name}</h2>
+          <p className="text-xs uppercase tracking-widest font-bold text-emerald-600 mt-1">Sinais Reais da Comunidade</p>
         </div>
       </div>
 
       {!showUploadForm ? (
         <button
           onClick={() => setShowUploadForm(true)}
-          className="w-full mb-8 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold py-5 px-6 rounded-3xl flex items-center justify-center gap-3 transition-all border border-emerald-500/20 shadow-lg shadow-emerald-900/10 text-lg active:scale-[0.98] group"
+          className="w-full mb-8 bg-emerald-600/10 hover:bg-emerald-500/20 text-emerald-600 font-bold py-5 px-6 rounded-3xl flex items-center justify-center gap-3 transition-all border border-emerald-600/20 shadow-lg shadow-emerald-900/10 text-lg active:scale-[0.98] group"
         >
           <Camera className="w-6 h-6 group-hover:scale-110 transition-transform" />
           Tirar Foto do Sinal
@@ -191,9 +191,9 @@ export function RealSignalsList({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-zinc-900/40 border border-white/5 rounded-3xl p-6 md:p-8 mb-8 backdrop-blur-sm"
+          className="bg-white border border-gray-200/60 shadow-sm rounded-3xl p-6 md:p-8 mb-8 backdrop-blur-sm"
         >
-          <h3 className="font-semibold text-lg mb-6 text-white tracking-wide">
+          <h3 className="font-semibold text-lg mb-6 text-gray-900 tracking-wide">
             Enviar Novo Sinal
           </h3>
 
@@ -203,7 +203,7 @@ export function RealSignalsList({
             value={motorcycleName}
             onChange={(e) => setMotorcycleName(e.target.value)}
             disabled={uploading}
-            className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-base text-zinc-100 placeholder:text-zinc-600 mb-6 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+            className="w-full bg-white border border-black/10 rounded-2xl px-5 py-4 text-base text-gray-900 placeholder:text-gray-600 mb-6 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
           />
 
           <input
@@ -217,10 +217,10 @@ export function RealSignalsList({
           {uploading ? (
             <div className="flex flex-col items-center py-8">
               <Loader2 className="w-8 h-8 animate-spin text-emerald-500 mb-4" />
-              <div className="w-full max-w-sm bg-black/40 rounded-full h-2 mb-3 overflow-hidden border border-white/5">
+              <div className="w-full max-w-sm bg-white rounded-full h-2 mb-3 overflow-hidden border border-gray-200/60 shadow-sm">
                 <div className="bg-emerald-500 h-2 rounded-full transition-all duration-300 w-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
               </div>
-              <span className="text-sm text-zinc-400 font-medium tracking-wide">
+              <span className="text-sm text-gray-600 font-medium tracking-wide">
                 Processando e Enviando...
               </span>
             </div>
@@ -229,20 +229,20 @@ export function RealSignalsList({
               <div className="flex gap-4">
                 <button
                   onClick={openCamera}
-                  className="flex-1 bg-white/5 hover:bg-white/10 text-white py-4 rounded-2xl text-base font-bold flex items-center justify-center gap-2 transition-colors border border-white/10"
+                  className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-900 py-4 rounded-2xl text-base font-bold flex items-center justify-center gap-2 transition-colors border border-black/10"
                 >
                   <Camera className="w-5 h-5" /> Câmera
                 </button>
                 <button
                   onClick={openGallery}
-                  className="flex-1 bg-white/5 hover:bg-white/10 text-white py-4 rounded-2xl text-base font-bold flex items-center justify-center gap-2 transition-colors border border-white/10"
+                  className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-900 py-4 rounded-2xl text-base font-bold flex items-center justify-center gap-2 transition-colors border border-black/10"
                 >
                   <ImageIcon className="w-5 h-5" /> Galeria
                 </button>
               </div>
               <button
                 onClick={() => setShowUploadForm(false)}
-                className="w-full py-4 bg-transparent hover:bg-red-500/10 text-zinc-500 hover:text-red-400 rounded-2xl text-base font-bold transition-colors border border-transparent hover:border-red-500/20"
+                className="w-full py-4 bg-transparent hover:bg-red-500/10 text-gray-600 hover:text-red-600 rounded-2xl text-base font-bold transition-colors border border-transparent hover:border-red-500/20"
               >
                 Cancelar
               </button>
@@ -254,7 +254,7 @@ export function RealSignalsList({
       <div className="pb-12">
         {loading ? (
           <div className="flex justify-center py-16">
-            <Loader2 className="w-10 h-10 animate-spin text-zinc-500" />
+            <Loader2 className="w-10 h-10 animate-spin text-gray-600" />
           </div>
         ) : signals.length > 0 ? (
           <div className="grid gap-8">
@@ -263,9 +263,9 @@ export function RealSignalsList({
                 key={signal.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="bg-zinc-900/40 border border-white/5 rounded-[2rem] overflow-hidden backdrop-blur-sm"
+                className="bg-white border border-gray-200/60 shadow-sm rounded-[2rem] overflow-hidden backdrop-blur-sm"
               >
-                <div className="w-full aspect-video bg-black/80 relative border-b border-white/5">
+                <div className="w-full aspect-video bg-white relative border-b border-gray-200/80">
                   <img
                     src={signal.imageUrl}
                     alt={`Sinal de ${signal.motorcycleName}`}
@@ -274,17 +274,17 @@ export function RealSignalsList({
                 </div>
                 <div className="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <h4 className="font-bold text-xl text-white mb-2 tracking-tight">
+                    <h4 className="font-bold text-xl text-gray-900 mb-2 font-bold tracking-tight">
                       {signal.motorcycleName}
                     </h4>
-                    <p className="text-sm text-zinc-400 flex items-center gap-1.5">
+                    <p className="text-sm text-gray-600 flex items-center gap-1.5">
                       Enviado por:{" "}
-                      <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                      <span className="text-emerald-600 font-bold bg-emerald-600/10 px-2 py-0.5 rounded border border-emerald-600/20">
                         {signal.userName}
                       </span>
                     </p>
                   </div>
-                  <div className="text-xs font-mono text-zinc-500 bg-black/40 px-3 py-1.5 rounded-lg border border-white/5 self-start md:self-center">
+                  <div className="text-xs font-mono text-gray-600 bg-white px-3 py-1.5 rounded-lg border border-gray-200/60 shadow-sm self-start md:self-center">
                     {new Date(signal.createdAt).toLocaleDateString("pt-BR")} às{" "}
                     {new Date(signal.createdAt).toLocaleTimeString("pt-BR", {
                       hour: "2-digit",
@@ -296,14 +296,14 @@ export function RealSignalsList({
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 bg-zinc-900/20 rounded-[2rem] border border-white/5 border-dashed">
-            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Camera className="w-8 h-8 text-zinc-500" />
+          <div className="text-center py-20 bg-white rounded-[2rem] border border-gray-200/60 shadow-sm border-dashed">
+            <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Camera className="w-8 h-8 text-gray-600" />
             </div>
-            <p className="text-zinc-300 font-semibold text-lg mb-2">
+            <p className="text-gray-700 font-semibold text-lg mb-2">
               Nenhum sinal registrado
             </p>
-            <p className="text-zinc-500 text-sm">
+            <p className="text-gray-600 text-sm">
               Seja o primeiro a enviar uma foto para este componente.
             </p>
           </div>

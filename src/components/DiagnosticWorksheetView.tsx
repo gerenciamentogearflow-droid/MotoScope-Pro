@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { DiagnosticModel, ComponentData } from "../types";
-import { ArrowLeft, ChevronDown, Info, X, Activity } from "lucide-react";
+import { ArrowLeft, ChevronDown, CheckCircle2, AlertCircle, FileText, Download, X, Info, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { OscilloscopeDisplay } from "./OscilloscopeDisplay";
 
-interface DiagnosticParametersViewProps {
+interface DiagnosticWorksheetViewProps {
   brand: string;
   models: DiagnosticModel[];
   onBack: () => void;
@@ -326,24 +326,85 @@ const getTutorialSteps = (tipo: string, localizacao: string): string[] => {
   return defaultTutorialData[tipo] || [];
 };
 
-export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticParametersViewProps) {
+const evaluateStatus = (padrao: string, input: string): 'ok' | 'nok' | 'pending' => {
+  if (!input) return 'pending';
+  const cleanInput = input.trim().toLowerCase().replace(/,/g, '.');
+  if (!cleanInput) return 'pending';
+  
+  const inputMatch = cleanInput.match(/-?\d+(?:\.\d+)?/);
+  if (!inputMatch) return 'pending';
+  const inputNum = parseFloat(inputMatch[0]);
+  
+  if (!padrao) return 'pending';
+  const padraoClean = padrao.toLowerCase().replace(/,/g, '.');
+  
+  // 1. Plus/Minus: "0.08 ± 0.02" or "0.08±0.02"
+  const pmMatch = padraoClean.match(/(\d+(?:\.\d+)?)\s*[±]\s*(\d+(?:\.\d+)?)/);
+  if (pmMatch) {
+    const base = parseFloat(pmMatch[1]);
+    const tol = parseFloat(pmMatch[2]);
+    return (inputNum >= base - tol && inputNum <= base + tol) ? 'ok' : 'nok';
+  }
+  
+  // 2. Range: "0.1 - 0.3" or "0.1 a 0.3"
+  const rangeMatch = padraoClean.match(/(\d+(?:\.\d+)?)\s*(?:-|a)\s*(\d+(?:\.\d+)?)/);
+  if (rangeMatch) {
+    const min = parseFloat(rangeMatch[1]);
+    const max = parseFloat(rangeMatch[2]);
+    return (inputNum >= min && inputNum <= max) ? 'ok' : 'nok';
+  }
+  
+  // 3. Minimum: "120v (mínimo)"
+  if (padraoClean.includes('mínimo') || padraoClean.includes('min') || padraoClean.includes('acima')) {
+    const minMatch = padraoClean.match(/(\d+(?:\.\d+)?)/);
+    if (minMatch) {
+      const min = parseFloat(minMatch[1]);
+      return inputNum >= min ? 'ok' : 'nok';
+    }
+  }
+
+  // 4. Maximum: "máximo" or "max"
+  if (padraoClean.includes('máximo') || padraoClean.includes('max') || padraoClean.includes('abaixo')) {
+    const maxMatch = padraoClean.match(/(\d+(?:\.\d+)?)/);
+    if (maxMatch) {
+      const max = parseFloat(maxMatch[1]);
+      return inputNum <= max ? 'ok' : 'nok';
+    }
+  }
+  
+  // 5. Exact match with a single value
+  const singleMatch = padraoClean.match(/(\d+(?:\.\d+)?)/);
+  if (singleMatch) {
+    const val = parseFloat(singleMatch[1]);
+    // Allow 5% tolerance for generic single number patterns
+    const min = val * 0.95;
+    const max = val * 1.05;
+    if (inputNum >= min && inputNum <= max) return 'ok';
+    return 'nok';
+  }
+  
+  return 'pending';
+};
+
+export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWorksheetViewProps) {
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
   const [selectedAbbr, setSelectedAbbr] = useState<{ key: string; description: string } | null>(null);
   const [selectedTutorial, setSelectedTutorial] = useState<{ key: string; title: string; steps: string[] } | null>(null);
+  
+  // State to store findings: rowKey -> value
+  const [findings, setFindings] = useState<Record<string, { value: string; status: 'ok' | 'nok' | 'pending' }>>({});
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [selectedModelId]);
 
   const handleAbbrClick = (text: string) => {
-    // Try to find if any legend key is in the text (exact match for types, or partial for others)
     const exactMatch = legendData[text];
     if (exactMatch) {
       setSelectedAbbr({ key: text, description: exactMatch });
       return;
     }
     
-    // For padrao which might contain "(S)", "Contín.", etc.
     const foundKey = Object.keys(legendData).find(key => text.includes(key));
     if (foundKey) {
       setSelectedAbbr({ key: foundKey, description: legendData[foundKey] });
@@ -352,169 +413,90 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
 
   const selectedModel = models.find(m => m.id === selectedModelId);
 
-  // Reusable modal for abbreviations
-  const abbrModal = (
-    <AnimatePresence>
-      {selectedAbbr && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white backdrop-blur-sm"
-          onClick={() => setSelectedAbbr(null)}
-        >
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
-            className="bg-white border border-gray-300 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-mono font-bold text-red-600">
-                {selectedAbbr.key}
-              </h3>
-              <button
-                onClick={() => setSelectedAbbr(null)}
-                className="p-2 text-gray-600 hover:text-gray-900 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <p className="text-gray-700 text-base leading-relaxed">
-              {selectedAbbr.description}
-            </p>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+  const handleValueChange = (rowKey: string, value: string, padrao: string) => {
+    const autoStatus = evaluateStatus(padrao, value);
+    setFindings(prev => {
+      if (!value.trim()) {
+        return {
+          ...prev,
+          [rowKey]: { ...prev[rowKey], value, status: 'pending' }
+        };
+      }
+      return {
+        ...prev,
+        [rowKey]: {
+          ...prev[rowKey],
+          value,
+          status: autoStatus !== 'pending' ? autoStatus : (prev[rowKey]?.status || 'pending')
+        }
+      };
+    });
+  };
 
-  // Reusable modal for tutorials
-  const tutorialModal = (
-    <AnimatePresence>
-      {selectedTutorial && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white backdrop-blur-sm"
-          onClick={() => setSelectedTutorial(null)}
-        >
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
-            className="bg-white border border-gray-300 rounded-2xl p-6 max-w-md w-full shadow-2xl flex flex-col max-h-[85vh]"
-          >
-            <div className="flex items-center justify-between mb-6 shrink-0">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <Info className="w-5 h-5 text-red-600" />
-                  Como testar - {selectedTutorial.title}
-                </h3>
-                <p className="text-xs text-red-600 font-mono mt-1">TESTE TIPO: {selectedTutorial.key}</p>
-              </div>
-              <button
-                onClick={() => setSelectedTutorial(null)}
-                className="p-2 text-gray-600 hover:text-gray-900 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors self-start"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <div className="overflow-y-auto pr-2 space-y-4">
-              {selectedTutorial.steps.map((step, idx) => {
-                const isHeader = step.startsWith("COM ") || step.startsWith("TESTE ") || step.startsWith("DIAGNÓSTICO");
-                const isSpacing = step === "";
-                
-                if (isSpacing) return <div key={idx} className="h-2" />;
-                
-                if (isHeader) {
-                  return (
-                    <div key={idx} className="mt-4 mb-1 border-b border-gray-200 pb-1">
-                      <p className="font-bold text-red-600 text-xs tracking-wider">{step}</p>
-                    </div>
-                  );
-                }
+  const handleStatusChange = (rowKey: string, status: 'ok' | 'nok') => {
+    setFindings(prev => ({
+      ...prev,
+      [rowKey]: {
+        ...prev[rowKey],
+        value: prev[rowKey]?.value || '',
+        status
+      }
+    }));
+  };
 
-                let content = step;
-                let numberStr = (idx + 1).toString();
-                const match = step.match(/^(\d+)\.\s+(.*)/);
-                let isWaveform = false;
-
-                if (match) {
-                  numberStr = match[1];
-                  content = match[2];
-                }
-
-                if (content.startsWith("PADRÃO DA ONDA:")) {
-                  numberStr = "";
-                  isWaveform = true;
-                  content = content.replace("PADRÃO DA ONDA:", "").trim();
-                }
-
-                return (
-                  <div key={idx} className={`flex gap-3 ${isWaveform ? 'flex-col bg-white p-3 rounded-lg border border-gray-200 mt-4' : ''}`}>
-                    <div className="flex gap-3">
-                      {numberStr && (
-                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-600/10 border border-red-600/20 flex items-center justify-center text-red-600 text-xs font-bold font-mono mt-0.5">
-                          {numberStr}
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        {isWaveform && (
-                          <p className="text-red-600 text-xs font-bold mb-1 flex items-center gap-1.5">
-                            <Activity className="w-3.5 h-3.5" />
-                            PADRÃO DA ONDA
-                          </p>
-                        )}
-                        <p className="text-gray-700 text-sm leading-relaxed">
-                          {content}
-                        </p>
-                      </div>
-                    </div>
-                    {isWaveform && selectedTutorial.title.includes("BOBINA DE IGNIÇÃO") && (
-                      <div className="mt-4 pt-4 border-t border-gray-200/80">
-                        <OscilloscopeDisplay component={pvIgnitionComponent} />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+  const clearForm = () => {
+    if (confirm("Deseja realmente limpar todos os dados preenchidos?")) {
+      setFindings({});
+    }
+  };
 
   if (selectedModel) {
     return (
       <div className="min-h-screen bg-transparent text-gray-900 flex flex-col">
-        <header className="px-6 pt-12 pb-5 border-b border-gray-200/80">
-          <div className="flex items-center gap-4 max-w-4xl mx-auto w-full">
-            <button
-              onClick={() => setSelectedModelId(null)}
-              className="p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200/60 shadow-sm text-gray-700 hover:text-gray-900 transition-all active:scale-95"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900 tracking-tight line-clamp-1">
-                {selectedModel.name}
-              </h1>
-              <p className="text-[10px] uppercase tracking-widest text-red-600 font-bold mt-0.5">Especificações Técnicas</p>
+        <header className="px-6 pt-12 pb-5 border-b border-gray-200/80 sticky top-0 bg-gray-50/80 backdrop-blur-xl z-30">
+          <div className="flex items-center justify-between max-w-5xl mx-auto w-full gap-4">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setSelectedModelId(null)}
+                className="p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200/60 shadow-sm text-gray-700 hover:text-gray-900 transition-all active:scale-95"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900 tracking-tight line-clamp-1">
+                  Relatório Técnico: {selectedModel.name}
+                </h1>
+                <p className="text-[10px] uppercase tracking-widest text-emerald-500 font-bold mt-0.5">Diagnóstico em Andamento</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <button
+                onClick={clearForm}
+                className="px-4 py-2 text-xs font-bold text-gray-600 hover:text-white bg-white border border-gray-300 rounded-lg transition-colors"
+              >
+                Limpar
+              </button>
             </div>
           </div>
         </header>
 
         <main key={selectedModel.id} className="flex-1 p-4 md:p-6 overflow-y-auto">
-          <div className="max-w-4xl mx-auto space-y-10 pb-12">
+          <div className="max-w-5xl mx-auto space-y-10 pb-12">
+            
+            <div className="bg-emerald-600/10 border border-emerald-600/20 p-5 rounded-2xl flex items-start gap-4">
+              <FileText className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-sm font-bold text-emerald-600 uppercase tracking-widest mb-1">Instruções do Relatório</h3>
+                <p className="text-sm text-emerald-900/80 font-medium">
+                  Meça os componentes listados abaixo na motocicleta. Compare o valor encontrado com o Padrão do Manual. Digite o valor real medido no campo "Valor Encontrado" e marque se a peça foi Aprovada (OK) ou Condenada (FALHA).
+                </p>
+              </div>
+            </div>
+
             {selectedModel.tables.map((table, tIdx) => (
               <div key={tIdx} className="space-y-4">
-                <h3 className="text-sm font-bold text-red-600 flex items-center justify-between uppercase tracking-widest border-b border-gray-200/80 pb-2">
+                <h3 className="text-sm font-bold text-gray-700 flex items-center justify-between uppercase tracking-widest border-b border-gray-200/80 pb-2">
                   <span>{table.name}</span>
                   {table.notes && (
                     <span className="text-[10px] font-bold text-amber-700 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20">
@@ -522,92 +504,269 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
                     </span>
                   )}
                 </h3>
-                <div className="overflow-x-auto rounded-[1.5rem] border border-gray-200/60 shadow-sm bg-white backdrop-blur-sm shadow-xl">
-                  <table className="w-full text-xs sm:text-sm text-left">
-                    <thead className="bg-white text-gray-600">
-                      <tr>
-                        <th className="px-4 py-4 font-semibold uppercase tracking-wider text-[11px]">Padrão</th>
-                        <th className="px-4 py-4 font-semibold uppercase tracking-wider text-[11px]">Localização</th>
-                        <th className="px-4 py-4 font-semibold uppercase tracking-wider text-[11px] text-center">Tipo</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                      {table.rows.map((row, rIdx) => {
-                        // Replace hyphen with newline ' a ' newline for numeric ranges to avoid confusion with minus sign and stack them
-                        const formattedPadrao = (row.padrao || "")
-                          .replace(/(\d+(?:,\d+)?)\s*-\s*(\d+(?:,\d+)?)/g, "$1\n a \n$2")
-                          .replace(/(\d+(?:,\d+)?)\s*±\s*(\d+(?:,\d+)?)/g, (match, p1, p2) => {
-                            const base = parseFloat(p1.replace(',', '.'));
-                            const tol = parseFloat(p2.replace(',', '.'));
-                            const dec = Math.max(p1.includes(',') ? p1.split(',')[1].length : 0, p2.includes(',') ? p2.split(',')[1].length : 0);
-                            const min = (base - tol).toFixed(dec).replace('.', ',');
-                            const max = (base + tol).toFixed(dec).replace('.', ',');
-                            return `Entre ${min} e ${max}\n(Ideal: ${p1})`;
-                          });
-                        
-                        // Highlight recognizable abbreviations in row.padrao
-                        let padraoDisplay: React.ReactNode = formattedPadrao;
-                        const matchKey = Object.keys(legendData).find(k => formattedPadrao.includes(k));
-                        if (matchKey) {
-                          const parts = formattedPadrao.split(matchKey);
-                          padraoDisplay = (
-                            <>
-                              {parts[0]}
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); handleAbbrClick(matchKey); }}
-                                className="text-red-600 underline decoration-red-600/50 underline-offset-2 active:text-cyan-700 inline-block"
-                              >
-                                {matchKey}
-                              </button>
-                              {parts[1]}
-                            </>
-                          );
-                        }
-
-                        const formattedLocalizacao = (row.localizacao || "").replace(/\s+\+/g, '\u00A0+').replace(/\s+\-/g, '\u00A0-');
-
-                        return (
-                        <tr key={rIdx} className="hover:bg-gray-100 transition-colors">
-                          <td className="px-4 py-4 text-gray-900 font-mono text-[11px] sm:text-xs whitespace-pre-line text-center sm:text-left">
-                            {padraoDisplay}
-                          </td>
-                          <td className="px-4 py-4 text-gray-700 text-[11px] sm:text-xs">{formattedLocalizacao}</td>
-                          <td className="px-4 py-4 text-center">
-                            <div className="flex flex-col items-center gap-2">
-                              <button 
-                                onClick={() => handleAbbrClick(row.tipo)}
-                                className="inline-block px-2 py-1 bg-red-600/10 hover:bg-red-600/20 border border-red-600/20 active:scale-95 rounded text-red-600 font-mono font-bold text-[10px] transition-all cursor-pointer"
-                              >
-                                {row.tipo}
-                              </button>
-                              {getTutorialSteps(row.tipo, row.localizacao).length > 0 && (
-                                <button
-                                  onClick={() => setSelectedTutorial({ key: row.tipo, title: row.localizacao, steps: getTutorialSteps(row.tipo, row.localizacao) })}
-                                  className="w-full max-w-[80px] flex items-center justify-center gap-1.5 px-2 py-1.5 bg-red-600/10 hover:bg-red-600/20 text-red-600 rounded-md text-[10px] font-bold transition-colors border border-red-600/20"
-                                >
-                                  <Info className="w-3 h-3" />
-                                  Testar
-                                </button>
-                              )}
+                
+                <div className="grid grid-cols-1 gap-3">
+                  {table.rows.map((row, rIdx) => {
+                    const rowKey = `${tIdx}-${rIdx}`;
+                    const currentStatus = findings[rowKey]?.status || 'pending';
+                    const currentValue = findings[rowKey]?.value || '';
+                    
+                    let placeholderText = "Ex: valor medido...";
+                    if (row.tipo === "PR") placeholderText = "Ex: 1400 kPa / 3.0 bar";
+                    else if (row.tipo === "MM") placeholderText = "Ex: 0,10 mm";
+                    else if (row.tipo === "AL") placeholderText = "Ex: 30V~";
+                    else if (row.tipo === "RS") placeholderText = "Ex: 150 Ω / 2.3 kΩ";
+                    else if (row.tipo === "PV") placeholderText = "Ex: 150V / 2.5V";
+                    else if (row.tipo === "SN") placeholderText = "Ex: 0.5V / 4.5V";
+                    else if (row.tipo === "VZ") placeholderText = "Ex: 100 ml";
+                    else if (row.tipo === "PR/VZ") placeholderText = "Ex: 3.0 bar / 35 ml";
+                    
+                    const formattedPadrao = (row.padrao || "")
+                      .replace(/(\d+(?:,\d+)?)\s*-\s*(\d+(?:,\d+)?)/g, "$1\n a \n$2")
+                      .replace(/(\d+(?:,\d+)?)\s*±\s*(\d+(?:,\d+)?)/g, (match, p1, p2) => {
+                        const base = parseFloat(p1.replace(',', '.'));
+                        const tol = parseFloat(p2.replace(',', '.'));
+                        const dec = Math.max(p1.includes(',') ? p1.split(',')[1].length : 0, p2.includes(',') ? p2.split(',')[1].length : 0);
+                        const min = (base - tol).toFixed(dec).replace('.', ',');
+                        const max = (base + tol).toFixed(dec).replace('.', ',');
+                        return `Entre ${min} e ${max}\n(Ideal: ${p1})`;
+                      });
+                    
+                    let padraoDisplay: React.ReactNode = formattedPadrao;
+                    const matchKey = Object.keys(legendData).find(k => formattedPadrao.includes(k));
+                    if (matchKey) {
+                      const parts = formattedPadrao.split(matchKey);
+                      padraoDisplay = (
+                        <>
+                          {parts[0]}
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleAbbrClick(matchKey); }}
+                            className="text-red-600 underline decoration-red-600/50 underline-offset-2 active:text-cyan-700 inline-block"
+                          >
+                            {matchKey}
+                          </button>
+                          {parts[1]}
+                        </>
+                      );
+                    }
+                    
+                    return (
+                      <div key={rowKey} className="flex flex-col sm:flex-row gap-4 p-4 sm:p-5 bg-white border border-gray-200/60 shadow-sm rounded-2xl transition-all hover:bg-white hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg">
+                        {/* Info Section */}
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-start justify-between">
+                            <h4 className="font-semibold text-gray-900 text-sm leading-snug">
+                              {row.localizacao}
+                            </h4>
+                            <button 
+                              onClick={() => handleAbbrClick(row.tipo)}
+                              className="inline-block px-2 py-0.5 bg-gray-200 hover:bg-gray-200 border border-gray-400 rounded text-gray-600 font-mono font-bold text-[10px] transition-colors active:scale-95"
+                            >
+                              {row.tipo}
+                            </button>
+                          </div>
+                          
+                          <div className="bg-gray-50/50 rounded-lg p-3 border border-black/20">
+                            <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold block mb-1">Padrão de Fábrica</span>
+                            <div className="font-mono text-red-600 text-xs sm:text-sm whitespace-pre-line">
+                              {padraoDisplay}
                             </div>
-                          </td>
-                        </tr>
-                      )})}
-                    </tbody>
-                  </table>
+                          </div>
+
+                          {getTutorialSteps(row.tipo, row.localizacao).length > 0 && (
+                            <button
+                              onClick={() => setSelectedTutorial({ key: row.tipo, title: row.localizacao, steps: getTutorialSteps(row.tipo, row.localizacao) })}
+                              className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-600/10 hover:bg-red-600/20 text-red-600 rounded-lg text-xs font-bold transition-colors border border-red-600/20"
+                            >
+                              <Info className="w-3.5 h-3.5" />
+                              Como testar
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Input Section */}
+                        <div className="w-full sm:w-64 flex flex-col justify-between gap-3 shrink-0">
+                          <div>
+                            <label className="text-[10px] uppercase tracking-widest text-gray-500 font-bold block mb-1">
+                              Valor Encontrado
+                            </label>
+                            <input
+                              type="text"
+                              value={currentValue}
+                              onChange={(e) => handleValueChange(rowKey, e.target.value, row.padrao)}
+                              placeholder={placeholderText}
+                              className="w-full bg-gray-50/80 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-all placeholder:text-gray-500 font-mono"
+                            />
+                          </div>
+
+                          <div className="flex items-center gap-2 mt-auto">
+                            <button
+                              onClick={() => handleStatusChange(rowKey, 'ok')}
+                              className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
+                                currentStatus === 'ok' 
+                                  ? 'bg-emerald-500/20 text-emerald-600 border-emerald-500/50' 
+                                  : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-200'
+                              }`}
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              OK
+                            </button>
+                            <button
+                              onClick={() => handleStatusChange(rowKey, 'nok')}
+                              className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
+                                currentStatus === 'nok' 
+                                  ? 'bg-red-500/20 text-red-600 border-red-500/50' 
+                                  : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-200'
+                              }`}
+                            >
+                              <AlertCircle className="w-3.5 h-3.5" />
+                              FALHA
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
           </div>
         </main>
-        
-        {abbrModal}
-        {tutorialModal}
+        <AnimatePresence>
+          {selectedAbbr && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white backdrop-blur-sm"
+              onClick={() => setSelectedAbbr(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white border border-gray-300 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-mono font-bold text-red-600">
+                    {selectedAbbr.key}
+                  </h3>
+                  <button
+                    onClick={() => setSelectedAbbr(null)}
+                    className="p-2 text-gray-600 hover:text-gray-900 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <p className="text-gray-700 text-base leading-relaxed">
+                  {selectedAbbr.description}
+                </p>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {selectedTutorial && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white backdrop-blur-sm"
+              onClick={() => setSelectedTutorial(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white border border-gray-300 rounded-2xl p-6 max-w-md w-full shadow-2xl flex flex-col max-h-[85vh]"
+              >
+                <div className="flex items-center justify-between mb-6 shrink-0">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                      <Info className="w-5 h-5 text-red-600" />
+                      Como testar - {selectedTutorial.title}
+                    </h3>
+                    <p className="text-xs text-red-600 font-mono mt-1">TESTE TIPO: {selectedTutorial.key}</p>
+                  </div>
+                  <button
+                    onClick={() => setSelectedTutorial(null)}
+                    className="p-2 text-gray-600 hover:text-gray-900 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors self-start"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <div className="overflow-y-auto pr-2 space-y-4">
+                  {selectedTutorial.steps.map((step, idx) => {
+                    const isHeader = step.startsWith("COM ") || step.startsWith("TESTE ") || step.startsWith("DIAGNÓSTICO");
+                    const isSpacing = step === "";
+                    
+                    if (isSpacing) return <div key={idx} className="h-2" />;
+                    
+                    if (isHeader) {
+                      return (
+                        <div key={idx} className="mt-4 mb-1 border-b border-gray-200 pb-1">
+                          <p className="font-bold text-red-600 text-xs tracking-wider">{step}</p>
+                        </div>
+                      );
+                    }
+
+                    let content = step;
+                    let numberStr = (idx + 1).toString();
+                    const match = step.match(/^(\d+)\.\s+(.*)/);
+                    let isWaveform = false;
+
+                    if (match) {
+                      numberStr = match[1];
+                      content = match[2];
+                    }
+
+                    if (content.startsWith("PADRÃO DA ONDA:")) {
+                      numberStr = "";
+                      isWaveform = true;
+                      content = content.replace("PADRÃO DA ONDA:", "").trim();
+                    }
+
+                    return (
+                      <div key={idx} className={`flex gap-3 ${isWaveform ? 'flex-col bg-white p-3 rounded-lg border border-gray-200 mt-4' : ''}`}>
+                        <div className="flex gap-3">
+                          {numberStr && (
+                            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-600/10 border border-red-600/20 flex items-center justify-center text-red-600 text-xs font-bold font-mono mt-0.5">
+                              {numberStr}
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            {isWaveform && (
+                              <p className="text-red-600 text-xs font-bold mb-1 flex items-center gap-1.5">
+                                <Activity className="w-3.5 h-3.5" />
+                                PADRÃO DA ONDA
+                              </p>
+                            )}
+                            <p className="text-gray-700 text-sm leading-relaxed">
+                              {content}
+                            </p>
+                          </div>
+                        </div>
+                        {isWaveform && selectedTutorial.title.includes("BOBINA DE IGNIÇÃO") && (
+                          <div className="mt-4 pt-4 border-t border-gray-200/80">
+                            <OscilloscopeDisplay component={pvIgnitionComponent} />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   }
 
-  // If no model is selected, show the list of models + legend
+  // List of models
   return (
     <div className="min-h-screen bg-transparent text-gray-900 flex flex-col">
       <header className="px-6 pt-12 pb-5 border-b border-gray-200/80">
@@ -620,9 +779,9 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
           </button>
           <div>
             <h1 className="text-xl font-bold text-gray-900 tracking-tight">
-              Parâmetros: <span className="text-red-600">{brand}</span>
+              Ficha de Diagnóstico: <span className="text-emerald-600">{brand}</span>
             </h1>
-            <p className="text-[10px] uppercase tracking-widest text-gray-600 font-bold mt-0.5">Selecione o Modelo</p>
+            <p className="text-[10px] uppercase tracking-widest text-gray-600 font-bold mt-0.5">Selecione a Motocicleta</p>
           </div>
         </div>
       </header>
@@ -630,25 +789,6 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
       <main key="list" className="flex-1 p-4 md:p-6 overflow-y-auto">
         <div className="max-w-4xl mx-auto space-y-8 pb-12">
           
-          {/* Legendas e Abreviações */}
-          <div className="bg-red-600/5 border border-red-600/20 rounded-3xl p-6 md:p-8 backdrop-blur-sm">
-            <h2 className="text-sm font-bold text-red-600 mb-4 flex items-center gap-2 uppercase tracking-widest">
-              <Info className="w-4 h-4" />
-              Legenda de Siglas e Abreviações
-            </h2>
-            <p className="text-sm text-red-600/60 mb-6">
-              Toque em qualquer sigla na tabela para ver o seu significado, ou consulte a lista abaixo:
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
-              {Object.entries(legendData).map(([key, desc]) => (
-                <div key={key} className="flex items-start gap-3 text-sm">
-                  <span className="font-mono font-bold text-red-600 bg-red-600/10 px-1.5 py-0.5 rounded border border-red-600/20 text-[11px] mt-0.5">{key}</span>
-                  <span className="text-gray-700/80 leading-snug">{desc}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
           <div className="space-y-4">
             <h2 className="text-sm font-bold text-gray-600 uppercase tracking-widest px-2">Modelos Disponíveis</h2>
             {models.length === 0 ? (
@@ -661,11 +801,11 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
                   <button
                     key={model.id}
                     onClick={() => setSelectedModelId(model.id)}
-                    className="group w-full flex items-center justify-between p-5 bg-white border border-gray-200/60 shadow-sm rounded-2xl text-left hover:bg-gray-200/60 hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg transition-all shadow-sm active:scale-[0.98]"
+                    className="group w-full flex items-center justify-between p-5 bg-white border border-gray-200/60 shadow-sm rounded-2xl text-left hover:bg-gray-200/60 hover:border-emerald-500/30 transition-all shadow-sm active:scale-[0.98]"
                   >
-                    <span className="text-base font-semibold text-gray-900 group-hover:text-red-600 transition-colors">{model.name}</span>
-                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-red-600/10 transition-colors">
-                      <ChevronDown className="w-4 h-4 text-gray-600 group-hover:text-red-600 -rotate-90 transition-colors" />
+                    <span className="text-base font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors">{model.name}</span>
+                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-emerald-600/10 transition-colors">
+                      <ChevronDown className="w-4 h-4 text-gray-600 group-hover:text-emerald-600 -rotate-90 transition-colors" />
                     </div>
                   </button>
                 ))}
@@ -674,9 +814,6 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
           </div>
         </div>
       </main>
-      
-      {abbrModal}
-      {tutorialModal}
     </div>
   );
 }

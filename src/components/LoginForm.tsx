@@ -46,40 +46,40 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-[360px] bg-zinc-900/40 border border-white/5 rounded-[2rem] p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden"
+        className="w-full max-w-[360px] bg-white border border-gray-200/60 shadow-sm rounded-[2rem] p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-[3rem] -z-10" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-[3rem] -z-10" />
+        <div className="absolute top-0 right-0 w-48 h-48 bg-red-600/10 rounded-full blur-[3rem] -z-10" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-red-600/10 rounded-full blur-[3rem] -z-10" />
 
         <div className="flex justify-center mb-8">
-          <div className="bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 p-4 rounded-2xl border border-cyan-500/20 shadow-inner">
-            <Activity className="w-10 h-10 text-cyan-400" />
+          <div className="bg-gradient-to-br from-red-600/20 to-red-600/5 p-4 rounded-2xl border border-red-600/20 shadow-inner">
+            <Activity className="w-10 h-10 text-red-600" />
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-center text-white mb-2 tracking-tight">
+        <h1 className="text-2xl font-bold text-center text-gray-900 mb-2 font-bold tracking-tight">
           MotoScope Pro
         </h1>
-        <p className="text-zinc-400 text-center text-xs uppercase tracking-widest font-bold mb-10">
+        <p className="text-gray-600 text-center text-xs uppercase tracking-widest font-bold mb-10">
           Acesso ao Sistema
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs uppercase tracking-widest font-bold text-zinc-500 mb-2 pl-1">
+            <label className="block text-xs uppercase tracking-widest font-bold text-gray-600 mb-2 pl-1">
               Usuário
             </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-base text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 transition-all shadow-inner"
+              className="w-full bg-white border border-black/10 rounded-2xl px-5 py-4 text-base text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all shadow-inner"
               placeholder="Digite seu usuário"
               required
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-widest font-bold text-zinc-500 mb-2 pl-1">
+            <label className="block text-xs uppercase tracking-widest font-bold text-gray-600 mb-2 pl-1">
               Senha
             </label>
             <div className="relative">
@@ -87,14 +87,14 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-2xl pl-5 pr-12 py-4 text-base text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 transition-all shadow-inner"
+                className="w-full bg-white border border-black/10 rounded-2xl pl-5 pr-12 py-4 text-base text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all shadow-inner"
                 placeholder="••••••••"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-zinc-500 hover:text-zinc-300 focus:outline-none transition-colors"
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-600 hover:text-gray-700 focus:outline-none transition-colors"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -107,9 +107,9 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
               id="remember"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="w-5 h-5 rounded border-white/10 bg-black/40 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-0"
+              className="w-5 h-5 rounded border-black/10 bg-white text-red-600 focus:ring-red-600 focus:ring-offset-0"
             />
-            <label htmlFor="remember" className="ml-3 text-sm font-medium text-zinc-400">
+            <label htmlFor="remember" className="ml-3 text-sm font-medium text-gray-600">
               Manter conectado
             </label>
           </div>
@@ -117,7 +117,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           {error && (
             <motion.p 
               initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
-              className="text-red-400 text-sm text-center font-bold bg-red-500/10 py-3 rounded-xl border border-red-500/20"
+              className="text-red-600 text-sm text-center font-bold bg-red-500/10 py-3 rounded-xl border border-red-500/20"
             >
               Credenciais inválidas.
             </motion.p>
@@ -126,21 +126,21 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           <button
             type="submit"
             disabled={isLoggingIn}
-            className="w-full bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:hover:bg-cyan-500 text-black text-base font-bold py-4 px-4 rounded-2xl transition-all mt-4 shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] active:scale-[0.98] flex items-center justify-center gap-2"
+            className="w-full bg-red-600 hover:bg-red-500 disabled:opacity-50 disabled:hover:bg-red-600 text-white text-base font-bold py-4 px-4 rounded-2xl transition-all mt-4 shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(220,38,38,0.5)] active:scale-[0.98] flex items-center justify-center gap-2"
           >
             {isLoggingIn ? "Autenticando..." : "Entrar"}
           </button>
         </form>
       </motion.div>
       <div className="mt-10 text-center px-4 max-w-[360px] opacity-60 hover:opacity-100 transition-opacity">
-        <p className="text-zinc-500 text-xs leading-relaxed font-mono">
-          Desenvolvido por <span className="font-bold text-zinc-300">Mafran junior</span>
+        <p className="text-gray-600 text-xs leading-relaxed font-mono">
+          Desenvolvido por <span className="font-bold text-gray-700">Mafran junior</span>
           <br />
           31 9 8613-8576
           <br />
           Mecânico e programador low-code
           <br />
-          <span className="text-cyan-500/80 mt-2 block font-bold tracking-wider uppercase text-[10px]">
+          <span className="text-red-600/80 mt-2 block font-bold tracking-wider uppercase text-[10px]">
             Crie o seu app conosco
           </span>
         </p>

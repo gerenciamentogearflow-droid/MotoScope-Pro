@@ -14,7 +14,8 @@ import {
   Share2,
   ArrowLeft,
   Eye,
-  EyeOff
+  EyeOff,
+  ClipboardList
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { RealSignalsList } from "./RealSignalsList";
@@ -23,6 +24,7 @@ import { BrandLogo } from "./BrandLogo";
 
 import { DiagnosticParametersView } from "./DiagnosticParametersView";
 import { PinoutsView } from "./PinoutsView";
+import { DiagnosticWorksheetView } from "./DiagnosticWorksheetView";
 import { shinerayModels } from "../data/shinerayModels";
 import { hondaParameters } from "../data/hondaParameters";
 import { yamahaParameters } from "../data/yamahaParameters";
@@ -42,7 +44,7 @@ export function Dashboard({
   onAdminClick,
   onLogout,
 }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState<"home" | "oscilloscope_menu" | "didactic" | "real_signals" | "multimeter" | "parameters" | "pinouts">(
+  const [activeTab, setActiveTab] = useState<"home" | "oscilloscope_menu" | "didactic" | "real_signals" | "multimeter" | "parameters" | "pinouts" | "diagnostic_worksheet">(
     "home",
   );
   const [selectedRealSignalComponent, setSelectedRealSignalComponent] =
@@ -50,6 +52,8 @@ export function Dashboard({
   const [selectedMultimeterComponent, setSelectedMultimeterComponent] =
     useState<ComponentData | null>(null);
   const [selectedBrandParameters, setSelectedBrandParameters] =
+    useState<string | null>(null);
+  const [selectedBrandWorksheet, setSelectedBrandWorksheet] =
     useState<string | null>(null);
   const [selectedPinoutComponent, setSelectedPinoutComponent] =
     useState<ComponentData | null>(null);
@@ -133,38 +137,47 @@ export function Dashboard({
     return <DiagnosticParametersView brand={selectedBrandParameters} models={models} onBack={() => setSelectedBrandParameters(null)} />;
   }
 
+  if (selectedBrandWorksheet) {
+    let models: DiagnosticModel[] = [];
+    if (selectedBrandWorksheet === "Shineray") models = shinerayModels;
+    else if (selectedBrandWorksheet === "Honda") models = hondaParameters;
+    else if (selectedBrandWorksheet === "Yamaha") models = yamahaParameters;
+    
+    return <DiagnosticWorksheetView brand={selectedBrandWorksheet} models={models} onBack={() => setSelectedBrandWorksheet(null)} />;
+  }
+
   if (selectedBrandPinouts) {
     return <PinoutsView brand={selectedBrandPinouts} onBack={() => setSelectedBrandPinouts(null)} />;
   }
 
   if (selectedPinoutComponent) {
     return (
-      <div className="min-h-screen bg-transparent text-zinc-100 p-6 flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-transparent text-gray-900 p-6 flex flex-col items-center justify-center">
         <h2 className="text-2xl font-bold mb-4">Pinagens: {selectedPinoutComponent.name}</h2>
-        <p className="text-zinc-400 mb-8">Esta área está em desenvolvimento.</p>
-        <button onClick={() => setSelectedPinoutComponent(null)} className="px-6 py-3 bg-rose-600 rounded-xl font-bold">Voltar</button>
+        <p className="text-gray-600 mb-8">Esta área está em desenvolvimento.</p>
+        <button onClick={() => setSelectedPinoutComponent(null)} className="px-6 py-3 bg-rose-600 text-white font-bold">Voltar</button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-zinc-100 flex flex-col">
-      <header className="px-6 pt-12 pb-5 border-b border-white/5">
+    <div className="min-h-screen bg-transparent text-gray-900 flex flex-col">
+      <header className="px-6 pt-12 pb-5 border-b border-gray-200/80">
         <div className="flex justify-between items-center max-w-5xl mx-auto w-full">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-tr from-cyan-500 to-blue-500 rounded-xl shadow-lg shadow-cyan-500/20">
+            <div className="p-2 bg-gradient-to-tr from-red-600 to-red-500 rounded-xl shadow-lg shadow-red-600/20">
               <Activity className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-white">MotoScope Pro</h1>
-              <p className="text-xs text-zinc-500 font-medium">Diagnostic System</p>
+              <h1 className="text-xl font-bold tracking-tight text-gray-900">MotoScope Pro</h1>
+              <p className="text-xs text-gray-600 font-medium">Diagnostic System</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {user.role === "admin" && (
               <button
                 onClick={onAdminClick}
-                className="p-2.5 rounded-full hover:bg-white/5 text-zinc-400 hover:text-white transition-colors"
+                className="p-2.5 rounded-full hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition-colors"
                 title="Painel Admin"
               >
                 <Settings className="w-5 h-5" />
@@ -172,7 +185,7 @@ export function Dashboard({
             )}
             <button
               onClick={onLogout}
-              className="p-2.5 rounded-full hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-colors"
+              className="p-2.5 rounded-full hover:bg-red-500/10 text-gray-600 hover:text-red-600 transition-colors"
             >
               <LogOut className="w-5 h-5" />
             </button>
@@ -191,21 +204,37 @@ export function Dashboard({
               className="pb-12 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
             >
               <div className="col-span-full mb-4">
-                <h2 className="text-3xl font-bold text-white tracking-tight">Bem-vindo, {user.username}</h2>
-                <p className="text-zinc-400 mt-1">Selecione um módulo para iniciar o diagnóstico.</p>
+                <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Bem-vindo, {user.username}</h2>
+                <p className="text-gray-600 mt-1">Selecione um módulo para iniciar o diagnóstico.</p>
               </div>
 
               <button
-                onClick={() => setActiveTab("oscilloscope_menu")}
-                className="group flex flex-col items-start gap-4 bg-zinc-900/50 hover:bg-zinc-800/80 border border-white/5 hover:border-white/10 p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden md:col-span-2"
+                onClick={() => setActiveTab("diagnostic_worksheet")}
+                className="group flex flex-col items-start gap-4 bg-white hover:bg-gray-50 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden col-span-full"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="p-3.5 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 group-hover:scale-110 transition-transform">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="p-3.5 rounded-2xl bg-emerald-600/10 text-emerald-600 border border-emerald-600/20 group-hover:scale-110 transition-transform">
+                  <ClipboardList className="w-8 h-8" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2 font-bold">Ficha de Diagnóstico Inteligente</h2>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Acesse a tabela de parâmetros, preencha os valores encontrados na motocicleta e gere relatórios técnicos.
+                  </p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setActiveTab("oscilloscope_menu")}
+                className="group flex flex-col items-start gap-4 bg-white hover:bg-gray-50 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden md:col-span-2"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="p-3.5 rounded-2xl bg-red-600/10 text-red-600 border border-red-600/20 group-hover:scale-110 transition-transform">
                   <Activity className="w-8 h-8" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-white mb-2">Osciloscópio</h2>
-                  <p className="text-zinc-400 text-sm leading-relaxed">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2 font-bold">Osciloscópio</h2>
+                  <p className="text-gray-600 text-sm leading-relaxed">
                     Aprenda sobre ondas, teoria e veja banco de sinais reais.
                   </p>
                 </div>
@@ -213,15 +242,15 @@ export function Dashboard({
 
               <button
                 onClick={() => setActiveTab("multimeter")}
-                className="group flex flex-col items-start gap-4 bg-zinc-900/50 hover:bg-zinc-800/80 border border-white/5 hover:border-white/10 p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
+                className="group flex flex-col items-start gap-4 bg-white hover:bg-gray-50 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="p-3.5 rounded-2xl bg-orange-500/10 text-orange-400 border border-orange-500/20 group-hover:scale-110 transition-transform">
+                <div className="p-3.5 rounded-2xl bg-orange-600/10 text-orange-600 border border-orange-600/20 group-hover:scale-110 transition-transform">
                   <Zap className="w-8 h-8" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-white mb-2">Multímetro</h2>
-                  <p className="text-zinc-400 text-sm leading-relaxed">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2 font-bold">Multímetro</h2>
+                  <p className="text-gray-600 text-sm leading-relaxed">
                     Aprenda a testar componentes passo a passo com multímetro.
                   </p>
                 </div>
@@ -229,15 +258,15 @@ export function Dashboard({
 
               <button
                 onClick={() => setActiveTab("parameters")}
-                className="group flex flex-col items-start gap-4 bg-zinc-900/50 hover:bg-zinc-800/80 border border-white/5 hover:border-white/10 p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
+                className="group flex flex-col items-start gap-4 bg-white hover:bg-gray-50 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="p-3.5 rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/20 group-hover:scale-110 transition-transform">
+                <div className="p-3.5 rounded-2xl bg-purple-600/10 text-purple-600 border border-purple-600/20 group-hover:scale-110 transition-transform">
                   <SlidersHorizontal className="w-8 h-8" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-white mb-2">Parâmetros Base</h2>
-                  <p className="text-zinc-400 text-sm leading-relaxed">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2 font-bold">Parâmetros Base</h2>
+                  <p className="text-gray-600 text-sm leading-relaxed">
                     Consulte tabelas e parâmetros de referência dos sistemas.
                   </p>
                 </div>
@@ -245,15 +274,15 @@ export function Dashboard({
 
               <button
                 onClick={() => setActiveTab("pinouts")}
-                className="group flex flex-col items-start gap-4 bg-zinc-900/50 hover:bg-zinc-800/80 border border-white/5 hover:border-white/10 p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden md:col-span-2 lg:col-span-1"
+                className="group flex flex-col items-start gap-4 bg-white hover:bg-gray-50 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden md:col-span-2 lg:col-span-1"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="p-3.5 rounded-2xl bg-rose-500/10 text-rose-400 border border-rose-500/20 group-hover:scale-110 transition-transform">
+                <div className="p-3.5 rounded-2xl bg-rose-600/10 text-rose-600 border border-rose-600/20 group-hover:scale-110 transition-transform">
                   <Share2 className="w-8 h-8" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-white mb-2">Pinagens</h2>
-                  <p className="text-zinc-400 text-sm leading-relaxed">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2 font-bold">Pinagens</h2>
+                  <p className="text-gray-600 text-sm leading-relaxed">
                     Verifique diagramas de conectores e esquemas de fiação.
                   </p>
                 </div>
@@ -270,30 +299,30 @@ export function Dashboard({
               <div className="flex items-center gap-4 mb-8">
                 <button
                   onClick={() => setActiveTab("home")}
-                  className="bg-white/5 hover:bg-white/10 p-2.5 rounded-xl transition-colors active:scale-95 border border-white/5"
+                  className="bg-gray-50 hover:bg-gray-100 p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200/60 shadow-sm"
                 >
-                  <ArrowLeft className="w-5 h-5 text-zinc-300" />
+                  <ArrowLeft className="w-5 h-5 text-gray-700" />
                 </button>
                 <div>
-                  <h2 className="text-2xl font-bold text-white tracking-tight">
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
                     Osciloscópio
                   </h2>
-                  <p className="text-sm text-zinc-400">Teoria e prática com análise de sinais</p>
+                  <p className="text-sm text-gray-600">Teoria e prática com análise de sinais</p>
                 </div>
               </div>
 
               <div className="grid gap-6 sm:grid-cols-2">
                 <button
                   onClick={() => setActiveTab("didactic")}
-                  className="group flex flex-col items-start gap-4 bg-zinc-900/50 hover:bg-zinc-800/80 border border-white/5 hover:border-white/10 p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
+                  className="group flex flex-col items-start gap-4 bg-white hover:bg-gray-50 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="p-3.5 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 group-hover:scale-110 transition-transform">
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="p-3.5 rounded-2xl bg-red-600/10 text-red-600 border border-red-600/20 group-hover:scale-110 transition-transform">
                     <BookOpen className="w-8 h-8" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold text-white mb-2">Aprender sobre Ondas</h2>
-                    <p className="text-zinc-400 text-sm leading-relaxed">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-2 font-bold">Aprender sobre Ondas</h2>
+                    <p className="text-gray-600 text-sm leading-relaxed">
                       Aprenda teoria, identificação de defeitos e como analisar ondas.
                     </p>
                   </div>
@@ -301,15 +330,15 @@ export function Dashboard({
 
                 <button
                   onClick={() => setActiveTab("real_signals")}
-                  className="group flex flex-col items-start gap-4 bg-zinc-900/50 hover:bg-zinc-800/80 border border-white/5 hover:border-white/10 p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
+                  className="group flex flex-col items-start gap-4 bg-white hover:bg-gray-50 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="p-3.5 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="p-3.5 rounded-2xl bg-emerald-600/10 text-emerald-600 border border-emerald-600/20 group-hover:scale-110 transition-transform">
                     <Camera className="w-8 h-8" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold text-white mb-2">Sinais Reais</h2>
-                    <p className="text-zinc-400 text-sm leading-relaxed">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-2 font-bold">Sinais Reais</h2>
+                    <p className="text-gray-600 text-sm leading-relaxed">
                       Banco de dados da comunidade com fotos de testes em campo.
                     </p>
                   </div>
@@ -327,15 +356,15 @@ export function Dashboard({
               <div className="flex items-center gap-4 mb-8">
                 <button
                   onClick={() => setActiveTab("oscilloscope_menu")}
-                  className="bg-white/5 hover:bg-white/10 p-2.5 rounded-xl transition-colors active:scale-95 border border-white/5"
+                  className="bg-gray-50 hover:bg-gray-100 p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200/60 shadow-sm"
                 >
-                  <ArrowLeft className="w-5 h-5 text-zinc-300" />
+                  <ArrowLeft className="w-5 h-5 text-gray-700" />
                 </button>
                 <div>
-                  <h2 className="text-2xl font-bold text-white tracking-tight">
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
                     Aprender sobre Ondas
                   </h2>
-                  <p className="text-sm text-zinc-400">{filteredComponents.length} componentes encontrados</p>
+                  <p className="text-sm text-gray-600">{filteredComponents.length} componentes encontrados</p>
                 </div>
               </div>
 
@@ -347,22 +376,22 @@ export function Dashboard({
                     transition={{ delay: idx * 0.05 }}
                     key={comp.id}
                     onClick={() => handleComponentClick(comp, "didactic")}
-                    className="group text-left w-full bg-zinc-900/40 hover:bg-zinc-800/60 border border-white/5 hover:border-white/10 rounded-2xl p-5 transition-all flex items-start gap-5 active:scale-[0.98]"
+                    className="group text-left w-full bg-white hover:bg-gray-200/60 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-start gap-5 active:scale-[0.98]"
                   >
                     <div
-                      className={`p-3.5 rounded-2xl border transition-transform group-hover:scale-110 ${comp.type === "sensor" ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" : "bg-orange-500/10 text-orange-400 border-orange-500/20"}`}
+                      className={`p-3.5 rounded-2xl border transition-transform group-hover:scale-110 ${comp.type === "sensor" ? "bg-red-600/10 text-red-600 border-red-600/20" : "bg-orange-600/10 text-orange-600 border-orange-600/20"}`}
                     >
                       <Cpu className="w-6 h-6" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-lg text-white mb-1 group-hover:text-cyan-50 transition-colors">
+                      <h3 className="font-semibold text-lg text-gray-900 mb-1 group-hover:text-red-600 transition-colors">
                         {comp.name}
                       </h3>
-                      <p className="text-sm text-zinc-500 line-clamp-2 leading-relaxed mb-3">
+                      <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed mb-3">
                         {comp.shortDescription}
                       </p>
                       <span
-                        className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md border ${comp.type === "sensor" ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" : "bg-orange-500/10 text-orange-400 border-orange-500/20"}`}
+                        className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md border ${comp.type === "sensor" ? "bg-red-600/10 text-red-600 border-red-600/20" : "bg-orange-600/10 text-orange-600 border-orange-600/20"}`}
                       >
                         {comp.type === "sensor" ? "Sensor" : "Atuador"}
                       </span>
@@ -371,7 +400,7 @@ export function Dashboard({
                 ))}
 
                 {filteredComponents.length === 0 && (
-                  <div className="text-center py-12 text-zinc-500 text-lg">
+                  <div className="text-center py-12 text-gray-600 text-lg">
                     <p>Nenhum componente encontrado.</p>
                   </div>
                 )}
@@ -396,15 +425,15 @@ export function Dashboard({
                   <div className="flex items-center gap-4 mb-8">
                     <button
                       onClick={() => setActiveTab("oscilloscope_menu")}
-                      className="bg-white/5 hover:bg-white/10 p-2.5 rounded-xl transition-colors active:scale-95 border border-white/5"
+                      className="bg-gray-50 hover:bg-gray-100 p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200/60 shadow-sm"
                     >
-                      <ArrowLeft className="w-5 h-5 text-zinc-300" />
+                      <ArrowLeft className="w-5 h-5 text-gray-700" />
                     </button>
                     <div>
-                      <h2 className="text-2xl font-bold text-white tracking-tight">
+                      <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
                         Sinais Reais Osciloscópio
                       </h2>
-                      <p className="text-sm text-zinc-400">{filteredComponents.length} componentes encontrados</p>
+                      <p className="text-sm text-gray-600">{filteredComponents.length} componentes encontrados</p>
                     </div>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -415,20 +444,20 @@ export function Dashboard({
                         transition={{ delay: idx * 0.05 }}
                         key={comp.id}
                         onClick={() => handleComponentClick(comp, "real")}
-                        className="group text-left w-full bg-zinc-900/40 hover:bg-zinc-800/60 border border-white/5 hover:border-white/10 rounded-2xl p-5 transition-all flex items-center justify-between active:scale-[0.98]"
+                        className="group text-left w-full bg-white hover:bg-gray-200/60 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-center justify-between active:scale-[0.98]"
                       >
                         <div className="flex items-center gap-5">
                           <div
-                            className={`p-3.5 rounded-2xl border transition-transform group-hover:scale-110 ${comp.type === "sensor" ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" : "bg-orange-500/10 text-orange-400 border-orange-500/20"}`}
+                            className={`p-3.5 rounded-2xl border transition-transform group-hover:scale-110 ${comp.type === "sensor" ? "bg-red-600/10 text-red-600 border-red-600/20" : "bg-orange-600/10 text-orange-600 border-orange-600/20"}`}
                           >
                             <Camera className="w-6 h-6" />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-lg text-white mb-1 group-hover:text-cyan-50 transition-colors">
+                            <h3 className="font-semibold text-lg text-gray-900 mb-1 group-hover:text-red-600 transition-colors">
                               {comp.name}
                             </h3>
                             <span
-                              className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md border ${comp.type === "sensor" ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20" : "bg-orange-500/10 text-orange-400 border-orange-500/20"}`}
+                              className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md border ${comp.type === "sensor" ? "bg-red-600/10 text-red-600 border-red-600/20" : "bg-orange-600/10 text-orange-600 border-orange-600/20"}`}
                             >
                               {comp.type === "sensor" ? "Sensor" : "Atuador"}
                             </span>
@@ -437,7 +466,7 @@ export function Dashboard({
                       </motion.button>
                     ))}
                     {filteredComponents.length === 0 && (
-                      <div className="text-center py-12 text-zinc-500 text-lg">
+                      <div className="text-center py-12 text-gray-600 text-lg">
                         <p>Nenhum componente encontrado.</p>
                       </div>
                     )}
@@ -456,15 +485,15 @@ export function Dashboard({
               <div className="flex items-center gap-4 mb-8">
                 <button
                   onClick={() => setActiveTab("home")}
-                  className="bg-white/5 hover:bg-white/10 p-2.5 rounded-xl transition-colors active:scale-95 border border-white/5"
+                  className="bg-gray-50 hover:bg-gray-100 p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200/60 shadow-sm"
                 >
-                  <ArrowLeft className="w-5 h-5 text-zinc-300" />
+                  <ArrowLeft className="w-5 h-5 text-gray-700" />
                 </button>
                 <div>
-                  <h2 className="text-2xl font-bold text-white tracking-tight">
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
                     Multímetro
                   </h2>
-                  <p className="text-sm text-zinc-400">{filteredComponents.length} testes disponíveis</p>
+                  <p className="text-sm text-gray-600">{filteredComponents.length} testes disponíveis</p>
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -475,17 +504,17 @@ export function Dashboard({
                     transition={{ delay: idx * 0.05 }}
                     key={comp.id}
                     onClick={() => handleComponentClick(comp, "multimeter")}
-                    className="group text-left w-full bg-zinc-900/40 hover:bg-zinc-800/60 border border-white/5 hover:border-white/10 rounded-2xl p-5 transition-all flex items-center justify-between active:scale-[0.98]"
+                    className="group text-left w-full bg-white hover:bg-gray-200/60 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-center justify-between active:scale-[0.98]"
                   >
                     <div className="flex items-center gap-5">
-                      <div className="p-3.5 rounded-2xl border border-orange-500/20 bg-orange-500/10 text-orange-400 transition-transform group-hover:scale-110">
+                      <div className="p-3.5 rounded-2xl border border-orange-600/20 bg-orange-600/10 text-orange-600 transition-transform group-hover:scale-110">
                         <Zap className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-lg text-white group-hover:text-orange-50 transition-colors">
+                        <h3 className="font-semibold text-lg text-gray-900 group-hover:text-orange-600 transition-colors">
                           {comp.name}
                         </h3>
-                        <p className="text-sm text-zinc-500 mt-0.5">
+                        <p className="text-sm text-gray-600 mt-0.5">
                           Valores esperados e pinagem
                         </p>
                       </div>
@@ -493,10 +522,64 @@ export function Dashboard({
                   </motion.button>
                 ))}
                 {filteredComponents.length === 0 && (
-                  <div className="text-center py-12 text-zinc-500 text-lg">
+                  <div className="text-center py-12 text-gray-600 text-lg">
                     <p>Nenhum teste de multímetro encontrado.</p>
                   </div>
                 )}
+              </div>
+            </motion.div>
+          ) : activeTab === "diagnostic_worksheet" ? (
+            <motion.div
+              key="diagnostic_worksheet"
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              className="pb-8 h-full"
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <button
+                  onClick={() => setActiveTab("home")}
+                  className="bg-gray-50 hover:bg-gray-100 p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200/60 shadow-sm"
+                >
+                  <ArrowLeft className="w-5 h-5 text-gray-700" />
+                </button>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+                    Ficha de Diagnóstico
+                  </h2>
+                  <p className="text-sm text-gray-600">Selecione uma marca</p>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {["Honda", "Yamaha", "Shineray"]
+                  .filter((brand) => user.role === "admin" || !hiddenBrands.includes(brand))
+                  .map((brand, idx) => {
+                    const isHidden = hiddenBrands.includes(brand);
+                    return (
+                      <motion.button
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        key={brand}
+                        onClick={() => setSelectedBrandWorksheet(brand)}
+                        className={`group relative text-left w-full bg-white hover:bg-gray-200/60 border border-gray-200/60 shadow-sm hover:border-emerald-500/30 rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
+                      >
+                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-gray-50 p-1 border border-black/10 group-hover:scale-105 transition-transform">
+                          <BrandLogo brand={brand} className="w-full h-full object-contain" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg text-gray-900 group-hover:text-emerald-700 transition-colors">
+                            {brand}
+                          </h3>
+                          <p className="text-sm text-gray-600 mt-0.5">
+                            Ficha para {brand}
+                          </p>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+                  
+
               </div>
             </motion.div>
           ) : activeTab === "parameters" ? (
@@ -510,15 +593,15 @@ export function Dashboard({
               <div className="flex items-center gap-4 mb-8">
                 <button
                   onClick={() => setActiveTab("home")}
-                  className="bg-white/5 hover:bg-white/10 p-2.5 rounded-xl transition-colors active:scale-95 border border-white/5"
+                  className="bg-gray-50 hover:bg-gray-100 p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200/60 shadow-sm"
                 >
-                  <ArrowLeft className="w-5 h-5 text-zinc-300" />
+                  <ArrowLeft className="w-5 h-5 text-gray-700" />
                 </button>
                 <div>
-                  <h2 className="text-2xl font-bold text-white tracking-tight">
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
                     Parâmetros por Montadora
                   </h2>
-                  <p className="text-sm text-zinc-400">Selecione uma marca</p>
+                  <p className="text-sm text-gray-600">Selecione uma marca</p>
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -533,28 +616,28 @@ export function Dashboard({
                         transition={{ delay: idx * 0.05 }}
                         key={brand}
                         onClick={() => setSelectedBrandParameters(brand)}
-                        className={`group relative text-left w-full bg-zinc-900/40 hover:bg-zinc-800/60 border border-white/5 hover:border-white/10 rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
+                        className={`group relative text-left w-full bg-white hover:bg-gray-200/60 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
                       >
-                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-white/5 p-1 border border-white/10 group-hover:scale-105 transition-transform">
+                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-gray-50 p-1 border border-black/10 group-hover:scale-105 transition-transform">
                           <BrandLogo brand={brand} className="w-full h-full object-contain" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-lg text-white group-hover:text-purple-100 transition-colors">
+                          <h3 className="font-semibold text-lg text-gray-900 group-hover:text-purple-700 transition-colors">
                             {brand}
                           </h3>
-                          <p className="text-sm text-zinc-500 mt-0.5">
+                          <p className="text-sm text-gray-600 mt-0.5">
                             Consulte {brand}
                           </p>
                         </div>
                         {user.role === "admin" && (
                           <div 
-                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors z-10"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors z-10"
                             onClick={(e) => toggleBrandVisibility(brand, e)}
                           >
                             {isHidden ? (
-                              <EyeOff className="w-5 h-5 text-zinc-400 hover:text-white" />
+                              <EyeOff className="w-5 h-5 text-gray-600 hover:text-gray-900" />
                             ) : (
-                              <Eye className="w-5 h-5 text-zinc-400 hover:text-white" />
+                              <Eye className="w-5 h-5 text-gray-600 hover:text-gray-900" />
                             )}
                           </div>
                         )}
@@ -574,15 +657,15 @@ export function Dashboard({
               <div className="flex items-center gap-4 mb-8">
                 <button
                   onClick={() => setActiveTab("home")}
-                  className="bg-white/5 hover:bg-white/10 p-2.5 rounded-xl transition-colors active:scale-95 border border-white/5"
+                  className="bg-gray-50 hover:bg-gray-100 p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200/60 shadow-sm"
                 >
-                  <ArrowLeft className="w-5 h-5 text-zinc-300" />
+                  <ArrowLeft className="w-5 h-5 text-gray-700" />
                 </button>
                 <div>
-                  <h2 className="text-2xl font-bold text-white tracking-tight">
+                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
                     Pinagens por Montadora
                   </h2>
-                  <p className="text-sm text-zinc-400">Diagramas em desenvolvimento</p>
+                  <p className="text-sm text-gray-600">Diagramas em desenvolvimento</p>
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -597,28 +680,28 @@ export function Dashboard({
                         transition={{ delay: idx * 0.05 }}
                         key={brand}
                         onClick={() => setSelectedBrandPinouts(brand)}
-                        className={`group relative text-left w-full bg-zinc-900/40 hover:bg-zinc-800/60 border border-white/5 hover:border-white/10 rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
+                        className={`group relative text-left w-full bg-white hover:bg-gray-200/60 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
                       >
-                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-white/5 p-1 border border-white/10 group-hover:scale-105 transition-transform">
+                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-gray-50 p-1 border border-black/10 group-hover:scale-105 transition-transform">
                           <BrandLogo brand={brand} className="w-full h-full object-contain" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-lg text-white group-hover:text-rose-100 transition-colors">
+                          <h3 className="font-semibold text-lg text-gray-900 group-hover:text-rose-700 transition-colors">
                             {brand}
                           </h3>
-                          <p className="text-sm text-zinc-500 mt-0.5">
+                          <p className="text-sm text-gray-600 mt-0.5">
                             Verifique {brand}
                           </p>
                         </div>
                         {user.role === "admin" && (
                           <div 
-                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors z-10"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors z-10"
                             onClick={(e) => toggleBrandVisibility(brand, e)}
                           >
                             {isHidden ? (
-                              <EyeOff className="w-5 h-5 text-zinc-400 hover:text-white" />
+                              <EyeOff className="w-5 h-5 text-gray-600 hover:text-gray-900" />
                             ) : (
-                              <Eye className="w-5 h-5 text-zinc-400 hover:text-white" />
+                              <Eye className="w-5 h-5 text-gray-600 hover:text-gray-900" />
                             )}
                           </div>
                         )}
@@ -637,7 +720,7 @@ export function Dashboard({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center sm:p-4"
+              className="fixed inset-0 bg-white z-50 flex items-end sm:items-center justify-center sm:p-4"
               onClick={() => setShowStatorModal(null)}
             >
               <motion.div
@@ -645,42 +728,42 @@ export function Dashboard({
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: "100%", opacity: 0 }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="bg-zinc-900 border border-zinc-800 w-full sm:w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-12 sm:pb-6 shadow-2xl"
+                className="bg-white border border-gray-300 w-full sm:w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-12 sm:pb-6 shadow-2xl"
                 onClick={e => e.stopPropagation()}
               >
-                <div className="w-12 h-1.5 bg-zinc-700 rounded-full mx-auto mb-6 sm:hidden"></div>
-                <h3 className="text-xl font-bold text-white mb-2">Qual o tipo de estator?</h3>
-                <p className="text-zinc-400 mb-6">Selecione a configuração de fases da motocicleta para ver os testes específicos.</p>
+                <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-6 sm:hidden"></div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2 font-bold">Qual o tipo de estator?</h3>
+                <p className="text-gray-600 mb-6">Selecione a configuração de fases da motocicleta para ver os testes específicos.</p>
                 
                 <div className="space-y-3">
                   <button 
                     onClick={() => handleStatorSelection("estator-1f")}
-                    className="w-full bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 p-4 rounded-xl text-left transition-colors flex items-center gap-4"
+                    className="w-full bg-white hover:bg-gray-200 border border-gray-300 p-4 rounded-xl text-left transition-colors flex items-center gap-4"
                   >
-                    <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-300">1</div>
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-700">1</div>
                     <div>
-                      <h4 className="font-bold text-white text-lg">1 Fase (Monofásico)</h4>
-                      <p className="text-sm text-zinc-500">1 saída, retorna pelo chassi</p>
+                      <h4 className="font-bold text-gray-900 text-lg">1 Fase (Monofásico)</h4>
+                      <p className="text-sm text-gray-600">1 saída, retorna pelo chassi</p>
                     </div>
                   </button>
                   <button 
                     onClick={() => handleStatorSelection("estator-2f")}
-                    className="w-full bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 p-4 rounded-xl text-left transition-colors flex items-center gap-4"
+                    className="w-full bg-white hover:bg-gray-200 border border-gray-300 p-4 rounded-xl text-left transition-colors flex items-center gap-4"
                   >
-                    <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-300">2</div>
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-700">2</div>
                     <div>
-                      <h4 className="font-bold text-white text-lg">2 Fases (Bifásico)</h4>
-                      <p className="text-sm text-zinc-500">Bobina flutuante, 2 saídas</p>
+                      <h4 className="font-bold text-gray-900 text-lg">2 Fases (Bifásico)</h4>
+                      <p className="text-sm text-gray-600">Bobina flutuante, 2 saídas</p>
                     </div>
                   </button>
                   <button 
                     onClick={() => handleStatorSelection("estator-3f")}
-                    className="w-full bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 p-4 rounded-xl text-left transition-colors flex items-center gap-4"
+                    className="w-full bg-white hover:bg-gray-200 border border-gray-300 p-4 rounded-xl text-left transition-colors flex items-center gap-4"
                   >
-                    <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-300">3</div>
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-700">3</div>
                     <div>
-                      <h4 className="font-bold text-white text-lg">3 Fases (Trifásico)</h4>
-                      <p className="text-sm text-zinc-500">Ligação estrela/triângulo, 3 saídas</p>
+                      <h4 className="font-bold text-gray-900 text-lg">3 Fases (Trifásico)</h4>
+                      <p className="text-sm text-gray-600">Ligação estrela/triângulo, 3 saídas</p>
                     </div>
                   </button>
                 </div>

@@ -34,11 +34,11 @@ export class ErrorBoundary extends Component<Props, State> {
               </svg>
               Algo deu errado
             </h1>
-            <p className="text-slate-300 mb-6">
+            <p className="text-slate-700 mb-6">
               Ocorreu um erro inesperado no aplicativo. A tela branca foi evitada por esta página de recuperação.
             </p>
             <div className="bg-slate-950 p-4 rounded-lg overflow-x-auto mb-6">
-              <pre className="text-red-400 text-sm font-mono whitespace-pre-wrap break-words">
+              <pre className="text-red-600 text-sm font-mono whitespace-pre-wrap break-words">
                 {this.state.error?.toString()}
               </pre>
             </div>
