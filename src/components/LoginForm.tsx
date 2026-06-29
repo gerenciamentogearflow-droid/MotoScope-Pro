@@ -52,8 +52,8 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-red-600/10 rounded-full blur-[3rem] -z-10" />
 
         <div className="flex justify-center mb-8">
-          <div className="bg-gradient-to-br from-red-600/20 to-red-600/5 p-4 rounded-2xl border border-red-600/20 shadow-inner">
-            <Activity className="w-10 h-10 text-red-600" />
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-4 rounded-3xl border border-gray-800 shadow-xl overflow-hidden">
+            <img src="/icon.svg?v=2" alt="MotoScope Pro Logo" className="w-16 h-16 object-contain" />
           </div>
         </div>
 

@@ -408,6 +408,10 @@ export function DiagnosticParametersView({
     steps: string[];
     padrao: string;
   } | null>(null);
+  const [selectedMultimeter, setSelectedMultimeter] = useState<{
+    setting: any;
+    displayValue?: string;
+  } | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -468,6 +472,47 @@ export function DiagnosticParametersView({
     </AnimatePresence>
   );
 
+  // Reusable modal for multimeter
+  const multimeterModal = (
+    <AnimatePresence>
+      {selectedMultimeter && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setSelectedMultimeter(null)}
+        >
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-[2rem] p-6 max-w-sm w-full shadow-2xl flex flex-col items-center"
+          >
+            <div className="w-full flex justify-end mb-2">
+              <button
+                onClick={() => setSelectedMultimeter(null)}
+                className="p-2 text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <h3 className="text-sm font-bold text-gray-900 mb-8 text-center uppercase tracking-widest">
+              Ajuste do Multímetro
+            </h3>
+            <div className="transform scale-[1.3] mb-12 origin-top">
+              <MultimeterVisual
+                setting={selectedMultimeter.setting}
+                displayValue={selectedMultimeter.displayValue}
+              />
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
   // Reusable modal for tutorials
   const tutorialModal = (
     <AnimatePresence>
@@ -505,36 +550,6 @@ export function DiagnosticParametersView({
             </div>
 
             <div className="overflow-y-auto pr-2 space-y-4">
-              {selectedTutorial.padrao &&
-                getMultimeterConfig(
-                  selectedTutorial.key,
-                  selectedTutorial.padrao,
-                ) && (
-                  <div className="flex flex-col items-center justify-center my-6 bg-gray-50 rounded-2xl py-6 border border-gray-200">
-                    <div className="text-center mb-4">
-                      <span className="text-sm font-bold text-gray-500 uppercase tracking-wider">
-                        Ajuste do Multímetro Recomendado
-                      </span>
-                    </div>
-                    <div className="transform scale-[0.9] sm:scale-100">
-                      <MultimeterVisual
-                        setting={
-                          getMultimeterConfig(
-                            selectedTutorial.key,
-                            selectedTutorial.padrao,
-                          )!.setting
-                        }
-                        displayValue={
-                          getMultimeterConfig(
-                            selectedTutorial.key,
-                            selectedTutorial.padrao,
-                          )!.displayValue
-                        }
-                      />
-                    </div>
-                  </div>
-                )}
-
               {selectedTutorial.steps.map((step, idx) => {
                 const isHeader =
                   step.startsWith("COM ") ||
@@ -740,12 +755,8 @@ export function DiagnosticParametersView({
                                 >
                                   {row.tipo}
                                 </button>
-                                {(getTutorialSteps(row.tipo, row.localizacao)
-                                  .length > 0 ||
-                                  getMultimeterConfig(
-                                    row.tipo,
-                                    row.padrao || "",
-                                  )) && (
+                                {getTutorialSteps(row.tipo, row.localizacao)
+                                  .length > 0 && (
                                   <button
                                     onClick={() =>
                                       setSelectedTutorial({
@@ -760,20 +771,27 @@ export function DiagnosticParametersView({
                                     }
                                     className="w-full max-w-[90px] flex items-center justify-center gap-1.5 px-2 py-1.5 bg-red-600/10 hover:bg-red-600/20 text-red-600 rounded-md text-[10px] font-bold transition-colors border border-red-600/20"
                                   >
-                                    {getMultimeterConfig(
-                                      row.tipo,
-                                      row.padrao || "",
-                                    ) ? (
-                                      <Activity className="w-3 h-3" />
-                                    ) : (
-                                      <Info className="w-3 h-3" />
-                                    )}
-                                    {getMultimeterConfig(
-                                      row.tipo,
-                                      row.padrao || "",
-                                    )
-                                      ? "Medir"
-                                      : "Testar"}
+                                    <Info className="w-3 h-3" />
+                                    Testar
+                                  </button>
+                                )}
+                                {getMultimeterConfig(
+                                  row.tipo,
+                                  row.padrao || "",
+                                ) && (
+                                  <button
+                                    onClick={() =>
+                                      setSelectedMultimeter(
+                                        getMultimeterConfig(
+                                          row.tipo,
+                                          row.padrao || "",
+                                        ),
+                                      )
+                                    }
+                                    className="w-full max-w-[90px] flex items-center justify-center gap-1.5 px-2 py-1.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-600 rounded-md text-[10px] font-bold transition-colors border border-blue-600/20"
+                                  >
+                                    <Activity className="w-3 h-3" />
+                                    Multímetro
                                   </button>
                                 )}
                               </div>
