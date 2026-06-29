@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-type Setting = "200_ohms" | "2000_ohms" | "20k_ohms" | "20v_dc" | "2v_dc" | "off";
+type Setting = "OHM_200" | "OHM_2000" | "OHM_20K" | "DCV_20" | "DCV_2000m" | "ACV_200" | "off" | string;
 
 interface MultimeterVisualProps {
   setting: Setting;
@@ -11,26 +11,37 @@ export function MultimeterVisual({ setting }: MultimeterVisualProps) {
   const getAngle = () => {
     switch (setting) {
       case 'off': return 0;
-      case '2v_dc': return 35;
-      case '20v_dc': return 60;
-      case '200_ohms': return -130;
-      case '2000_ohms': return -90;
-      case '20k_ohms': return -50;
+      case 'DCV_2000m': return 35;
+      case 'DCV_20': return 60;
+      case 'ACV_200': return 120;
+      case 'OHM_200': return -130;
+      case 'OHM_2000': return -90;
+      case 'OHM_20K': return -50;
       default: return 0;
     }
   };
+
+  const getSettingText = () => {
+    switch (setting) {
+      case 'OHM_200': return "200 Ω (Resistência)";
+      case 'OHM_2000': return "2000 Ω (Resistência)";
+      case 'OHM_20K': return "20k Ω (Resistência)";
+      case 'DCV_20': return "20V DC (Tensão Contínua)";
+      case 'DCV_2000m': return "2000m / 2V DC (Tensão)";
+      case 'ACV_200': return "200V AC (Tensão Alternada)";
+      case 'off': return "Desligado";
+      default: return setting;
+    }
+  };
+
+  const isOhm = setting.includes('OHM') || setting.includes('ohms');
 
   return (
     <div className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-gray-300/80 my-4 shadow-sm">
       <div className="mb-4 text-center">
         <h4 className="text-gray-600 font-medium text-xs mb-1 uppercase tracking-wider">Ajuste do Multímetro</h4>
         <p className="text-blue-600 font-bold text-base">
-          {setting === '200_ohms' && "200 Ω (Resistência)"}
-          {setting === '2000_ohms' && "2000 Ω (Resistência)"}
-          {setting === '20k_ohms' && "20k Ω (Resistência)"}
-          {setting === '20v_dc' && "20V DC (Tensão Contínua)"}
-          {setting === '2v_dc' && "2000m / 2V DC (Tensão)"}
-          {setting === 'off' && "Desligado"}
+          {getSettingText()}
         </p>
       </div>
       
@@ -40,7 +51,7 @@ export function MultimeterVisual({ setting }: MultimeterVisualProps) {
         {/* Screen */}
         <div className="w-full h-16 bg-[#8FA49A] rounded mb-5 flex items-center justify-end px-3 shadow-inner border border-gray-900/10">
           <span className="font-mono text-3xl text-gray-900/90 font-bold tracking-widest drop-shadow-sm">
-            {setting.includes('ohms') ? "1 .  " : "0.00"}
+            {isOhm ? "1 .  " : "0.00"}
           </span>
         </div>
         
