@@ -63,7 +63,7 @@ export function MultimeterDetail({ component, onBack }: MultimeterDetailProps) {
           {/* Visual Multimeter Component */}
           <div className="flex flex-col gap-6 py-8 px-4 bg-white border border-gray-200/60 shadow-sm rounded-[2rem] overflow-hidden items-center backdrop-blur-sm shadow-xl relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-orange-600/10 rounded-full blur-3xl" />
-             <MultimeterVisual setting={mm.setting as any} />
+             <MultimeterVisual setting={mm.setting as any} displayValue={currentDisplayValue} />
              
              {mm.minValue !== undefined && mm.maxValue !== undefined && (
                <div className="flex gap-4 mt-4 w-full max-w-[320px] relative z-10">

@@ -5,9 +5,10 @@ type Setting = "OHM_200" | "OHM_2000" | "OHM_20K" | "DCV_20" | "DCV_2000m" | "AC
 
 interface MultimeterVisualProps {
   setting: Setting;
+  displayValue?: number | string;
 }
 
-export function MultimeterVisual({ setting }: MultimeterVisualProps) {
+export function MultimeterVisual({ setting, displayValue }: MultimeterVisualProps) {
   
   const labels = [
     { id: 'off', label: 'OFF', color: 'text-white font-bold', angle: 0 },
@@ -91,7 +92,7 @@ export function MultimeterVisual({ setting }: MultimeterVisualProps) {
           <div className="w-[85%] h-[65px] bg-[#8a9e92] rounded flex items-center justify-end px-4 shadow-[inset_0_3px_8px_rgba(0,0,0,0.5)] border-[2px] border-[#111] relative">
             <span className="absolute top-1 left-2 text-[10px] text-gray-800 font-bold">HV</span>
             <span className="font-mono text-[42px] text-black/90 font-bold tracking-widest leading-none drop-shadow-sm translate-y-1">
-              {isOhm ? "1 .  " : "0.00"}
+              {displayValue !== undefined ? displayValue : (isOhm ? "1 .  " : "0.00")}
             </span>
           </div>
         </div>
