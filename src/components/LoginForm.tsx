@@ -53,7 +53,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 
         <div className="flex justify-center mb-8">
           <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-4 rounded-3xl border border-gray-800 shadow-xl overflow-hidden">
-            <img src="/icon.svg?v=2" alt="MotoScope Pro Logo" className="w-16 h-16 object-contain" />
+            <img src="/icon.svg?v=3" alt="MotoScope Pro Logo" className="w-16 h-16 object-contain" />
           </div>
         </div>
 

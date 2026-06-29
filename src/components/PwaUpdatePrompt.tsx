@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { Download, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -10,6 +10,15 @@ export function PwaUpdatePrompt() {
   } = useRegisterSW({
     onRegistered(r) {
       console.log('SW Registered: ', r);
+      // Force an immediate check for updates when registered
+      if (r) {
+        r.update().catch(console.error);
+        
+        // Also check periodically
+        setInterval(() => {
+          r.update().catch(console.error);
+        }, 10 * 60 * 1000); // 10 minutes
+      }
     },
     onRegisterError(error) {
       console.log('SW registration error', error);
