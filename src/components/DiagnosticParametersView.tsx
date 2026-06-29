@@ -3,6 +3,7 @@ import { DiagnosticModel, ComponentData } from "../types";
 import { ArrowLeft, ChevronDown, Info, X, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { OscilloscopeDisplay } from "./OscilloscopeDisplay";
+import { MultimeterVisual } from "./MultimeterVisual";
 
 interface DiagnosticParametersViewProps {
   brand: string;
@@ -11,26 +12,27 @@ interface DiagnosticParametersViewProps {
 }
 
 const legendData: Record<string, string> = {
-  "AL": "Teste de alimentação ou teste de entrada",
-  "CC": "Teste de curto circuito",
-  "CA": "Teste de circuito aberto",
-  "SN": "Teste de sinal ou teste de saída",
-  "RS": "Teste de resistência",
-  "PV": "Pico de voltagem",
-  "MM": "Milímetros (Folga ou Medida)",
-  "PR": "Pressão (Bomba, Cilindro, etc)",
-  "VZ": "Vazão (Bomba, Bico, etc)",
+  AL: "Teste de alimentação ou teste de entrada",
+  CC: "Teste de curto circuito",
+  CA: "Teste de circuito aberto",
+  SN: "Teste de sinal ou teste de saída",
+  RS: "Teste de resistência",
+  PV: "Pico de voltagem",
+  MM: "Milímetros (Folga ou Medida)",
+  PR: "Pressão (Bomba, Cilindro, etc)",
+  VZ: "Vazão (Bomba, Bico, etc)",
   "PR/VZ": "Pressão e Vazão",
   "(S)": "Quando o resultado do teste deve ser SIM",
   "(N)": "Quando o resultado do teste deve ser NÃO",
   "Contín.": "Refere-se a teste de continuidade",
   "Volt. Bat": "Refere-se a voltagem da bateria",
-  "V": "Unidade de medida 'Voltagem'",
-  "Osc.": "Quando o resultado do teste deve ser oscilando entre o padrão estabelecido"
+  V: "Unidade de medida 'Voltagem'",
+  "Osc.":
+    "Quando o resultado do teste deve ser oscilando entre o padrão estabelecido",
 };
 
 const defaultTutorialData: Record<string, string[]> = {
-  "AL": [
+  AL: [
     "Coloque o multímetro na escala de Corrente Contínua (VDC) ou Alternada (VAC) conforme o sistema.",
     "Conecte a ponta preta do multímetro no negativo da bateria ou em um bom aterramento no motor/chassi.",
     "Conecte a ponta vermelha no fio de alimentação que chega ao componente.",
@@ -38,9 +40,9 @@ const defaultTutorialData: Record<string, string[]> = {
     "",
     "DIAGNÓSTICO DE FALHAS:",
     "1. Sem alimentação (0V): Fio rompido, fusível queimado, relé defeituoso, mau contato nos conectores ou defeito no módulo que envia a alimentação.",
-    "2. Alimentação abaixo do normal: Bateria fraca, resistência alta no circuito (fio oxidado, conector solto), excesso de consumo por outro componente no mesmo circuito."
+    "2. Alimentação abaixo do normal: Bateria fraca, resistência alta no circuito (fio oxidado, conector solto), excesso de consumo por outro componente no mesmo circuito.",
   ],
-  "RS": [
+  RS: [
     "Certifique-se de que a ignição está DESLIGADA.",
     "Desconecte o componente do chicote elétrico. NUNCA meça resistência com o componente conectado, pois a leitura será falsa.",
     "Coloque o multímetro na escala de Resistência (Ohms - Ω) adequada.",
@@ -50,9 +52,9 @@ const defaultTutorialData: Record<string, string[]> = {
     "DIAGNÓSTICO DE FALHAS:",
     "1. Resistência Infinita (OL): O componente interno está rompido (circuito aberto). Requer substituição.",
     "2. Resistência Abaixo do Padrão: Curto-circuito interno nas espiras do enrolamento (ex: bobina ou estator com isolamento comprometido).",
-    "3. Resistência Acima do Padrão: Oxidação nos terminais do componente, solda fria interna ou degradação do material condutor."
+    "3. Resistência Acima do Padrão: Oxidação nos terminais do componente, solda fria interna ou degradação do material condutor.",
   ],
-  "PV": [
+  PV: [
     "É obrigatório o uso de um adaptador de Pico de Voltagem conectado ao multímetro (em VDC) ou um multímetro com função Peak Hold real.",
     "Conecte as pontas de prova em paralelo com o circuito (ex: fio de sinal da bobina de pulso e aterramento).",
     "Não desconecte o módulo CDI/ECU, a menos que o manual peça.",
@@ -62,9 +64,9 @@ const defaultTutorialData: Record<string, string[]> = {
     "DIAGNÓSTICO DE FALHAS:",
     "1. Abaixo do padrão (Bobinas/Estator): Falha de isolamento, espiras em curto, ímã do volante desmagnetizado ou rotação de partida muito baixa.",
     "2. Abaixo do padrão (Sensores CKP/CMP): Folga excessiva entre o sensor e a roda fônica, sujeira (limalha) na ponta magnética, ou defeito no enrolamento interno.",
-    "3. Zero Volts: Circuito interrompido, aterramento deficiente, falha grave no componente gerador do sinal."
+    "3. Zero Volts: Circuito interrompido, aterramento deficiente, falha grave no componente gerador do sinal.",
   ],
-  "CC": [
+  CC: [
     "Ignição DESLIGADA.",
     "Desconecte ambas as extremidades do fio que será testado (para isolar o circuito).",
     "Coloque o multímetro na escala de Continuidade (Bipe) ou Resistência (Ohms).",
@@ -73,9 +75,9 @@ const defaultTutorialData: Record<string, string[]> = {
     "",
     "DIAGNÓSTICO DE FALHAS:",
     "1. Continuidade com o Terra: Fio desencapado encostando no chassi metálico da moto, umidade nos conectores, fiação esmagada sob carenagens/tanque.",
-    "2. Fio derretido: Em casos severos de curto-circuito (especialmente cabos positivos), a proteção falhou e o fio superaqueceu, fundindo o isolamento plástico."
+    "2. Fio derretido: Em casos severos de curto-circuito (especialmente cabos positivos), a proteção falhou e o fio superaqueceu, fundindo o isolamento plástico.",
   ],
-  "CA": [
+  CA: [
     "Ignição DESLIGADA.",
     "Coloque o multímetro na escala de Continuidade (Bipe) ou Resistência (Ohms).",
     "Conecte uma ponta do multímetro em uma extremidade do fio e a outra ponta na outra extremidade do mesmo fio.",
@@ -83,9 +85,9 @@ const defaultTutorialData: Record<string, string[]> = {
     "",
     "DIAGNÓSTICO DE FALHAS:",
     "1. Circuito Aberto (Sem Continuidade): Fio partido internamente (muito comum em regiões de articulação do guidão), terminal quebrado ou solto de dentro do conector de plástico.",
-    "2. Alta Resistência (Marcando valor alto e sem bip): Fio esmagado com filamentos rompidos (mas não totalmente cortado) ou severa oxidação (zinabre) na extensão do fio."
+    "2. Alta Resistência (Marcando valor alto e sem bip): Fio esmagado com filamentos rompidos (mas não totalmente cortado) ou severa oxidação (zinabre) na extensão do fio.",
   ],
-  "SN": [
+  SN: [
     "Ignição LIGADA.",
     "Mantenha o sensor CONECTADO ao chicote. Use uma agulha fina por trás do conector (back-probe) para acessar o contato sem perfurar a isolação do fio.",
     "Multímetro em VDC. Ponta preta no terra do sensor (ou bateria), ponta vermelha na agulha no fio de sinal.",
@@ -94,18 +96,18 @@ const defaultTutorialData: Record<string, string[]> = {
     "DIAGNÓSTICO DE FALHAS:",
     "1. Sinal Incorreto ou Travado: Sensor danificado internamente, falha no seu aterramento ou na tensão de alimentação (5V), componente mecânico emperrado (ex: borboleta não abrindo toda).",
     "2. Sinal com 'Buracos' ou Cortes: Pista resistiva gasta (TPS), mau contato no chicote, picos de vibração que cortam a conexão intermitentemente.",
-    "3. Ausência de Sinal: Fio partido entre o sensor e o módulo, sensor totalmente inoperante."
+    "3. Ausência de Sinal: Fio partido entre o sensor e o módulo, sensor totalmente inoperante.",
   ],
-  "MM": [
+  MM: [
     "Utilize a ferramenta de precisão adequada: Calibrador de lâminas, paquímetro ou micrômetro.",
     "Ajuste ou posicione o componente conforme as instruções do manual.",
     "Insira a ferramenta de medição e verifique se a folga ou dimensão está dentro da tolerância do padrão de fábrica.",
     "",
     "DIAGNÓSTICO DE FALHAS:",
     "1. Medida Acima do Padrão: Desgaste mecânico natural das peças em atrito (cilindros, anéis, embreagem) ou parafusos afrouxando (aumentando a folga de válvulas).",
-    "2. Medida Abaixo do Padrão: Assentamento das peças, retentores gastos, expansão térmica não prevista, ou sujeira impedindo o fechamento (diminuindo folga)."
+    "2. Medida Abaixo do Padrão: Assentamento das peças, retentores gastos, expansão térmica não prevista, ou sujeira impedindo o fechamento (diminuindo folga).",
   ],
-  "PR": [
+  PR: [
     "Utilize o manômetro adequado para o sistema.",
     "Conecte a ferramenta no ponto de teste especificado.",
     "Acione o sistema e compare o valor máximo com o padrão de fábrica.",
@@ -113,9 +115,9 @@ const defaultTutorialData: Record<string, string[]> = {
     "DIAGNÓSTICO DE FALHAS:",
     "1. Pressão Baixa: Bomba desgastada, vazamento na linha, regulador de pressão danificado não retendo pressão (aberto).",
     "2. Pressão Alta: Regulador de pressão travado fechado ou mangueira de retorno obstruída/dobrada.",
-    "3. Queda Rápida de Pressão: Vazamento por anéis de vedação ou sistema falhando em manter pressão residual (regulador não segurando a pressão de retorno)."
+    "3. Queda Rápida de Pressão: Vazamento por anéis de vedação ou sistema falhando em manter pressão residual (regulador não segurando a pressão de retorno).",
   ],
-  "VZ": [
+  VZ: [
     "BOMBA DE COMBUSTÍVEL: Conecte a mangueira de saída da bomba diretamente num proveta (recipiente graduado em ml).",
     "Desconecte a alimentação da bobina de ignição para evitar faísca.",
     "Faça um jumper no relé da bomba ou acione a ignição repetidas vezes para que a bomba funcione pelo tempo exato pedido no manual (geralmente 10 seg).",
@@ -123,7 +125,7 @@ const defaultTutorialData: Record<string, string[]> = {
     "",
     "DIAGNÓSTICO DE FALHAS:",
     "1. Vazão Baixa: Bomba de combustível cansada/desgastada internamente, filtro/pré-filtro de combustível severamente obstruído, ou tensão elétrica chegando na bomba abaixo de 12V (mau contato, bateria fraca).",
-    "2. Vazão Inexistente: Bomba travada ou queimada, fusível queimado, circuito interrompido ou módulo/relé não enviando o comando."
+    "2. Vazão Inexistente: Bomba travada ou queimada, fusível queimado, circuito interrompido ou módulo/relé não enviando o comando.",
   ],
   "PR/VZ": [
     "Necessário um manômetro de combustível que possua válvula de alívio e mangueira de descarte.",
@@ -133,8 +135,8 @@ const defaultTutorialData: Record<string, string[]> = {
     "",
     "DIAGNÓSTICO DE FALHAS:",
     "1. Pressão Boa / Vazão Baixa: O regulador de pressão e a vedação estão bons, mas a capacidade da bomba de deslocar volume sob resistência está comprometida (bomba desgastada ou filtro obstruído).",
-    "2. Pressão Baixa / Vazão Alta: A bomba envia bastante volume, mas o regulador não está segurando a pressão no sistema (molas cansadas ou preso aberto)."
-  ]
+    "2. Pressão Baixa / Vazão Alta: A bomba envia bastante volume, mas o regulador não está segurando a pressão no sistema (molas cansadas ou preso aberto).",
+  ],
 };
 
 const pvIgnitionComponent: ComponentData = {
@@ -149,7 +151,7 @@ const pvIgnitionComponent: ComponentData = {
     voltageDiv: "50V/div ou 100V/div",
     triggerMode: "Normal/Auto",
     triggerEdge: "Subida/Descida",
-    triggerLevel: "Varia"
+    triggerLevel: "Varia",
   },
   waveformExplanation: "",
   waveformPhases: [
@@ -160,7 +162,7 @@ const pvIgnitionComponent: ComponentData = {
       x: 30,
       y: 80,
       labelX: 30,
-      labelY: 90
+      labelY: 90,
     },
     {
       id: 2,
@@ -169,7 +171,7 @@ const pvIgnitionComponent: ComponentData = {
       x: 46,
       y: 10,
       labelX: 35,
-      labelY: 10
+      labelY: 10,
     },
     {
       id: 3,
@@ -178,7 +180,7 @@ const pvIgnitionComponent: ComponentData = {
       x: 50,
       y: 48,
       labelX: 50,
-      labelY: 35
+      labelY: 35,
     },
     {
       id: 4,
@@ -187,16 +189,21 @@ const pvIgnitionComponent: ComponentData = {
       x: 64,
       y: 35,
       labelX: 75,
-      labelY: 25
-    }
-  ]
+      labelY: 25,
+    },
+  ],
 };
 
 const getTutorialSteps = (tipo: string, localizacao: string): string[] => {
   const loc = localizacao.toUpperCase();
-  
+
   if (tipo === "AL") {
-    if (loc.includes("ESTATOR") || loc.includes("V~") || loc.includes("VAC") || loc.includes("ALTERNADA")) {
+    if (
+      loc.includes("ESTATOR") ||
+      loc.includes("V~") ||
+      loc.includes("VAC") ||
+      loc.includes("ALTERNADA")
+    ) {
       return [
         "1. Desconecte o conector do estator ou siga a orientação do manual para medição.",
         "2. Coloque o multímetro na escala de Corrente Alternada (VAC ou V~), geralmente na escala de 200V~.",
@@ -206,7 +213,7 @@ const getTutorialSteps = (tipo: string, localizacao: string): string[] => {
         "",
         "DIAGNÓSTICO DE FALHAS:",
         "1. Voltagem muito baixa ou zero: Uma ou mais bobinas do estator podem estar queimadas ou em curto. Pode haver desmagnetização do volante (raro).",
-        "2. Voltagem de uma fase diferente das outras (em estator trifásico): Aquela fase específica do estator está queimada."
+        "2. Voltagem de uma fase diferente das outras (em estator trifásico): Aquela fase específica do estator está queimada.",
       ];
     } else if (loc.includes("BATERIA") || loc.includes("CARGA")) {
       return [
@@ -217,7 +224,7 @@ const getTutorialSteps = (tipo: string, localizacao: string): string[] => {
         "",
         "DIAGNÓSTICO DE FALHAS:",
         "1. Tensão de carga muito alta (ex: >15V): Regulador/Retificador defeituoso (não cortando a carga). Risco grave de queimar bateria, módulos e lâmpadas.",
-        "2. Tensão não sobe acelerando: Problema no estator (não gerando), no regulador/retificador (não retificando/não liberando carga) ou fiação/aterramento defeituoso entre as peças."
+        "2. Tensão não sobe acelerando: Problema no estator (não gerando), no regulador/retificador (não retificando/não liberando carga) ou fiação/aterramento defeituoso entre as peças.",
       ];
     }
   }
@@ -233,7 +240,7 @@ const getTutorialSteps = (tipo: string, localizacao: string): string[] => {
         "6. Anote a pressão máxima e compare com o limite padrão de fábrica.",
         "",
         "DIAGNÓSTICO DE FALHAS:",
-        "1. Pressão Baixa: Desgaste nos anéis de segmento/cilindro (teste colocando um pouco de óleo no cilindro - se subir a pressão, é anel), vazamento pelas sedes das válvulas (não assentando direito) ou junta do cabeçote queimada."
+        "1. Pressão Baixa: Desgaste nos anéis de segmento/cilindro (teste colocando um pouco de óleo no cilindro - se subir a pressão, é anel), vazamento pelas sedes das válvulas (não assentando direito) ou junta do cabeçote queimada.",
       ];
     } else if (loc.includes("COMBUSTÍVEL") || loc.includes("BOMBA")) {
       return [
@@ -245,7 +252,7 @@ const getTutorialSteps = (tipo: string, localizacao: string): string[] => {
         "DIAGNÓSTICO DE FALHAS:",
         "1. Pressão Baixa: Refil da bomba gasto, vazamento interno nas mangueiras do conjunto, ou regulador de pressão com mola cansada (abrindo antes da hora).",
         "2. Pressão Alta: Filtro obstruído (se o teste for antes dele) ou regulador de pressão travado fechado.",
-        "3. Pressão cai rápido ao desligar: Regulador de pressão não estanca ou bico injetor gotejando/vazando."
+        "3. Pressão cai rápido ao desligar: Regulador de pressão não estanca ou bico injetor gotejando/vazando.",
       ];
     } else if (loc.includes("ÓLEO")) {
       return [
@@ -256,11 +263,11 @@ const getTutorialSteps = (tipo: string, localizacao: string): string[] => {
         "",
         "DIAGNÓSTICO DE FALHAS:",
         "1. Baixa Pressão de Óleo: Bomba de óleo desgastada, folga excessiva nos mancais/bronzinas do motor (vazamento interno da pressão), filtro de óleo severamente entupido, ou válvula de alívio presa aberta.",
-        "2. Alta Pressão: Válvula de alívio da bomba de óleo presa fechada ou obstrução grave nas galerias do motor."
+        "2. Alta Pressão: Válvula de alívio da bomba de óleo presa fechada ou obstrução grave nas galerias do motor.",
       ];
     }
   }
-  
+
   if (tipo === "MM") {
     if (loc.includes("VÁLVULA")) {
       return [
@@ -271,7 +278,7 @@ const getTutorialSteps = (tipo: string, localizacao: string): string[] => {
         "",
         "DIAGNÓSTICO DE FALHAS:",
         "1. Válvula muito presa (sem folga): A válvula pode não fechar completamente, causando perda de compressão, marcha lenta irregular e risco de carbonização/queima da sede da válvula.",
-        "2. Válvula muito solta: Excesso de ruído metálico (batida de válvula), alteração no tempo de abertura e fechamento das válvulas (perda de performance e maior consumo)."
+        "2. Válvula muito solta: Excesso de ruído metálico (batida de válvula), alteração no tempo de abertura e fechamento das válvulas (perda de performance e maior consumo).",
       ];
     } else if (loc.includes("CILINDRO") || loc.includes("PISTÃO")) {
       return [
@@ -280,7 +287,7 @@ const getTutorialSteps = (tipo: string, localizacao: string): string[] => {
         "3. Calcule a folga, ovalização e conicidade, comparando com o limite de serviço.",
         "",
         "DIAGNÓSTICO DE FALHAS:",
-        "1. Acima do Limite de Serviço: Se o cilindro estiver excessivamente gasto, ovalizado ou cônico, haverá queima de óleo (fumaça azul) e perda de compressão. Requer retífica."
+        "1. Acima do Limite de Serviço: Se o cilindro estiver excessivamente gasto, ovalizado ou cônico, haverá queima de óleo (fumaça azul) e perda de compressão. Requer retífica.",
       ];
     }
   }
@@ -303,7 +310,7 @@ const getTutorialSteps = (tipo: string, localizacao: string): string[] => {
         "",
         "DIAGNÓSTICO DE FALHAS:",
         "1. Pico abaixo do mínimo: Pode indicar resistência alta no circuito, fuga de centelha (cabo/cachimbo trincado), curto-circuito interno na bobina ou falha no aterramento/alimentação do módulo de ignição.",
-        "2. Sem oscilações residuais: Se após o tempo de queima a onda não apresenta oscilações dissipando a energia, é um forte indício de curto-circuito interno nas espiras da bobina."
+        "2. Sem oscilações residuais: Se após o tempo de queima a onda não apresenta oscilações dissipando a energia, é um forte indício de curto-circuito interno nas espiras da bobina.",
       ];
     }
   }
@@ -318,7 +325,7 @@ const getTutorialSteps = (tipo: string, localizacao: string): string[] => {
         "5. Leia a corrente de fuga. Se o valor for maior que o padrão máximo, há algum componente consumindo carga indevidamente com a moto desligada.",
         "",
         "DIAGNÓSTICO DE FALHAS:",
-        "1. Fuga alta: Acessórios instalados incorretamente (rastreadores, alarmes diretos na bateria), retificador/regulador em curto, chave de ignição com contatos carbonizados conduzindo internamente ou curto-circuito em chicote úmido/esmagado."
+        "1. Fuga alta: Acessórios instalados incorretamente (rastreadores, alarmes diretos na bateria), retificador/regulador em curto, chave de ignição com contatos carbonizados conduzindo internamente ou curto-circuito em chicote úmido/esmagado.",
       ];
     }
   }
@@ -326,10 +333,81 @@ const getTutorialSteps = (tipo: string, localizacao: string): string[] => {
   return defaultTutorialData[tipo] || [];
 };
 
-export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticParametersViewProps) {
+function getMultimeterConfig(
+  tipo: string,
+  padrao: string,
+): { setting: any; displayValue?: string } | null {
+  if (tipo === "CC" || tipo === "CA" || tipo === "Contín.") {
+    return { setting: "Continuity", displayValue: "0.00" };
+  }
+
+  const lowerPadrao = (padrao || "").toLowerCase();
+
+  if (
+    tipo === "AL" ||
+    tipo === "SN" ||
+    tipo === "Volt. Bat" ||
+    tipo === "PV" ||
+    lowerPadrao.includes("v") ||
+    lowerPadrao.includes("volts") ||
+    lowerPadrao.includes("vdc") ||
+    lowerPadrao.includes("vac")
+  ) {
+    // If it's AC voltage
+    if (
+      lowerPadrao.includes("acv") ||
+      lowerPadrao.includes("vac") ||
+      lowerPadrao.includes("alternada") ||
+      tipo === "PV"
+    ) {
+      return { setting: "ACV_200", displayValue: "0.00" };
+    }
+    // Default to DC
+    return { setting: "DCV_20", displayValue: "0.00" };
+  }
+
+  if (
+    tipo === "RS" ||
+    lowerPadrao.includes("ohm") ||
+    lowerPadrao.includes("ω") ||
+    lowerPadrao.includes("kω")
+  ) {
+    let setting = "OHM_200";
+    // Check if there are numbers
+    const numMatch = (padrao || "").match(/(\d+[\.,]?\d*)/);
+    if (numMatch) {
+      let numStr = numMatch[1].replace(",", ".");
+      let num = parseFloat(numStr);
+      if (lowerPadrao.includes("k")) num *= 1000;
+
+      if (num < 200) setting = "OHM_200";
+      else if (num < 2000) setting = "OHM_2000";
+      else if (num < 20000) setting = "OHM_20K";
+      else if (num < 200000) setting = "OHM_200K";
+      else setting = "OHM_2000K";
+    }
+    return { setting, displayValue: "1 .  " };
+  }
+
+  return null;
+}
+
+export function DiagnosticParametersView({
+  brand,
+  models,
+  onBack,
+}: DiagnosticParametersViewProps) {
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
-  const [selectedAbbr, setSelectedAbbr] = useState<{ key: string; description: string } | null>(null);
-  const [selectedTutorial, setSelectedTutorial] = useState<{ key: string; title: string; steps: string[] } | null>(null);
+  const [selectedAbbr, setSelectedAbbr] = useState<{
+    key: string;
+    description: string;
+  } | null>(null);
+  const [selectedTutorial, setSelectedTutorial] = useState<{
+    key: string;
+    title: string;
+    steps: string[];
+    padrao: string;
+  } | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -342,15 +420,15 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
       setSelectedAbbr({ key: text, description: exactMatch });
       return;
     }
-    
+
     // For padrao which might contain "(S)", "Contín.", etc.
-    const foundKey = Object.keys(legendData).find(key => text.includes(key));
+    const foundKey = Object.keys(legendData).find((key) => text.includes(key));
     if (foundKey) {
       setSelectedAbbr({ key: foundKey, description: legendData[foundKey] });
     }
   };
 
-  const selectedModel = models.find(m => m.id === selectedModelId);
+  const selectedModel = models.find((m) => m.id === selectedModelId);
 
   // Reusable modal for abbreviations
   const abbrModal = (
@@ -414,7 +492,9 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
                   <Info className="w-5 h-5 text-red-600" />
                   Como testar - {selectedTutorial.title}
                 </h3>
-                <p className="text-xs text-red-600 font-mono mt-1">TESTE TIPO: {selectedTutorial.key}</p>
+                <p className="text-xs text-red-600 font-mono mt-1">
+                  TESTE TIPO: {selectedTutorial.key}
+                </p>
               </div>
               <button
                 onClick={() => setSelectedTutorial(null)}
@@ -423,18 +503,56 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="overflow-y-auto pr-2 space-y-4">
+              {selectedTutorial.padrao &&
+                getMultimeterConfig(
+                  selectedTutorial.key,
+                  selectedTutorial.padrao,
+                ) && (
+                  <div className="flex flex-col items-center justify-center my-6 bg-gray-50 rounded-2xl py-6 border border-gray-200">
+                    <div className="text-center mb-4">
+                      <span className="text-sm font-bold text-gray-500 uppercase tracking-wider">
+                        Ajuste do Multímetro Recomendado
+                      </span>
+                    </div>
+                    <div className="transform scale-[0.9] sm:scale-100">
+                      <MultimeterVisual
+                        setting={
+                          getMultimeterConfig(
+                            selectedTutorial.key,
+                            selectedTutorial.padrao,
+                          )!.setting
+                        }
+                        displayValue={
+                          getMultimeterConfig(
+                            selectedTutorial.key,
+                            selectedTutorial.padrao,
+                          )!.displayValue
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+
               {selectedTutorial.steps.map((step, idx) => {
-                const isHeader = step.startsWith("COM ") || step.startsWith("TESTE ") || step.startsWith("DIAGNÓSTICO");
+                const isHeader =
+                  step.startsWith("COM ") ||
+                  step.startsWith("TESTE ") ||
+                  step.startsWith("DIAGNÓSTICO");
                 const isSpacing = step === "";
-                
+
                 if (isSpacing) return <div key={idx} className="h-2" />;
-                
+
                 if (isHeader) {
                   return (
-                    <div key={idx} className="mt-4 mb-1 border-b border-gray-200 pb-1">
-                      <p className="font-bold text-red-600 text-xs tracking-wider">{step}</p>
+                    <div
+                      key={idx}
+                      className="mt-4 mb-1 border-b border-gray-200 pb-1"
+                    >
+                      <p className="font-bold text-red-600 text-xs tracking-wider">
+                        {step}
+                      </p>
                     </div>
                   );
                 }
@@ -456,7 +574,10 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
                 }
 
                 return (
-                  <div key={idx} className={`flex gap-3 ${isWaveform ? 'flex-col bg-white p-3 rounded-lg border border-gray-200 mt-4' : ''}`}>
+                  <div
+                    key={idx}
+                    className={`flex gap-3 ${isWaveform ? "flex-col bg-white p-3 rounded-lg border border-gray-200 mt-4" : ""}`}
+                  >
                     <div className="flex gap-3">
                       {numberStr && (
                         <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-600/10 border border-red-600/20 flex items-center justify-center text-red-600 text-xs font-bold font-mono mt-0.5">
@@ -475,11 +596,14 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
                         </p>
                       </div>
                     </div>
-                    {isWaveform && selectedTutorial.title.includes("BOBINA DE IGNIÇÃO") && (
-                      <div className="mt-4 pt-4 border-t border-gray-200/80">
-                        <OscilloscopeDisplay component={pvIgnitionComponent} />
-                      </div>
-                    )}
+                    {isWaveform &&
+                      selectedTutorial.title.includes("BOBINA DE IGNIÇÃO") && (
+                        <div className="mt-4 pt-4 border-t border-gray-200/80">
+                          <OscilloscopeDisplay
+                            component={pvIgnitionComponent}
+                          />
+                        </div>
+                      )}
                   </div>
                 );
               })}
@@ -505,12 +629,17 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
               <h1 className="text-xl font-bold text-gray-900 tracking-tight line-clamp-1">
                 {selectedModel.name}
               </h1>
-              <p className="text-[10px] uppercase tracking-widest text-red-600 font-bold mt-0.5">Especificações Técnicas</p>
+              <p className="text-[10px] uppercase tracking-widest text-red-600 font-bold mt-0.5">
+                Especificações Técnicas
+              </p>
             </div>
           </div>
         </header>
 
-        <main key={selectedModel.id} className="flex-1 p-4 md:p-6 overflow-y-auto">
+        <main
+          key={selectedModel.id}
+          className="flex-1 p-4 md:p-6 overflow-y-auto"
+        >
           <div className="max-w-4xl mx-auto space-y-10 pb-12">
             {selectedModel.tables.map((table, tIdx) => (
               <div key={tIdx} className="space-y-4">
@@ -526,35 +655,59 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
                   <table className="w-full text-xs sm:text-sm text-left">
                     <thead className="bg-white text-gray-600">
                       <tr>
-                        <th className="px-4 py-4 font-semibold uppercase tracking-wider text-[11px]">Padrão</th>
-                        <th className="px-4 py-4 font-semibold uppercase tracking-wider text-[11px]">Localização</th>
-                        <th className="px-4 py-4 font-semibold uppercase tracking-wider text-[11px] text-center">Tipo</th>
+                        <th className="px-4 py-4 font-semibold uppercase tracking-wider text-[11px]">
+                          Padrão
+                        </th>
+                        <th className="px-4 py-4 font-semibold uppercase tracking-wider text-[11px]">
+                          Localização
+                        </th>
+                        <th className="px-4 py-4 font-semibold uppercase tracking-wider text-[11px] text-center">
+                          Tipo
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
                       {table.rows.map((row, rIdx) => {
                         // Replace hyphen with newline ' a ' newline for numeric ranges to avoid confusion with minus sign and stack them
                         const formattedPadrao = (row.padrao || "")
-                          .replace(/(\d+(?:,\d+)?)\s*-\s*(\d+(?:,\d+)?)/g, "$1\n a \n$2")
-                          .replace(/(\d+(?:,\d+)?)\s*±\s*(\d+(?:,\d+)?)/g, (match, p1, p2) => {
-                            const base = parseFloat(p1.replace(',', '.'));
-                            const tol = parseFloat(p2.replace(',', '.'));
-                            const dec = Math.max(p1.includes(',') ? p1.split(',')[1].length : 0, p2.includes(',') ? p2.split(',')[1].length : 0);
-                            const min = (base - tol).toFixed(dec).replace('.', ',');
-                            const max = (base + tol).toFixed(dec).replace('.', ',');
-                            return `Entre ${min} e ${max}\n(Ideal: ${p1})`;
-                          });
-                        
+                          .replace(
+                            /(\d+(?:,\d+)?)\s*-\s*(\d+(?:,\d+)?)/g,
+                            "$1\n a \n$2",
+                          )
+                          .replace(
+                            /(\d+(?:,\d+)?)\s*±\s*(\d+(?:,\d+)?)/g,
+                            (match, p1, p2) => {
+                              const base = parseFloat(p1.replace(",", "."));
+                              const tol = parseFloat(p2.replace(",", "."));
+                              const dec = Math.max(
+                                p1.includes(",") ? p1.split(",")[1].length : 0,
+                                p2.includes(",") ? p2.split(",")[1].length : 0,
+                              );
+                              const min = (base - tol)
+                                .toFixed(dec)
+                                .replace(".", ",");
+                              const max = (base + tol)
+                                .toFixed(dec)
+                                .replace(".", ",");
+                              return `Entre ${min} e ${max}\n(Ideal: ${p1})`;
+                            },
+                          );
+
                         // Highlight recognizable abbreviations in row.padrao
                         let padraoDisplay: React.ReactNode = formattedPadrao;
-                        const matchKey = Object.keys(legendData).find(k => formattedPadrao.includes(k));
+                        const matchKey = Object.keys(legendData).find((k) =>
+                          formattedPadrao.includes(k),
+                        );
                         if (matchKey) {
                           const parts = formattedPadrao.split(matchKey);
                           padraoDisplay = (
                             <>
                               {parts[0]}
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); handleAbbrClick(matchKey); }}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAbbrClick(matchKey);
+                                }}
                                 className="text-red-600 underline decoration-red-600/50 underline-offset-2 active:text-cyan-700 inline-block"
                               >
                                 {matchKey}
@@ -564,35 +717,70 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
                           );
                         }
 
-                        const formattedLocalizacao = (row.localizacao || "").replace(/\s+\+/g, '\u00A0+').replace(/\s+\-/g, '\u00A0-');
+                        const formattedLocalizacao = (row.localizacao || "")
+                          .replace(/\s+\+/g, "\u00A0+")
+                          .replace(/\s+\-/g, "\u00A0-");
 
                         return (
-                        <tr key={rIdx} className="hover:bg-gray-100 transition-colors">
-                          <td className="px-4 py-4 text-gray-900 font-mono text-[11px] sm:text-xs whitespace-pre-line text-center sm:text-left">
-                            {padraoDisplay}
-                          </td>
-                          <td className="px-4 py-4 text-gray-700 text-[11px] sm:text-xs">{formattedLocalizacao}</td>
-                          <td className="px-4 py-4 text-center">
-                            <div className="flex flex-col items-center gap-2">
-                              <button 
-                                onClick={() => handleAbbrClick(row.tipo)}
-                                className="inline-block px-2 py-1 bg-red-600/10 hover:bg-red-600/20 border border-red-600/20 active:scale-95 rounded text-red-600 font-mono font-bold text-[10px] transition-all cursor-pointer"
-                              >
-                                {row.tipo}
-                              </button>
-                              {getTutorialSteps(row.tipo, row.localizacao).length > 0 && (
+                          <tr
+                            key={rIdx}
+                            className="hover:bg-gray-100 transition-colors"
+                          >
+                            <td className="px-4 py-4 text-gray-900 font-mono text-[11px] sm:text-xs whitespace-pre-line text-center sm:text-left">
+                              {padraoDisplay}
+                            </td>
+                            <td className="px-4 py-4 text-gray-700 text-[11px] sm:text-xs">
+                              {formattedLocalizacao}
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <div className="flex flex-col items-center gap-2">
                                 <button
-                                  onClick={() => setSelectedTutorial({ key: row.tipo, title: row.localizacao, steps: getTutorialSteps(row.tipo, row.localizacao) })}
-                                  className="w-full max-w-[80px] flex items-center justify-center gap-1.5 px-2 py-1.5 bg-red-600/10 hover:bg-red-600/20 text-red-600 rounded-md text-[10px] font-bold transition-colors border border-red-600/20"
+                                  onClick={() => handleAbbrClick(row.tipo)}
+                                  className="inline-block px-2 py-1 bg-red-600/10 hover:bg-red-600/20 border border-red-600/20 active:scale-95 rounded text-red-600 font-mono font-bold text-[10px] transition-all cursor-pointer"
                                 >
-                                  <Info className="w-3 h-3" />
-                                  Testar
+                                  {row.tipo}
                                 </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      )})}
+                                {(getTutorialSteps(row.tipo, row.localizacao)
+                                  .length > 0 ||
+                                  getMultimeterConfig(
+                                    row.tipo,
+                                    row.padrao || "",
+                                  )) && (
+                                  <button
+                                    onClick={() =>
+                                      setSelectedTutorial({
+                                        key: row.tipo,
+                                        title: row.localizacao,
+                                        steps: getTutorialSteps(
+                                          row.tipo,
+                                          row.localizacao,
+                                        ),
+                                        padrao: row.padrao || "",
+                                      })
+                                    }
+                                    className="w-full max-w-[90px] flex items-center justify-center gap-1.5 px-2 py-1.5 bg-red-600/10 hover:bg-red-600/20 text-red-600 rounded-md text-[10px] font-bold transition-colors border border-red-600/20"
+                                  >
+                                    {getMultimeterConfig(
+                                      row.tipo,
+                                      row.padrao || "",
+                                    ) ? (
+                                      <Activity className="w-3 h-3" />
+                                    ) : (
+                                      <Info className="w-3 h-3" />
+                                    )}
+                                    {getMultimeterConfig(
+                                      row.tipo,
+                                      row.padrao || "",
+                                    )
+                                      ? "Medir"
+                                      : "Testar"}
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -600,7 +788,7 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
             ))}
           </div>
         </main>
-        
+
         {abbrModal}
         {tutorialModal}
       </div>
@@ -622,14 +810,15 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
             <h1 className="text-xl font-bold text-gray-900 tracking-tight">
               Parâmetros: <span className="text-red-600">{brand}</span>
             </h1>
-            <p className="text-[10px] uppercase tracking-widest text-gray-600 font-bold mt-0.5">Selecione o Modelo</p>
+            <p className="text-[10px] uppercase tracking-widest text-gray-600 font-bold mt-0.5">
+              Selecione o Modelo
+            </p>
           </div>
         </div>
       </header>
 
       <main key="list" className="flex-1 p-4 md:p-6 overflow-y-auto">
         <div className="max-w-4xl mx-auto space-y-8 pb-12">
-          
           {/* Legendas e Abreviações */}
           <div className="bg-red-600/5 border border-red-600/20 rounded-3xl p-6 md:p-8 backdrop-blur-sm">
             <h2 className="text-sm font-bold text-red-600 mb-4 flex items-center gap-2 uppercase tracking-widest">
@@ -637,12 +826,15 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
               Legenda de Siglas e Abreviações
             </h2>
             <p className="text-sm text-red-600/60 mb-6">
-              Toque em qualquer sigla na tabela para ver o seu significado, ou consulte a lista abaixo:
+              Toque em qualquer sigla na tabela para ver o seu significado, ou
+              consulte a lista abaixo:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
               {Object.entries(legendData).map(([key, desc]) => (
                 <div key={key} className="flex items-start gap-3 text-sm">
-                  <span className="font-mono font-bold text-red-600 bg-red-600/10 px-1.5 py-0.5 rounded border border-red-600/20 text-[11px] mt-0.5">{key}</span>
+                  <span className="font-mono font-bold text-red-600 bg-red-600/10 px-1.5 py-0.5 rounded border border-red-600/20 text-[11px] mt-0.5">
+                    {key}
+                  </span>
                   <span className="text-gray-700/80 leading-snug">{desc}</span>
                 </div>
               ))}
@@ -650,20 +842,26 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-sm font-bold text-gray-600 uppercase tracking-widest px-2">Modelos Disponíveis</h2>
+            <h2 className="text-sm font-bold text-gray-600 uppercase tracking-widest px-2">
+              Modelos Disponíveis
+            </h2>
             {models.length === 0 ? (
-               <div className="text-center py-16 bg-white rounded-3xl border border-gray-200/60 shadow-sm">
-                 <p className="text-gray-600">Nenhum modelo cadastrado para {brand}.</p>
-               </div>
+              <div className="text-center py-16 bg-white rounded-3xl border border-gray-200/60 shadow-sm">
+                <p className="text-gray-600">
+                  Nenhum modelo cadastrado para {brand}.
+                </p>
+              </div>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
-                {models.map(model => (
+                {models.map((model) => (
                   <button
                     key={model.id}
                     onClick={() => setSelectedModelId(model.id)}
                     className="group w-full flex items-center justify-between p-5 bg-white border border-gray-200/60 shadow-sm rounded-2xl text-left hover:bg-gray-200/60 hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg transition-all shadow-sm active:scale-[0.98]"
                   >
-                    <span className="text-base font-semibold text-gray-900 group-hover:text-red-600 transition-colors">{model.name}</span>
+                    <span className="text-base font-semibold text-gray-900 group-hover:text-red-600 transition-colors">
+                      {model.name}
+                    </span>
                     <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-red-600/10 transition-colors">
                       <ChevronDown className="w-4 h-4 text-gray-600 group-hover:text-red-600 -rotate-90 transition-colors" />
                     </div>
@@ -674,7 +872,7 @@ export function DiagnosticParametersView({ brand, models, onBack }: DiagnosticPa
           </div>
         </div>
       </main>
-      
+
       {abbrModal}
       {tutorialModal}
     </div>
