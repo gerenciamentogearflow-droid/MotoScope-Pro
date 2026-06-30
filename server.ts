@@ -66,6 +66,8 @@ Você é um especialista em mecânica avançada de motocicletas e diagnóstico e
 LEIA TODOS OS DADOS DO MANUAL INTEIRO. Analise minuciosamente este manual de serviço de motocicleta (em PDF) e extraia TODOS os parâmetros e tolerâncias RELEVANTES PARA DIAGNÓSTICO E MANUTENÇÃO AVANÇADA, com foco extremo nos sistemas eletrônicos e de injeção.
 
 É MANDATÓRIO que você encontre e extraia as seguintes informações se existirem no manual (procure em todas as páginas, especialmente nas seções "PGM-FI", "Injeção", "Sistema Elétrico" e "Especificações/Manutenção"):
+- Taxa de compressão do cilindro (Pressão de compressão do motor em psi, kPa ou kgf/cm2)
+- Pressão da Bomba de Combustível (Pressão de linha, vazão, tensão)
 - Bico Injetor (Resistência, voltagem, tempo de injeção)
 - Sensor MAP (Pressão Absoluta do Coletor) - Voltagem de saída, resistência, pressão
 - Sensor IAT (Temperatura do Ar de Admissão) - Voltagem, resistência x temperatura
@@ -74,10 +76,9 @@ LEIA TODOS OS DADOS DO MANUAL INTEIRO. Analise minuciosamente este manual de ser
 - Sensor ECT / EOT (Temperatura do Motor/Óleo) - Voltagem, resistência x temperatura
 - Sensor CKP (Sensor de Posição do Virabrequim / Bobina de Pulso) - Resistência, voltagem de pico mínima
 - Sonda Lambda (Sensor de O2) - Voltagem, resistência do aquecedor
-- Bomba de Combustível (Pressão e Vazão)
 - Válvula IACV / FID (Atuador de Marcha Lenta) - Resistência, voltagem
 - Bobina de Ignição (Resistência primária e secundária sem cachimbo, voltagem de pico mínima)
-- Estator e Regulador/Retificador (Resistência das bobinas, voltagem de carga a 5000rpm, fuga de corrente)
+- Sistema de Carga: Estator e Regulador/Retificador (Resistência das bobinas do estator, voltagem de carga a 5000rpm, fuga de corrente da bateria)
 - Folga de válvulas de admissão e escape (com motor frio)
 
 O QUE IGNORAR ABSOLUTAMENTE (NÃO EXTRAIA DADOS GENÉRICOS OU MECÂNICOS INTERNOS):
@@ -107,22 +108,26 @@ Sua saída deve ser estritamente em JSON, seguindo esta estrutura TypeScript:
         }
       ]
     }
-  ]
+  ],
+  "extractionReport": {
+    "found": ["Lista dos componentes principais solicitados que você CONSEGUIU encontrar e extrair com sucesso"],
+    "missing": ["Lista dos componentes principais solicitados que você NÃO CONSEGUIU encontrar no PDF"]
+  }
 }
 
 REGRAS CRÍTICAS:
-1. NÃO invente dados. Se não estiver no manual, não inclua.
+1. NÃO invente dados. Se não estiver no manual, coloque em "missing" no extractionReport.
 2. NÃO RESUMA! Extraia TODOS OS DADOS DE SENSORES E ATUADORES DE INJEÇÃO ELETRÔNICA, um por um.
 3. Agrupe as informações logicamente em seções ("tables"). O modelo da moto deve ser identificado na capa ou primeiras páginas.
 4. Para o "tipo", tente inferir o mais adequado de acordo com a unidade:
    - Ohms (Ω) -> "RS" (Resistência)
    - Volts (V) -> "AL" (Alimentação/Tensão) ou "PV" (Pulso/Pico)
    - mm / in -> "MM" (Medida Dimensional/Folga - ex: folga de válvula)
-   - kPa / psi / bar -> "PR" (Pressão - ex: bomba, compressão)
+   - kPa / psi / bar / kgf/cm² -> "PR" (Pressão - ex: bomba, compressão)
    - ml/min / L/h -> "VZ" (Vazão - ex: bomba)
    - Continuidade -> "CC"
-5. ATENÇÃO MÁXIMA E EXAUSTIVA ao capítulo de Injeção Eletrônica (PGM-FI/FI) e Sistema Elétrico. Você DEVE extrair dezenas de parâmetros se o manual for completo.
-6. Procure ativamente pelos sensores TPS, MAP, IAT, EOT, CKP, IACV, Sonda Lambda e Bomba de Combustível. Eles SÃO OBRIGATÓRIOS.
+5. ATENÇÃO MÁXIMA E EXAUSTIVA ao capítulo de Injeção Eletrônica (PGM-FI/FI) e Sistema de Carga/Elétrico. Você DEVE extrair dezenas de parâmetros se o manual for completo.
+6. Procure ativamente pelos sensores TPS, MAP, IAT, EOT, CKP, IACV, Sonda Lambda, Estator, e Bomba de Combustível. Eles SÃO OBRIGATÓRIOS. A Taxa de Compressão e Pressão da Bomba de Combustível são sua prioridade absoluta.
 7. Retorne APENAS o JSON válido.
 `;
 
@@ -173,9 +178,23 @@ REGRAS CRÍTICAS:
                     },
                     required: ["name", "rows"]
                   }
+                },
+                extractionReport: {
+                  type: "OBJECT",
+                  properties: {
+                    found: {
+                      type: "ARRAY",
+                      items: { type: "STRING" }
+                    },
+                    missing: {
+                      type: "ARRAY",
+                      items: { type: "STRING" }
+                    }
+                  },
+                  required: ["found", "missing"]
                 }
               },
-              required: ["name", "tables"]
+              required: ["name", "tables", "extractionReport"]
             }
           }
         });

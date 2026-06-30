@@ -15,7 +15,9 @@ import {
   ArrowLeft,
   Eye,
   EyeOff,
-  ClipboardList
+  ClipboardList,
+  X,
+  User as UserIcon
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { RealSignalsList } from "./RealSignalsList";
@@ -31,11 +33,14 @@ import { yamahaParameters } from "../data/yamahaParameters";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
+import { updateUserCredentials } from "../lib/auth";
+
 interface DashboardProps {
   user: User;
   onSelectComponent: (comp: ComponentData) => void;
   onAdminClick: () => void;
   onLogout: () => void;
+  onUserUpdate?: (updatedUser: User) => void;
 }
 
 export function Dashboard({
@@ -43,6 +48,7 @@ export function Dashboard({
   onSelectComponent,
   onAdminClick,
   onLogout,
+  onUserUpdate,
 }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<"home" | "oscilloscope_menu" | "didactic" | "real_signals" | "multimeter" | "parameters" | "pinouts" | "diagnostic_worksheet">(
     "home",
@@ -62,6 +68,31 @@ export function Dashboard({
     useState<string | null>(null);
   
   const [hiddenBrands, setHiddenBrands] = useState<string[]>([]);
+
+  const [showUserSettings, setShowUserSettings] = useState(false);
+  const [newUsername, setNewUsername] = useState(user.username);
+  const [newPassword, setNewPassword] = useState("");
+  const [userUpdateError, setUserUpdateError] = useState("");
+  const [userUpdateSuccess, setUserUpdateSuccess] = useState("");
+
+  const handleUpdateUser = async () => {
+    setUserUpdateError("");
+    setUserUpdateSuccess("");
+    if (!newUsername.trim()) {
+      setUserUpdateError("Nome de usuário não pode estar vazio.");
+      return;
+    }
+    const updated = await updateUserCredentials(user, newUsername, newPassword);
+    if (updated) {
+      setUserUpdateSuccess("Dados atualizados com sucesso!");
+      setTimeout(() => setShowUserSettings(false), 2000);
+      if (onUserUpdate) {
+        onUserUpdate(updated);
+      }
+    } else {
+      setUserUpdateError("Erro ao atualizar dados. Nome de usuário pode já estar em uso.");
+    }
+  };
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "app_settings", "visibility"), (docSnap) => {
@@ -174,11 +205,19 @@ export function Dashboard({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {user.role === "admin" && (
+            {user.role === "admin" ? (
               <button
                 onClick={onAdminClick}
                 className="p-2.5 rounded-full hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition-colors"
                 title="Painel Admin"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowUserSettings(true)}
+                className="p-2.5 rounded-full hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition-colors"
+                title="Configurações da Conta"
               >
                 <Settings className="w-5 h-5" />
               </button>
@@ -766,6 +805,91 @@ export function Dashboard({
                       <p className="text-sm text-gray-600">Ligação estrela/triângulo, 3 saídas</p>
                     </div>
                   </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {/* Modal de Configurações do Usuário */}
+        <AnimatePresence>
+          {showUserSettings && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]"
+              >
+                <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50/50">
+                  <div className="flex items-center gap-2">
+                    <UserIcon className="w-5 h-5 text-gray-700" />
+                    <h3 className="font-semibold text-lg text-gray-900">Configurações da Conta</h3>
+                  </div>
+                  <button
+                    onClick={() => setShowUserSettings(false)}
+                    className="p-2 hover:bg-gray-200 rounded-lg transition-colors text-gray-500"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <div className="p-6 overflow-y-auto">
+                  {userUpdateSuccess && (
+                    <div className="mb-4 p-3 bg-emerald-50 text-emerald-700 text-sm rounded-lg border border-emerald-100 font-medium">
+                      {userUpdateSuccess}
+                    </div>
+                  )}
+                  {userUpdateError && (
+                    <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-100 font-medium">
+                      {userUpdateError}
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Nome de Usuário (Login)
+                      </label>
+                      <input
+                        type="text"
+                        value={newUsername}
+                        onChange={(e) => setNewUsername(e.target.value)}
+                        className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Nova Senha
+                      </label>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Deixe em branco para manter a atual"
+                        className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-8 flex gap-3">
+                    <button
+                      onClick={() => setShowUserSettings(false)}
+                      className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleUpdateUser}
+                      className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition-colors shadow-sm"
+                    >
+                      Salvar Alterações
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             </motion.div>
