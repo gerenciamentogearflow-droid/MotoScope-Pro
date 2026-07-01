@@ -9,10 +9,10 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSuccess }: LoginFormProps) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState(() => localStorage.getItem("motostore_remembered_username") || "");
+  const [password, setPassword] = useState(() => localStorage.getItem("motostore_remembered_password") || "");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(() => localStorage.getItem("motostore_remember_me") === "true");
   const [error, setError] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -25,8 +25,14 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       if (user) {
         if (rememberMe) {
           localStorage.setItem("motostore_remembered_user", JSON.stringify(user));
+          localStorage.setItem("motostore_remembered_username", username);
+          localStorage.setItem("motostore_remembered_password", password);
+          localStorage.setItem("motostore_remember_me", "true");
         } else {
           localStorage.removeItem("motostore_remembered_user");
+          localStorage.removeItem("motostore_remembered_username");
+          localStorage.removeItem("motostore_remembered_password");
+          localStorage.setItem("motostore_remember_me", "false");
         }
         onSuccess(user);
       } else {
