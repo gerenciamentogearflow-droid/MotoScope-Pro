@@ -1,12 +1,50 @@
-import React from "react";
-import { ComponentData } from "../types";
-import { Battery, Activity, ArrowUp, ArrowDown } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { ComponentData, WaveformPhase } from "../types";
+import { Battery, Activity, ArrowUp, ArrowDown, X, Maximize, Minimize } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface OscilloscopeDisplayProps {
   component: ComponentData;
 }
 
 export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
+  const [selectedPhaseId, setSelectedPhaseId] = useState<number | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = async () => {
+    if (!document.fullscreenElement) {
+      try {
+        await containerRef.current?.requestFullscreen();
+        // Tenta forçar o modo paisagem em dispositivos móveis
+        if (screen.orientation && 'lock' in screen.orientation) {
+          try {
+            await (screen.orientation as any).lock("landscape");
+          } catch (e) {
+            console.log("Orientation lock not supported or blocked", e);
+          }
+        }
+      } catch (err) {
+        console.error("Error attempting to enable fullscreen:", err);
+      }
+    } else {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+        if (screen.orientation && 'unlock' in screen.orientation) {
+          (screen.orientation as any).unlock();
+        }
+      }
+    }
+  };
+
   // Generate SVG path based on wave type
   const getPath = () => {
     switch (component.waveType) {
@@ -76,11 +114,31 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
   };
 
   const waves = getWaves();
+  
+  const selectedPhase = component.waveformPhases?.find((p) => p.id === selectedPhaseId);
 
   return (
-    <div className="bg-gradient-to-b from-[#1a1c23] to-[#121318] p-3 sm:p-5 rounded-3xl shadow-2xl mx-auto w-full max-w-4xl flex flex-col sm:flex-row gap-3 sm:gap-5 border border-black/10 ring-1 ring-black/50">
+    <div 
+      ref={containerRef}
+      className={`bg-gradient-to-b from-[#1a1c23] to-[#121318] p-3 sm:p-5 rounded-3xl shadow-2xl mx-auto w-full flex flex-col gap-3 sm:gap-5 border border-black/10 ring-1 ring-black/50 ${isFullscreen ? "max-w-none h-screen rounded-none p-0 sm:p-0 border-0 ring-0 overflow-hidden bg-black" : "max-w-4xl"}`}
+    >
+      <style>{`
+        @media (orientation: portrait) {
+          .fullscreen-mobile-rotate {
+            transform: rotate(90deg);
+            transform-origin: center;
+            width: 100vh !important;
+            height: 100vw !important;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -50vw;
+            margin-left: -50vh;
+          }
+        }
+      `}</style>
       {/* Screen Section */}
-      <div className="flex-1 bg-[#050608] rounded-xl overflow-hidden flex flex-col font-mono text-xs text-zinc-400 border-[8px] border-[#0a0a0c] shadow-[inset_0_0_40px_rgba(0,0,0,1)] relative aspect-[4/3] sm:aspect-auto sm:h-[360px] ring-1 ring-white/5">
+      <div className={`flex-1 bg-[#050608] rounded-xl overflow-hidden flex flex-col font-mono text-xs text-zinc-400 border-[8px] border-[#0a0a0c] shadow-[inset_0_0_40px_rgba(0,0,0,1)] relative ring-1 ring-white/5 ${isFullscreen ? "fullscreen-mobile-rotate h-full rounded-none border-0 ring-0" : "aspect-[4/3] sm:aspect-auto sm:h-[360px]"}`}>
         {/* Top Bar */}
         <div className="flex justify-between items-center px-4 py-2 bg-[#0a0a0c]/80 border-b border-white/5 z-10 text-[#00FF00]">
           <div className="flex items-center gap-2">
@@ -90,7 +148,25 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="bg-[#00FF00]/20 text-[#00FF00] border border-[#00FF00]/50 px-2 py-0.5 rounded text-[9px] md:text-[10px] uppercase font-bold tracking-widest">
+            <button 
+              onClick={toggleFullscreen}
+              className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md transition-colors mr-2 text-[10px] uppercase font-bold"
+            >
+              {isFullscreen ? (
+                <>
+                  <Minimize className="w-3 h-3 md:w-4 md:h-4" />
+                  <span className="hidden sm:inline">Fechar Tela Cheia</span>
+                  <span className="sm:hidden">Fechar</span>
+                </>
+              ) : (
+                <>
+                  <Maximize className="w-3 h-3 md:w-4 md:h-4" />
+                  <span className="hidden sm:inline">Tela Cheia</span>
+                  <span className="sm:hidden">Ampliar</span>
+                </>
+              )}
+            </button>
+            <span className="bg-[#00FF00]/20 text-[#00FF00] border border-[#00FF00]/50 px-2 py-0.5 rounded text-[9px] md:text-[10px] uppercase font-bold tracking-widest hidden sm:inline-block">
               RUN
             </span>
             <div className="flex gap-2 text-zinc-500 font-bold text-[10px]">
@@ -102,7 +178,10 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
         </div>
 
         {/* Main Display Grid */}
-        <div className="relative flex-1 overflow-hidden flex flex-col justify-center items-center">
+        <div 
+          className="relative flex-1 overflow-hidden flex flex-col justify-center items-center"
+          onClick={() => setSelectedPhaseId(null)}
+        >
           {/* Grid background */}
           <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
             {[...Array(9)].map((_, i) => (
@@ -123,7 +202,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
 
           {/* Wave SVG */}
           <svg
-            className="absolute w-full h-full scale-y-[0.85]"
+            className="absolute w-full h-full scale-y-[0.85] cursor-pointer"
             preserveAspectRatio="none"
             viewBox="0 0 100 100"
           >
@@ -144,7 +223,22 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
             ))}
             {component.waveformPhases?.map((phase) =>
               phase.x !== undefined && phase.y !== undefined ? (
-                <g key={phase.id}>
+                <g 
+                  key={phase.id} 
+                  className="cursor-pointer transition-transform hover:scale-[1.02] origin-center"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPhaseId(phase.id);
+                  }}
+                  style={{ transformOrigin: `${phase.labelX ?? phase.x}px ${phase.labelY ?? phase.y - 10}px` }}
+                >
+                  {/* Invisible Hitbox for easier clicking */}
+                  <circle
+                    cx={phase.labelX ?? phase.x}
+                    cy={phase.labelY ?? phase.y - 10}
+                    r="8"
+                    fill="transparent"
+                  />
                   {/* Line pointing to wave */}
                   <line
                     x1={phase.labelX ?? phase.x}
@@ -162,17 +256,19 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
                     cx={phase.labelX ?? phase.x}
                     cy={phase.labelY ?? phase.y - 10}
                     r="4.5"
-                    fill="#000000"
+                    fill={selectedPhaseId === phase.id ? (waves[0]?.color || "#00FFFF") : "#000000"}
                     stroke={waves[0]?.color || "#00FFFF"}
                     strokeWidth="1"
+                    className="transition-colors duration-200"
                   />
                   <text
                     x={phase.labelX ?? phase.x}
                     y={(phase.labelY ?? phase.y - 10) + 1.5}
                     fontSize="4"
-                    fill={waves[0]?.color || "#00FFFF"}
+                    fill={selectedPhaseId === phase.id ? "#000000" : (waves[0]?.color || "#00FFFF")}
                     textAnchor="middle"
                     fontWeight="bold"
+                    className="transition-colors duration-200 pointer-events-none"
                   >
                     {phase.id}
                   </text>
@@ -180,6 +276,40 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
               ) : null,
             )}
           </svg>
+          
+          {/* Overlay Info Popup */}
+          <AnimatePresence>
+            {selectedPhase && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                className="absolute z-20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm sm:top-auto sm:left-auto sm:translate-x-0 sm:translate-y-0 sm:bottom-8 sm:right-4 sm:w-72 bg-[#0a0a0c]/95 border border-white/20 rounded-xl p-4 shadow-2xl backdrop-blur-sm max-h-[calc(100%-2rem)] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-between items-start mb-2 shrink-0">
+                  <div className="flex items-center gap-2">
+                    <span className="bg-[#00FF00] text-black w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs">
+                      {selectedPhase.id}
+                    </span>
+                    <h5 className="text-[#00FF00] font-bold text-sm tracking-wide">
+                      {selectedPhase.title}
+                    </h5>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedPhaseId(null)}
+                    className="text-white/50 hover:text-white transition-colors p-1"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <p className="text-zinc-300 text-xs leading-relaxed font-sans">
+                  {selectedPhase.description}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Bottom Status Bar */}
@@ -206,15 +336,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
           </div>
         </div>
       </div>
-
-      {/* Hardware Buttons Panel */}
-      <div className="grid grid-cols-5 sm:flex sm:flex-col gap-2.5 sm:gap-3 sm:w-[80px] sm:py-2">
-        {["AUTO", "MODE", <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5 mx-auto" key="up" />, <ArrowDown className="w-4 h-4 sm:w-5 sm:h-5 mx-auto" key="down" />, "RUN"].map((label, idx) => (
-          <button key={idx} className="bg-gradient-to-b from-white to-gray-100 hover:from-gray-50 hover:to-gray-200 text-gray-700 text-[9px] sm:text-[10px] font-bold rounded-lg shadow-[0_4px_0_#e5e7eb,0_5px_10px_rgba(0,0,0,0.1)] active:translate-y-[4px] active:shadow-[0_0px_0_#e5e7eb,0_1px_2px_rgba(0,0,0,0.1)] h-12 sm:h-14 flex items-center justify-center border border-gray-200 transition-all uppercase tracking-widest">
-            {label}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
+

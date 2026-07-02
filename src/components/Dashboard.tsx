@@ -13,6 +13,7 @@ import {
   SlidersHorizontal,
   Share2,
   ArrowLeft,
+  ArrowRight,
   Eye,
   EyeOff,
   ClipboardList,
@@ -23,6 +24,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { RealSignalsList } from "./RealSignalsList";
 import { MultimeterDetail } from "./MultimeterDetail";
 import { BrandLogo } from "./BrandLogo";
+import { SensorDifferencesModal } from "./SensorDifferencesModal";
 
 import { DiagnosticParametersView } from "./DiagnosticParametersView";
 import { PinoutsView } from "./PinoutsView";
@@ -121,6 +123,7 @@ export function Dashboard({
   );
 
   const [showStatorModal, setShowStatorModal] = useState<{ mode: "didactic" | "real" | "multimeter" | "parameters" | "pinouts" } | null>(null);
+  const [showCkpDifferences, setShowCkpDifferences] = useState(false);
 
   const handleComponentClick = (comp: ComponentData, mode: "didactic" | "real" | "multimeter" | "parameters" | "pinouts" = "didactic") => {
     if (comp.id === "estator") {
@@ -405,6 +408,19 @@ export function Dashboard({
                   </h2>
                   <p className="text-sm text-gray-600">{filteredComponents.length} componentes encontrados</p>
                 </div>
+              </div>
+
+              <div className="mb-6">
+                <button
+                  onClick={() => setShowCkpDifferences(true)}
+                  className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 p-4 rounded-2xl font-semibold flex items-center justify-between transition-colors shadow-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <Activity className="w-5 h-5 text-blue-600" />
+                    <span>Diferenças: Hall vs Indutivo</span>
+                  </div>
+                  <ArrowRight className="w-5 h-5 opacity-70" />
+                </button>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -893,6 +909,12 @@ export function Dashboard({
                 </div>
               </motion.div>
             </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {showCkpDifferences && (
+            <SensorDifferencesModal onClose={() => setShowCkpDifferences(false)} />
           )}
         </AnimatePresence>
       </main>
