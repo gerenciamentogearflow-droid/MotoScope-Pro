@@ -260,7 +260,7 @@ REGRAS CRÍTICAS:
         return res.status(400).json({ error: "Missing 'text' or 'id' in query." });
       }
 
-      // Check if file already exists
+      // Check if file already exists in tmp dir
       const outputDir = path.join(os.tmpdir(), 'moto-audio');
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
@@ -302,7 +302,7 @@ REGRAS CRÍTICAS:
         return res.status(400).json({ error: "Missing 'text' or 'id' in request body." });
       }
 
-      // Check if file already exists
+      // Check if file already exists in tmp dir
       const outputDir = path.join(os.tmpdir(), 'moto-audio');
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });

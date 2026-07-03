@@ -206,7 +206,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
       // Fix pronunciation of specific terms for the TTS
       textToSpeak = textToSpeak.replace(/Dwell/gi, 'Duél');
       
-      // By using the GET endpoint directly in the Audio object,
+      // Using the GET endpoint directly in the Audio object,
       // the browser streams the audio natively and starts playback
       // immediately without waiting for the full blob to download.
       const url = `/api/tts?id=${encodeURIComponent(audioId)}&text=${encodeURIComponent(textToSpeak)}`;
