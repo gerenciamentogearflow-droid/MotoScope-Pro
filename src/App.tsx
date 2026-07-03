@@ -7,10 +7,8 @@ import { AdminPanel } from "./components/AdminPanel";
 import { ComponentDetail } from "./components/ComponentDetail";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { OfflineStatus } from "./components/OfflineStatus";
-import { AudioPreloader } from "./components/AudioPreloader";
 
 export default function App() {
-  const [audioPreloaded, setAudioPreloaded] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [view, setView] = useState<"login" | "dashboard" | "admin" | "detail">(
     "login",
@@ -89,10 +87,6 @@ export default function App() {
 
     return null;
   };
-
-  if (!audioPreloaded) {
-    return <AudioPreloader onComplete={() => setAudioPreloaded(true)} />;
-  }
 
   return (
     <>

@@ -189,73 +189,47 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
   const selectedPhase = component.waveformPhases?.find((p) => p.id === selectedPhaseId);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const preloadedBlobs = useRef<Record<number, string>>({});
+  // Cache data URLs in memory to avoid reading blobs multiple times
+  const audioDataUrlCache = useRef<Record<string, string>>({});
 
-  useEffect(() => {
-    let active = true;
-    
-    const loadBlobs = async () => {
-      if (!component.waveformPhases) return;
-      
-      const newBlobs: Record<number, string> = {};
-      
-      for (const phase of component.waveformPhases) {
-        const audioId = `${component.id}-phase-${phase.id}`;
-        const url = `/audio/${encodeURIComponent(audioId)}.mp3`;
-        
-        let audioUrl = url;
-        if ('caches' in window) {
-          try {
-            const cache = await caches.open('moto-audio-cache-v2');
-            const response = await cache.match(url);
-            if (response) {
-              const originalBlob = await response.blob();
-              const blob = new Blob([originalBlob], { type: 'audio/mpeg' });
-              
-              // Convert blob to base64 Data URL for better mobile Safari compatibility
-              audioUrl = await new Promise<string>((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-              });
-            }
-          } catch (e) {
-            console.log("Error loading audio from cache", e);
-          }
-        }
-        if (!active) return;
-        newBlobs[phase.id] = audioUrl;
-      }
-      
-      if (active) {
-        preloadedBlobs.current = newBlobs;
-      }
-    };
-    
-    loadBlobs();
-    
-    return () => {
-      active = false;
-      Object.values(preloadedBlobs.current).forEach(url => {
-        if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      });
-      preloadedBlobs.current = {};
-    };
-  }, [component.id, component.waveformPhases]);
-
-  const playAudioForPhase = (phaseId: number) => {
+  const playAudioForPhase = async (phaseId: number) => {
     if (!audioRef.current) return;
     
     audioRef.current.pause();
     audioRef.current.currentTime = 0;
     
-    const url = preloadedBlobs.current[phaseId] || `/audio/${encodeURIComponent(component.id + '-phase-' + phaseId)}.mp3`;
+    const url = `/audio/${encodeURIComponent(component.id + '-phase-' + phaseId)}.mp3`;
     
-    audioRef.current.src = url;
-    audioRef.current.play().catch(err => console.log("Erro ao tocar áudio:", err));
+    try {
+      let srcToPlay = url;
+
+      // iOS Safari has a known issue playing audio from Service Worker caches because it demands
+      // HTTP 206 Partial Content, while SW caches usually return 200 OK.
+      // To bypass this, we fetch the audio (which SW will happily serve as 200),
+      // convert it to a Blob, then to a base64 Data URL, which Safari plays flawlessly.
+      if (!audioDataUrlCache.current[url]) {
+        const response = await fetch(url);
+        if (response.ok) {
+          const blob = await response.blob();
+          const base64Url = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+          audioDataUrlCache.current[url] = base64Url;
+        }
+      }
+
+      if (audioDataUrlCache.current[url]) {
+        srcToPlay = audioDataUrlCache.current[url];
+      }
+
+      audioRef.current.src = srcToPlay;
+      await audioRef.current.play();
+    } catch (err) {
+      console.log("Erro ao tocar áudio:", err);
+    }
   };
 
   useEffect(() => {
