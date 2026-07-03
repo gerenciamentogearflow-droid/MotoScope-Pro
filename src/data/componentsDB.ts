@@ -979,7 +979,7 @@ Comportamento e Defeitos como Professor:
     },
   },
   {
-    id: "cdi",
+    id: "cdi-ac",
     name: "CDI AC (Ignição Capacitiva)",
     type: "actuator",
     shortDescription: "Módulo de ignição de motos carburadas (descarrega energia na bobina).",

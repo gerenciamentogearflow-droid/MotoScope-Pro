@@ -1,7 +1,8 @@
 import { Howl } from 'howler';
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, getDocFromServer } from 'firebase/firestore';
 import { db } from './firebase';
 import { openDB } from 'idb';
+import { componentsDB } from '../data/componentsDB';
 
 const DB_NAME = 'motoscope-audio-db';
 const STORE_NAME = 'audios';
@@ -19,23 +20,47 @@ async function getAudioDB() {
 export async function syncAudiosForOffline(onProgress?: (progress: number) => void) {
   try {
     const localDb = await getAudioDB();
-    const audiosCollection = collection(db, 'audios');
-    const snap = await getDocs(audiosCollection);
     
+    // Determine expected audios from componentsDB
+    const expectedAudios = componentsDB.flatMap(c => 
+      c.waveformPhases ? c.waveformPhases.map(p => `${c.id}-phase-${p.id}`) : []
+    );
+
+    const existingKeys = await localDb.getAllKeys(STORE_NAME);
+    const missingAudios = expectedAudios.filter(id => !existingKeys.includes(id as string));
+
+    if (missingAudios.length === 0) {
+      console.log('All audios are already synced for offline use.');
+      if (onProgress) onProgress(100);
+      return;
+    }
+
     let processed = 0;
-    const total = snap.size;
-    
-    for (const document of snap.docs) {
-      const dataUri = document.data().data;
-      if (dataUri) {
-        await localDb.put(STORE_NAME, dataUri, document.id);
+    const total = missingAudios.length;
+
+    for (const audioId of missingAudios) {
+      try {
+        // Use getDocFromServer to bypass local cache, ensuring we get the new data
+        const docRef = doc(db, 'audios', audioId);
+        const docSnap = await getDocFromServer(docRef);
+        
+        if (docSnap.exists()) {
+          const dataUri = docSnap.data().data;
+          if (dataUri) {
+            await localDb.put(STORE_NAME, dataUri, audioId);
+          }
+        } else {
+          console.warn(`Audio ${audioId} not found on server during sync.`);
+        }
+      } catch (err) {
+        console.warn(`Failed to sync audio ${audioId}:`, err);
       }
       processed++;
       if (onProgress) {
         onProgress(Math.round((processed / total) * 100));
       }
     }
-    console.log(`Synced ${snap.size} audios to local IndexedDB for offline use.`);
+    console.log(`Synced ${missingAudios.length} missing audios to local IndexedDB for offline use.`);
   } catch (err) {
     console.error("Failed to sync audios:", err);
   }
