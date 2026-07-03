@@ -209,7 +209,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
       // By using the GET endpoint directly in the Audio object,
       // the browser streams the audio natively and starts playback
       // immediately without waiting for the full blob to download.
-      const url = `/api/tts?id=${encodeURIComponent(audioId)}&text=${encodeURIComponent(textToSpeak)}`;
+      const url = `/audio/${encodeURIComponent(audioId)}.mp3`;
       const audio = new Audio(url);
       audioRef.current = audio;
 
