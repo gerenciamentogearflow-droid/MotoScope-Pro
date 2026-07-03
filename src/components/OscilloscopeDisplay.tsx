@@ -207,7 +207,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
       textToSpeak = textToSpeak.replace(/Dwell/gi, 'Duél');
       
       // Since the app is hosted as a static site, use the pre-generated static audio files
-      const url = `./audio/${encodeURIComponent(audioId)}.mp3`;
+      const url = `/audio/${encodeURIComponent(audioId)}.mp3`;
       const audio = new Audio(url);
       audioRef.current = audio;
 
