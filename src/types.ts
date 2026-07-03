@@ -103,3 +103,4 @@ export interface PinoutModel {
   modules: PinoutModule[];
 }
 
+declare global { const __APP_UPDATE_DATE__: string; }

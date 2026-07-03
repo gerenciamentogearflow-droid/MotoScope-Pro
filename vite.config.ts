@@ -6,6 +6,9 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(() => {
   return {
+    define: {
+      __APP_UPDATE_DATE__: JSON.stringify(new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })),
+    },
     plugins: [
       react(), 
       tailwindcss(),

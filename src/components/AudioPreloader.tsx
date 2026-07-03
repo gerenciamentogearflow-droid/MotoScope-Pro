@@ -42,9 +42,7 @@ export function AudioPreloader({ onComplete }: AudioPreloaderProps) {
         // Check which files we already have
         for (const url of audioUrls) {
           const response = await cache.match(url);
-          // Only count as downloaded if it's an audio file
-          const contentType = response?.headers.get('Content-Type');
-          if (response && contentType && contentType.includes('audio')) {
+          if (response && response.ok) {
             downloadedCount++;
           } else {
             missingUrls.push(url);
@@ -65,23 +63,11 @@ export function AudioPreloader({ onComplete }: AudioPreloaderProps) {
           const url = missingUrls[i];
           try {
             const res = await fetch(url);
-            const contentType = res.headers.get('Content-Type');
             
-            if (res.status === 200 && contentType && contentType.includes('audio')) {
+            if (res.ok) {
               await cache.put(url, res.clone());
-            } else if (res.status === 206 && contentType && contentType.includes('audio')) {
-              const blob = await res.blob();
-              const newRes = new Response(blob, {
-                status: 200,
-                statusText: 'OK',
-                headers: new Headers({
-                  'Content-Type': contentType || 'audio/mpeg',
-                  'Content-Length': blob.size.toString(),
-                })
-              });
-              await cache.put(url, newRes);
             } else {
-              console.warn(`Invalid response or content type for ${url}: status=${res.status}, type=${contentType}`);
+              console.warn(`Invalid response for ${url}: status=${res.status}`);
             }
           } catch (e) {
             console.error("Failed to download", url, e);

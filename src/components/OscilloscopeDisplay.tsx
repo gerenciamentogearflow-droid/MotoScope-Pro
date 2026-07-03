@@ -189,40 +189,72 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
   const selectedPhase = component.waveformPhases?.find((p) => p.id === selectedPhaseId);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const preloadedBlobs = useRef<Record<number, string>>({});
 
-  const playAudioForPhase = async (phaseId: number) => {
+  useEffect(() => {
+    let active = true;
+    
+    const loadBlobs = async () => {
+      if (!component.waveformPhases) return;
+      
+      const newBlobs: Record<number, string> = {};
+      
+      for (const phase of component.waveformPhases) {
+        const audioId = `${component.id}-phase-${phase.id}`;
+        const url = `/audio/${encodeURIComponent(audioId)}.mp3`;
+        
+        let audioUrl = url;
+        if ('caches' in window) {
+          try {
+            const cache = await caches.open('moto-audio-cache-v2');
+            const response = await cache.match(url);
+            if (response) {
+              const originalBlob = await response.blob();
+              const blob = new Blob([originalBlob], { type: 'audio/mpeg' });
+              
+              // Convert blob to base64 Data URL for better mobile Safari compatibility
+              audioUrl = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result as string);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+              });
+            }
+          } catch (e) {
+            console.log("Error loading audio from cache", e);
+          }
+        }
+        if (!active) return;
+        newBlobs[phase.id] = audioUrl;
+      }
+      
+      if (active) {
+        preloadedBlobs.current = newBlobs;
+      }
+    };
+    
+    loadBlobs();
+    
+    return () => {
+      active = false;
+      Object.values(preloadedBlobs.current).forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+      preloadedBlobs.current = {};
+    };
+  }, [component.id, component.waveformPhases]);
+
+  const playAudioForPhase = (phaseId: number) => {
     if (!audioRef.current) return;
     
-    // Synchronously attempt to play a tiny silent audio to bless/unlock the element on mobile
-    if (!audioRef.current.src || !audioRef.current.src.startsWith('blob:')) {
-        audioRef.current.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
-    }
-    audioRef.current.play().catch(() => {});
     audioRef.current.pause();
     audioRef.current.currentTime = 0;
     
-    const audioId = `${component.id}-phase-${phaseId}`;
-    const url = `/audio/${encodeURIComponent(audioId)}.mp3`;
+    const url = preloadedBlobs.current[phaseId] || `/audio/${encodeURIComponent(component.id + '-phase-' + phaseId)}.mp3`;
     
-    let blobUrl = url;
-    if ('caches' in window) {
-      try {
-        const cache = await caches.open('moto-audio-cache-v2');
-        const response = await cache.match(url);
-        if (response) {
-          const blob = await response.blob();
-          blobUrl = URL.createObjectURL(blob);
-        }
-      } catch (e) {
-        console.log("Error loading audio from cache", e);
-      }
-    }
-    
-    if (audioRef.current.src && audioRef.current.src.startsWith('blob:')) {
-      URL.revokeObjectURL(audioRef.current.src);
-    }
-    
-    audioRef.current.src = blobUrl;
+    audioRef.current.src = url;
     audioRef.current.play().catch(err => console.log("Erro ao tocar áudio:", err));
   };
 

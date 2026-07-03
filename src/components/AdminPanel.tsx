@@ -334,6 +334,18 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
             </motion.div>
           </>
         )}
+        
+        {/* APP VERSION INFO */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-center py-6 mt-4"
+        >
+          <p className="text-xs text-gray-500 font-medium">
+            Última atualização: {typeof __APP_UPDATE_DATE__ !== 'undefined' ? __APP_UPDATE_DATE__ : 'Desconhecida'}
+          </p>
+        </motion.div>
       </main>
 
       {/* MODAL EDITAR USUÁRIO */}
