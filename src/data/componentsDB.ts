@@ -2,6 +2,57 @@ import { ComponentData } from "../types";
 
 export const componentsDB: ComponentData[] = [
   {
+    id: "cdi-dc",
+    name: "CDI DC (Ignição Capacitiva)",
+    type: "actuator",
+    shortDescription: "Módulo de ignição alimentado pela bateria (12V) que descarrega energia na bobina.",
+    fullDescription:
+      "O CDI DC (Corrente Contínua) possui um conversor interno que eleva os 12V da bateria para cerca de 200V a 400V, armazenando em um capacitor. Ao receber o sinal do CKP, ele descarrega essa energia instantaneamente no primário da bobina de ignição, gerando a faísca. A grande diferença para o CDI AC é que a alimentação vem da bateria pós-chave e não do estator.",
+    oscilloscopeSetup: {
+      timeDiv: "5ms a 10ms",
+      voltageDiv: "50V a 100V (Atenção: picos podem passar de 200V, use atenuador!)",
+      triggerEdge: "Subida",
+      triggerMode: "Normal",
+      triggerLevel: "20V a 50V",
+    },
+    connectionInstructions:
+      "Conecte a garra jacaré preta ao negativo da bateria ou chassi. Conecte a ponta de prova (canal 1), OBRIGATORIAMENTE com atenuador (ex: 20:1) se não suportar altas tensões, no fio que vai do CDI para a Bobina de Ignição.",
+    waveformExplanation:
+      "A forma de onda de saída do CDI DC para a bobina é semelhante à do CDI AC: um pico de tensão positivo de curtíssima duração, seguido de oscilações amortecidas.\n\nComportamento em Falhas:\n• Sem pico de tensão: Verifique se chegam 12V no CDI (pós-chave). Sem bateria carregada, o CDI DC não funciona.\n• Oscilação muito curta: Curto no primário da bobina de ignição ou fuga de corrente no sistema de ignição.",
+    waveformPhases: [
+      {
+        id: 1,
+        title: "Disparo do Capacitor",
+        description: "O CDI libera a energia armazenada (elevada a partir dos 12V) para o primário da bobina de ignição.",
+        x: 20,
+        y: 20,
+        labelX: 10,
+        labelY: 10,
+      },
+      {
+        id: 2,
+        title: "Oscilação Amortecida",
+        description: "Dissipação da energia restante no circuito da bobina após o disparo principal.",
+        x: 30,
+        y: 60,
+        labelX: 40,
+        labelY: 80,
+      }
+    ],
+    waveType: "cdi",
+    multimeter: {
+      setting: "Tensão Contínua (DCV) e Pico de Tensão (Peak Hold)",
+      instructions: "1. No fio de alimentação do CDI, meça tensão contínua (deve ter próximo de 12V).\n2. No fio de saída para a bobina, use adaptador de Pico (Peak Hold) para capturar o pico de disparo na partida.",
+      expectedValue: "Alimentação 12V constante (DCV). Disparo com pico alto na partida (Peak)."
+    },
+    symptoms: [
+      "Motor não pega se a bateria estiver descarregada",
+      "Cortes em aceleração caso haja queda de tensão 12V",
+      "Moto apaga subitamente"
+    ],
+  },
+
+  {
     id: "ckp-indutivo",
     name: "Sensor CKP (Rotação) - Indutivo",
     type: "sensor",
@@ -924,6 +975,52 @@ Comportamento e Defeitos como Professor:
       setting: "NA",
       instructions: "O multímetro não consegue ler o avanço de ignição pois depende da relação de TEMPO entre dois eventos super rápidos. Essa medição deve ser feita EXCLUSIVAMENTE com o osciloscópio (usando 2 canais) ou com pistola estroboscópica (lâmpada de ponto).",
       expectedValues: "Não se aplica.",
+      variesByModel: true,
+    },
+  },
+  {
+    id: "cdi",
+    name: "CDI AC (Ignição Capacitiva)",
+    type: "actuator",
+    shortDescription: "Módulo de ignição de motos carburadas (descarrega energia na bobina).",
+    fullDescription:
+      "O CDI (Capacitor Discharge Ignition) armazena a energia gerada pela bobina de força do estator em um capacitor interno e, ao receber o sinal do sensor de pulso (CKP), descarrega essa energia (um pulso de tensão positiva de alta voltagem) instantaneamente no primário da bobina de ignição, gerando a faísca na vela.",
+    oscilloscopeSetup: {
+      timeDiv: "5ms a 10ms",
+      voltageDiv: "50V a 100V (Atenção: picos podem passar de 200V, use atenuador!)",
+      triggerEdge: "Subida",
+      triggerMode: "Normal",
+      triggerLevel: "20V a 50V",
+    },
+    connectionInstructions:
+      "Conecte a garra jacaré preta ao negativo da bateria ou chassi. Conecte a ponta de prova (canal 1), OBRIGATORIAMENTE com atenuador (ex: 20:1) se não suportar altas tensões, no fio que vai do CDI para a Bobina de Ignição (geralmente Preto/Amarelo na Honda).",
+    waveformExplanation:
+      "A forma de onda do CDI é um pico de tensão extremamente alto e de curtíssima duração. É a descarga do capacitor. Logo após o pico principal, podem ocorrer algumas oscilações amortecidas. Diferente da ignição TCI (indutiva), não há o longo tempo de 'dwell' (carregamento) antes do disparo, a subida de tensão é instantânea.\n\nComportamento em Falhas:\n• Pico muito baixo ou inexistente: O CDI pode não estar recebendo alimentação do estator (bobina de força), o capacitor interno estourou, ou não está recebendo sinal do CKP (pulso).\n• Sem oscilação residual (amortecida): Pode indicar um curto-circuito no primário da bobina de ignição, que drena a energia muito rápido sem criar ressonância.",
+    waveformPhases: [
+      {
+        id: 1,
+        title: "Disparo do Capacitor",
+        description: "O momento exato em que o CDI libera a energia (100V a 400V) para o primário da bobina de ignição.",
+        x: 20,
+        y: 20,
+        labelX: 10,
+        labelY: 10,
+      },
+      {
+        id: 2,
+        title: "Oscilação Amortecida",
+        description: "Dissipação da energia restante entre a bobina e o capacitor após a faísca.",
+        x: 30,
+        y: 60,
+        labelX: 40,
+        labelY: 80,
+      }
+    ],
+    waveType: "cdi",
+    multimeter: {
+      setting: "Pico de Tensão (Peak Hold) em VDC ou Multímetro com Adaptador de Pico",
+      instructions: "1. Conecte a ponta preta ao terra (chassi ou negativo da bateria).\n2. Conecte a ponta vermelha no fio de saída do CDI para a bobina de ignição (ex: Preto/Amarelo).\n3. Dê partida no motor (start ou pedal).",
+      expectedValues: "Mínimo de 100V de pico (varia conforme o modelo e estado do estator).",
       variesByModel: true,
     },
   }

@@ -71,8 +71,8 @@ class AudioPlayer {
               await localDb.put(STORE_NAME, dataUri, audioId);
             }
           } else {
-            console.warn(`Audio ${audioId} not found in database.`);
-            return;
+            console.warn(`Audio ${audioId} not found in database. Trying local fallback...`);
+            dataUri = `/audio/${audioId}.mp3`;
           }
         }
 

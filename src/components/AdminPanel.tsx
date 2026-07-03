@@ -3,6 +3,11 @@ import { User } from "../types";
 import { registerUser, getAllUsers, updateUserCredentials, deleteUser, adminUpdateUser } from "../lib/auth";
 import { ArrowLeft, UserPlus, Users, Settings, KeyRound, Pencil, Trash2, Eye, EyeOff, AlertTriangle, X, FileText, Upload, CheckCircle2, Loader2, Copy } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { db } from "../lib/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { componentsDB } from "../data/componentsDB";
+import { Mic } from "lucide-react";
+
 
 interface AdminPanelProps {
   adminUser: User;
@@ -221,6 +226,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
         </motion.div>
 
         {/* ADMIN SECTION */}
+        
         {adminUser.role === "admin" && (
           <>
 

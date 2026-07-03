@@ -116,11 +116,13 @@ export function Dashboard({
     await setDoc(doc(db, "app_settings", "visibility"), { hiddenBrands: newHidden }, { merge: true });
   };
 
-  const filteredComponents = componentsDB.filter(
-    (c) =>
-      !c.hidden &&
-      (activeTab !== "multimeter" || c.multimeter)
-  );
+  const filteredComponents = componentsDB
+    .filter(
+      (c) =>
+        !c.hidden &&
+        (activeTab !== "multimeter" || c.multimeter)
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const [showStatorModal, setShowStatorModal] = useState<{ mode: "didactic" | "real" | "multimeter" | "parameters" | "pinouts" } | null>(null);
   const [showCkpDifferences, setShowCkpDifferences] = useState(false);

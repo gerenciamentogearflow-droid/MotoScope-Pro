@@ -113,6 +113,9 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
       case "ignition":
         // Ignition Coil: Dwell -> Spark Spike -> Burn Line (noisy) -> Extinguish -> Ringing
         return "M 0 60 L 15 60 L 15.5 80 L 45 80 L 45.5 5 L 46 45 L 48 46 L 50 44 L 53 46 L 56 44 L 58 46 L 58.5 25 L 59.5 75 L 61 40 L 62.5 70 L 64 50 L 65.5 65 L 67 55 L 68.5 60 L 100 60";
+      case "cdi":
+        // CDI: No Dwell -> Instant Spark Spike -> Ringing down
+        return "M 0 60 L 20 60 L 20.2 5 L 20.6 80 L 21.2 20 L 22 75 L 23 35 L 24.5 65 L 26.5 55 L 29 60 L 100 60";
       case "tps":
         // TPS: Idle noise -> smooth slope -> WOT noise
         return "M 0 85 L 2 84 L 4 86 L 6 85 L 20 85 L 80 15 L 90 14 L 92 16 L 94 15 L 100 15";
