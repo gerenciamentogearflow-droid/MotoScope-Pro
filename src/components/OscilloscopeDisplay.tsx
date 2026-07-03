@@ -205,9 +205,8 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
       
       // Fix pronunciation of specific terms for the TTS
       textToSpeak = textToSpeak.replace(/Dwell/gi, 'Duél');
-      
-      // Since the app is hosted as a static site, use the pre-generated static audio files
-      const url = `/audio/${encodeURIComponent(audioId)}.mp3`;
+
+      const url = `/api/tts?id=${encodeURIComponent(audioId)}&text=${encodeURIComponent(textToSpeak)}`;
       const audio = new Audio(url);
       audioRef.current = audio;
 
@@ -277,7 +276,14 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
           <div className="flex items-center gap-4">
             {hasAnimatedWaves && (
               <button 
-                onClick={(e) => { e.stopPropagation(); setIsLive(!isLive); setSelectedPhaseId(null); }}
+                onClick={(e) => { 
+                  e.stopPropagation(); 
+                  setIsLive(!isLive); 
+                  setSelectedPhaseId(null); 
+                  if (audioRef.current) {
+                    audioRef.current.pause();
+                  }
+                }}
                 className="flex items-center gap-1.5 bg-[#00FF00]/10 hover:bg-[#00FF00]/20 text-[#00FF00] px-3 py-1.5 rounded-md transition-colors mr-1 text-[10px] uppercase font-bold border border-[#00FF00]/30"
               >
                 {isLive ? (
@@ -325,7 +331,12 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
         {/* Main Display Grid */}
         <div 
           className="relative flex-1 overflow-hidden flex flex-col justify-center items-center"
-          onClick={() => setSelectedPhaseId(null)}
+          onClick={() => {
+            setSelectedPhaseId(null);
+            if (audioRef.current) {
+              audioRef.current.pause();
+            }
+          }}
         >
           {/* Grid background */}
           <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
@@ -497,7 +508,12 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
                       </h5>
                     </div>
                     <button 
-                      onClick={() => setSelectedPhaseId(null)}
+                      onClick={() => {
+                        setSelectedPhaseId(null);
+                        if (audioRef.current) {
+                          audioRef.current.pause();
+                        }
+                      }}
                       className="text-white/70 hover:text-white transition-colors p-1 -mr-1 -mt-1 shrink-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
                     >
                       <X className="w-4 h-4" />
