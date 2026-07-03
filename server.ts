@@ -12,6 +12,8 @@ dotenv.config();
 
 const upload = multer({ dest: 'uploads/' });
 
+import os from "os";
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
@@ -259,7 +261,7 @@ REGRAS CRÍTICAS:
       }
 
       // Check if file already exists
-      const outputDir = path.join(process.cwd(), 'public', 'audio');
+      const outputDir = path.join(os.tmpdir(), 'moto-audio');
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
       }
@@ -307,7 +309,7 @@ REGRAS CRÍTICAS:
       }
 
       // Check if file already exists
-      const outputDir = path.join(process.cwd(), 'public', 'audio');
+      const outputDir = path.join(os.tmpdir(), 'moto-audio');
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
       }
