@@ -1,62 +1,30 @@
-export class AudioPlayer {
-  private ctx: AudioContext | null = null;
-  private cache: Record<string, AudioBuffer> = {};
-  private currentSource: AudioBufferSourceNode | null = null;
+import { Howl } from 'howler';
 
-  public init() {
-    if (!this.ctx) {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContextClass) return;
-      this.ctx = new AudioContextClass();
-    }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => {});
-    }
-  }
+class AudioPlayer {
+  private currentHowl: Howl | null = null;
+  private cache: Record<string, Howl> = {};
 
-  public async play(url: string) {
-    this.init();
-    if (!this.ctx) return;
-
+  public play(url: string) {
     this.stop();
 
-    try {
-      let buffer = this.cache[url];
-      if (!buffer) {
-        const response = await fetch(url);
-        if (!response.ok) return;
-        const arrayBuffer = await response.arrayBuffer();
-        
-        buffer = await new Promise((resolve, reject) => {
-          try {
-            this.ctx!.decodeAudioData(arrayBuffer, resolve, reject);
-          } catch (e) {
-            reject(e);
-          }
-        });
-        
-        this.cache[url] = buffer;
-      }
-
-      const source = this.ctx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(this.ctx.destination);
-      source.start(0);
-      this.currentSource = source;
-    } catch (err) {
-      console.warn("Failed to play audio:", err);
+    let sound = this.cache[url];
+    if (!sound) {
+      sound = new Howl({
+        src: [url],
+        html5: false, // Force Web Audio API (downloads fully, avoids iOS 206 Partial Content SW bug)
+        preload: true,
+      });
+      this.cache[url] = sound;
     }
+
+    this.currentHowl = sound;
+    sound.play();
   }
 
   public stop() {
-    if (this.currentSource) {
-      try {
-        this.currentSource.stop();
-      } catch (e) {}
-      try {
-        this.currentSource.disconnect();
-      } catch (e) {}
-      this.currentSource = null;
+    if (this.currentHowl) {
+      this.currentHowl.stop();
+      this.currentHowl = null;
     }
   }
 }
