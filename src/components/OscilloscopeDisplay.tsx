@@ -190,65 +190,41 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    let active = true;
-    let currentBlobUrl: string | null = null;
-
-    const loadAndPlayAudio = async () => {
-      if (!selectedPhase) return;
-
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
-      
-      const audioId = `${component.id}-phase-${selectedPhase.id}`;
-      const url = `/audio/${encodeURIComponent(audioId)}.mp3`;
-      
-      let blobUrl = url;
-      if ('caches' in window) {
-        try {
-          const cache = await caches.open('moto-audio-cache-v2');
-          const response = await cache.match(url);
-          if (response) {
-            const blob = await response.blob();
-            blobUrl = URL.createObjectURL(blob);
-          }
-        } catch (e) {
-          console.log("Error loading audio from cache", e);
+  const playAudioForPhase = async (phaseId: number) => {
+    if (!audioRef.current) return;
+    
+    // Synchronously attempt to play a tiny silent audio to bless/unlock the element on mobile
+    if (!audioRef.current.src || !audioRef.current.src.startsWith('blob:')) {
+        audioRef.current.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+    }
+    audioRef.current.play().catch(() => {});
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+    
+    const audioId = `${component.id}-phase-${phaseId}`;
+    const url = `/audio/${encodeURIComponent(audioId)}.mp3`;
+    
+    let blobUrl = url;
+    if ('caches' in window) {
+      try {
+        const cache = await caches.open('moto-audio-cache-v2');
+        const response = await cache.match(url);
+        if (response) {
+          const blob = await response.blob();
+          blobUrl = URL.createObjectURL(blob);
         }
-      }
-
-      if (!active) return;
-      
-      currentBlobUrl = blobUrl;
-
-      const audio = new Audio(blobUrl);
-      audioRef.current = audio;
-
-      audio.play().catch((err) => {
-        console.log("Erro ao tocar áudio:", err);
-      });
-    };
-
-    if (selectedPhase) {
-      loadAndPlayAudio();
-    } else {
-      if (audioRef.current) {
-        audioRef.current.pause();
+      } catch (e) {
+        console.log("Error loading audio from cache", e);
       }
     }
-
-    return () => {
-      active = false;
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      if (currentBlobUrl && currentBlobUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(currentBlobUrl);
-      }
-    };
-  }, [selectedPhase, component.id]);
+    
+    if (audioRef.current.src && audioRef.current.src.startsWith('blob:')) {
+      URL.revokeObjectURL(audioRef.current.src);
+    }
+    
+    audioRef.current.src = blobUrl;
+    audioRef.current.play().catch(err => console.log("Erro ao tocar áudio:", err));
+  };
 
   useEffect(() => {
     return () => {
@@ -264,6 +240,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
       ref={containerRef}
       className={`bg-gradient-to-b from-[#1a1c23] to-[#121318] p-3 sm:p-5 rounded-3xl shadow-2xl mx-auto w-full flex flex-col gap-3 sm:gap-5 border border-black/10 ring-1 ring-black/50 ${isFullscreen ? "max-w-none h-screen rounded-none p-0 sm:p-0 border-0 ring-0 overflow-hidden bg-black" : "max-w-4xl"}`}
     >
+      <audio ref={audioRef} className="hidden" />
       <style>{`
         @media (orientation: portrait) {
           .fullscreen-mobile-rotate {
@@ -462,6 +439,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedPhaseId(phase.id);
+                    playAudioForPhase(phase.id);
                   }}
                   style={{ transformOrigin: `${labelX}px ${labelY}px` }}
                 >
