@@ -1,5 +1,5 @@
 import { Howl } from 'howler';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
 import { openDB } from 'idb';
 
@@ -14,6 +14,31 @@ async function getAudioDB() {
       }
     },
   });
+}
+
+export async function syncAudiosForOffline(onProgress?: (progress: number) => void) {
+  try {
+    const localDb = await getAudioDB();
+    const audiosCollection = collection(db, 'audios');
+    const snap = await getDocs(audiosCollection);
+    
+    let processed = 0;
+    const total = snap.size;
+    
+    for (const document of snap.docs) {
+      const dataUri = document.data().data;
+      if (dataUri) {
+        await localDb.put(STORE_NAME, dataUri, document.id);
+      }
+      processed++;
+      if (onProgress) {
+        onProgress(Math.round((processed / total) * 100));
+      }
+    }
+    console.log(`Synced ${snap.size} audios to local IndexedDB for offline use.`);
+  } catch (err) {
+    console.error("Failed to sync audios:", err);
+  }
 }
 
 class AudioPlayer {

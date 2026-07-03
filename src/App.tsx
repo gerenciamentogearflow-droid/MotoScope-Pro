@@ -7,14 +7,13 @@ import { AdminPanel } from "./components/AdminPanel";
 import { ComponentDetail } from "./components/ComponentDetail";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { OfflineStatus } from "./components/OfflineStatus";
+import { syncAudiosForOffline } from "./lib/audioPlayer";
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [view, setView] = useState<"login" | "dashboard" | "admin" | "detail">(
-    "login",
-  );
-  const [selectedComponent, setSelectedComponent] =
-    useState<ComponentData | null>(null);
+  const [view, setView] = useState<"login" | "dashboard" | "admin" | "detail">("login");
+  const [selectedComponent, setSelectedComponent] = useState<ComponentData | null>(null);
+  const [syncProgress, setSyncProgress] = useState<number | null>(null);
 
   useEffect(() => {
     // Inicializa o banco com o usuário master caso não exista no Firestore
@@ -22,6 +21,14 @@ export default function App() {
       await initAuth();
     };
     runInit();
+
+    // Sincroniza áudios para uso offline
+    syncAudiosForOffline((progress) => {
+      setSyncProgress(progress);
+      if (progress >= 100) {
+        setTimeout(() => setSyncProgress(null), 3000);
+      }
+    });
 
     // Verifica se há um acesso lembrado
     const remembered = localStorage.getItem("motostore_remembered_user");
@@ -93,6 +100,16 @@ export default function App() {
       {renderView()}
       <InstallPrompt />
       <OfflineStatus />
+      {syncProgress !== null && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg rounded-full px-4 py-2 flex items-center gap-3">
+          <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-sm font-medium text-gray-700">
+            {syncProgress < 100 
+              ? `Baixando áudios para offline: ${syncProgress}%` 
+              : 'Áudios baixados com sucesso!'}
+          </span>
+        </div>
+      )}
     </>
   );
 }
