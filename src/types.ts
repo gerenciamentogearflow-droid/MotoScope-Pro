@@ -14,6 +14,7 @@ export interface WaveformPhase {
   y?: number;
   labelX?: number;
   labelY?: number;
+  waveId?: string;
 }
 
 export interface ComponentData {

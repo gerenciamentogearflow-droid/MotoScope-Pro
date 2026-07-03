@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ComponentData, WaveformPhase } from "../types";
-import { Battery, Activity, ArrowUp, ArrowDown, X, Maximize, Minimize } from "lucide-react";
+import { Battery, Activity, ArrowUp, ArrowDown, X, Maximize, Minimize, Play, Pause } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface OscilloscopeDisplayProps {
@@ -10,7 +10,53 @@ interface OscilloscopeDisplayProps {
 export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
   const [selectedPhaseId, setSelectedPhaseId] = useState<number | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isLive, setIsLive] = useState(true);
+  const [waveOffsets, setWaveOffsets] = useState<Record<string, number>>({});
+  const [draggingWave, setDraggingWave] = useState<{ id: string, startX: number, startY: number, initialOffset: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const screenRef = useRef<HTMLDivElement>(null);
+
+  const handlePointerDown = (e: React.PointerEvent<Element>, waveId: string) => {
+    e.stopPropagation();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setDraggingWave({
+      id: waveId,
+      startX: e.clientX,
+      startY: e.clientY,
+      initialOffset: waveOffsets[waveId] || 0
+    });
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<Element>) => {
+    if (!draggingWave || !screenRef.current) return;
+    
+    const isRotated = isFullscreen && window.innerHeight > window.innerWidth;
+    
+    let deltaPixelY;
+    if (isRotated) {
+      // In portrait fullscreen, element is rotated 90deg clockwise.
+      // Element's visual Y axis (down) points to physical Left (-X).
+      deltaPixelY = -(e.clientX - draggingWave.startX);
+    } else {
+      deltaPixelY = e.clientY - draggingWave.startY;
+    }
+
+    const height = screenRef.current.clientHeight;
+    const viewBoxScale = 100 / (height * 0.85);
+    const deltaViewBox = deltaPixelY * viewBoxScale;
+    
+    setWaveOffsets(prev => ({
+      ...prev,
+      [draggingWave.id]: draggingWave.initialOffset + deltaViewBox
+    }));
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<Element>) => {
+    if (draggingWave) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+      setDraggingWave(null);
+    }
+  };
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -53,7 +99,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
         return "M 0 50 C 2 20 6 20 8 50 C 10 80 14 80 16 50 C 18 20 22 20 24 50 C 26 80 30 80 32 50 C 34 20 38 20 40 50 C 42 80 46 80 48 50 C 50 20 54 20 56 50 C 58 80 62 80 64 50 C 66 20 70 20 72 50 C 74 80 78 80 80 50 C 82 20 86 20 88 50 C 90 80 94 80 96 50 C 98 20 100 20 102 50";
       case "sine-gap":
         // Inductive CKP - organic AC wave, amplitude & freq increase, clear gap
-        return "M 0 50 C 2 20 6 20 8 50 C 10 80 14 80 16 50 C 18 20 22 20 24 50 C 26 80 30 80 32 50 C 34 20 38 20 40 50 C 42 80 46 80 48 50 C 52 0 65 0 70 50 C 72 80 76 80 78 50 C 80 20 84 20 86 50 C 88 80 92 80 94 50 C 96 20 100 20 102 50";
+        return "M 0 50 C 2 20 6 20 8 50 C 10 80 14 80 16 50 C 18 20 22 20 24 50 C 26 80 30 80 32 50 C 34 20 38 20 40 50 C 42 80 46 80 48 50 C 52 5 65 5 70 50 C 72 80 76 80 78 50 C 80 20 84 20 86 50 C 88 80 92 80 94 50 C 96 20 100 20 102 50";
       case "square":
         // Pure continuous square wave
         return "M 0 80 L 10 80 L 11 20 L 25 20 L 26 80 L 40 80 L 41 20 L 55 20 L 56 80 L 70 80 L 71 20 L 85 20 L 86 80 L 100 80";
@@ -65,7 +111,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
         return "M 0 70 L 29 70 L 29.5 90 L 35 89.5 L 40 90.5 L 45 89.5 L 50 90.5 L 55 90 L 55.5 15 L 57.5 50 L 58.5 48 L 59.5 55 C 61 65 63 70 68 70 L 100 70";
       case "ignition":
         // Ignition Coil: Dwell -> Spark Spike -> Burn Line (noisy) -> Extinguish -> Ringing
-        return "M 0 40 L 15 40 L 16 80 L 45 80 L 46 -10 L 47 50 L 50 48 L 53 50 L 56 48 L 59 40 Q 62 60 64 35 T 68 35 T 72 40 L 100 40";
+        return "M 0 60 L 15 60 L 15.5 80 L 45 80 L 45.5 5 L 46 45 L 48 46 L 50 44 L 53 46 L 56 44 L 58 46 L 58.5 25 L 59.5 75 L 61 40 L 62.5 70 L 64 50 L 65.5 65 L 67 55 L 68.5 60 L 100 60";
       case "tps":
         // TPS: Idle noise -> smooth slope -> WOT noise
         return "M 0 85 L 2 84 L 4 86 L 6 85 L 20 85 L 80 15 L 90 14 L 92 16 L 94 15 L 100 15";
@@ -88,34 +134,107 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
 
   const generateSinePath = (amplitude: number, period: number, phaseShift: number) => {
     let path = `M 0 ${50 + Math.sin(phaseShift) * amplitude}`;
-    for (let x = 1; x <= 105; x++) {
+    for (let x = 1; x <= 200; x++) {
       const y = 50 + Math.sin((x * 2 * Math.PI) / period + phaseShift) * amplitude;
       path += ` L ${x} ${y}`;
     }
     return path;
   };
 
-  const getWaves = () => {
+  type WaveData = { id: string; path: string; color: string; period?: number; dur?: number };
+
+  const getWaves = (): WaveData[] => {
     if (component.id === "estator-2f") {
       return [
-        { id: "p1", path: generateSinePath(-30, 16, 0), color: "#00FFFF" },
-        { id: "p2", path: generateSinePath(-30, 16, Math.PI), color: "#FF00FF" }, // 180 deg out of phase
+        { id: "p1", path: generateSinePath(-30, 16, 0), color: "#00FFFF", period: 16 },
+        { id: "p2", path: generateSinePath(-30, 16, Math.PI), color: "#FF00FF", period: 16 }, // 180 deg out of phase
       ];
     }
     if (component.id === "estator-3f") {
       return [
-        { id: "p1", path: generateSinePath(-30, 16, 0), color: "#00FFFF" },
-        { id: "p2", path: generateSinePath(-30, 16, (2 * Math.PI) / 3), color: "#FF00FF" }, // 120 deg out of phase
-        { id: "p3", path: generateSinePath(-30, 16, (4 * Math.PI) / 3), color: "#FFFF00" }, // 240 deg out of phase
+        { id: "p1", path: generateSinePath(-30, 16, 0), color: "#00FFFF", period: 16 },
+        { id: "p2", path: generateSinePath(-30, 16, (2 * Math.PI) / 3), color: "#FF00FF", period: 16 }, // 120 deg out of phase
+        { id: "p3", path: generateSinePath(-30, 16, (4 * Math.PI) / 3), color: "#FFFF00", period: 16 }, // 240 deg out of phase
       ];
     }
     
-    return [{ id: "main", path: getPath(), color: "#00FFFF" }];
+    if (component.waveType === "ignition-timing") {
+      const ckpPath = "M 0 50 Q 2.5 20 5 50 T 10 50 T 15 50 T 20 50 T 25 50 T 30 50 T 35 50 T 40 50 T 45 50 T 50 50 L 70 50 Q 72.5 20 75 50 T 80 50 T 85 50 T 90 50 T 95 50 T 100 50 Q 102.5 20 105 50 T 110 50 T 115 50 T 120 50 T 125 50 T 130 50 T 135 50 T 140 50 T 145 50 T 150 50 L 170 50 Q 172.5 20 175 50 T 180 50 T 185 50 T 190 50 T 195 50 T 200 50";
+      
+      const generateIgnPulseAt = (baseX: number) => {
+        const startX = baseX + 25;
+        const dwellX = baseX + 25.5;
+        const sparkEndX = baseX + 42;
+        const sparkPeakX = baseX + 42.5;
+        const sparkStartLineX = baseX + 43;
+        const extinguishX = baseX + 48;
+        const endX = baseX + 58;
+        return `L ${startX} 60 L ${dwellX} 80 L ${sparkEndX} 80 L ${sparkPeakX} 5 L ${sparkStartLineX} 45 L ${extinguishX} 46 L ${extinguishX+0.5} 25 L ${extinguishX+1.5} 75 L ${extinguishX+3} 40 L ${extinguishX+4.5} 70 L ${extinguishX+6} 50 L ${extinguishX+7.5} 65 L ${extinguishX+9} 55 L ${extinguishX+10} 60 L ${endX} 60`;
+      };
+
+      const ignPath = `M 0 60 ${generateIgnPulseAt(0)} L 100 60 ${generateIgnPulseAt(100)} L 200 60`;
+      
+      return [
+        { id: "ckp", path: ckpPath, color: "#00FFFF" },
+        { id: "ign", path: ignPath, color: "#FF00FF" },
+      ];
+    }
+    
+    return [{ id: "main", path: getPath(), color: "#00FFFF", period: 0 }];
   };
 
   const waves = getWaves();
+  const hasAnimatedWaves = waves.some(w => w.period && w.period > 0);
   
   const selectedPhase = component.waveformPhases?.find((p) => p.id === selectedPhaseId);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    if (selectedPhase) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      
+      const audioId = `${component.id}-phase-${selectedPhase.id}`;
+      const plainTextDescription = selectedPhase.description.replace(/\*\*/g, '').replace(/\*/g, '');
+      let textToSpeak = `${selectedPhase.title}. ${plainTextDescription}`;
+      
+      // Fix pronunciation of specific terms for the TTS
+      textToSpeak = textToSpeak.replace(/Dwell/gi, 'Duél');
+      
+      // By using the GET endpoint directly in the Audio object,
+      // the browser streams the audio natively and starts playback
+      // immediately without waiting for the full blob to download.
+      const url = `/api/tts?id=${encodeURIComponent(audioId)}&text=${encodeURIComponent(textToSpeak)}`;
+      const audio = new Audio(url);
+      audioRef.current = audio;
+
+      audio.play().catch((err) => {
+        console.log("Erro ao tocar áudio gerado:", err);
+      });
+      
+    } else {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    }
+    return () => {
+      active = false;
+    };
+  }, [selectedPhase, component.id]);
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
 
   return (
     <div 
@@ -138,16 +257,44 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
         }
       `}</style>
       {/* Screen Section */}
-      <div className={`flex-1 bg-[#050608] rounded-xl overflow-hidden flex flex-col font-mono text-xs text-zinc-400 border-[8px] border-[#0a0a0c] shadow-[inset_0_0_40px_rgba(0,0,0,1)] relative ring-1 ring-white/5 ${isFullscreen ? "fullscreen-mobile-rotate h-full rounded-none border-0 ring-0" : "aspect-[4/3] sm:aspect-auto sm:h-[360px]"}`}>
+      <div 
+        ref={screenRef}
+        className={`flex-1 bg-[#050608] rounded-xl overflow-hidden flex flex-col font-mono text-xs text-zinc-400 border-[8px] border-[#0a0a0c] shadow-[inset_0_0_40px_rgba(0,0,0,1)] relative ring-1 ring-white/5 ${isFullscreen ? "fullscreen-mobile-rotate h-full rounded-none border-0 ring-0" : "aspect-[4/3] sm:aspect-auto sm:h-[360px]"}`}
+      >
         {/* Top Bar */}
         <div className="flex justify-between items-center px-4 py-2 bg-[#0a0a0c]/80 border-b border-white/5 z-10 text-[#00FF00]">
-          <div className="flex items-center gap-2">
-            <Activity className="w-3 h-3 md:w-4 md:h-4 text-[#00FF00]/80" />
-            <span className="font-semibold tracking-wider text-[10px] md:text-xs text-[#00FF00]/90">
-              H={component.oscilloscopeSetup.timeDiv}
-            </span>
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-2">
+            <div className="flex items-center gap-2">
+              <Activity className="w-3 h-3 md:w-4 md:h-4 text-[#00FF00]/80" />
+              <span className="font-semibold tracking-wider text-[10px] md:text-xs text-[#00FF00]/90">
+                H={component.oscilloscopeSetup.timeDiv}
+              </span>
+            </div>
+            {waves.length > 1 && (
+              <span className="text-white/40 font-mono text-[8px] md:text-[9px] uppercase font-bold ml-0 md:ml-2">
+                (Arraste as ondas p/ separar)
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-4">
+            {hasAnimatedWaves && (
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsLive(!isLive); setSelectedPhaseId(null); }}
+                className="flex items-center gap-1.5 bg-[#00FF00]/10 hover:bg-[#00FF00]/20 text-[#00FF00] px-3 py-1.5 rounded-md transition-colors mr-1 text-[10px] uppercase font-bold border border-[#00FF00]/30"
+              >
+                {isLive ? (
+                  <>
+                    <Pause className="w-3 h-3 md:w-4 md:h-4" />
+                    <span className="hidden sm:inline">Pausar</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3 h-3 md:w-4 md:h-4" />
+                    <span className="hidden sm:inline">Ao Vivo</span>
+                  </>
+                )}
+              </button>
+            )}
             <button 
               onClick={toggleFullscreen}
               className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md transition-colors mr-2 text-[10px] uppercase font-bold"
@@ -200,72 +347,122 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
             ))}
           </div>
 
+          {/* HTML Overlay for Channel Indicators */}
+          {waves.length > 1 && waves.map((wave, index) => {
+            const yOffset = waveOffsets[wave.id] || 0;
+            return (
+              <div
+                key={`ch-tab-${wave.id}`}
+                className="absolute right-0 w-6 h-6 flex items-center justify-center cursor-ns-resize touch-none select-none z-20"
+                style={{
+                  top: `calc(${50 + yOffset * 0.85}% - 12px)`,
+                  backgroundColor: wave.color,
+                  color: "#000",
+                  borderRadius: "4px 0 0 4px",
+                  fontWeight: "bold",
+                  fontSize: "12px",
+                  boxShadow: `0 0 10px ${wave.color}80`,
+                  border: `1px solid ${wave.color}`,
+                  borderRight: 'none'
+                }}
+                onPointerDown={(e) => handlePointerDown(e, wave.id)}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
+              >
+                {index + 1}
+              </div>
+            );
+          })}
+
           {/* Wave SVG */}
           <svg
-            className="absolute w-full h-full scale-y-[0.85] cursor-pointer"
+            className="absolute w-full h-full scale-y-[0.85] pointer-events-none"
             preserveAspectRatio="none"
             viewBox="0 0 100 100"
+            style={{ overflow: 'visible' }}
           >
             {waves.map((wave) => (
-              <path
-                key={wave.id}
-                d={wave.path}
-                fill="none"
-                stroke={wave.color}
-                strokeWidth="1.2"
-                vectorEffect="non-scaling-stroke"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                style={{
-                  filter: `drop-shadow(0px 0px 4px ${wave.color}) drop-shadow(0px 0px 8px ${wave.color}80)`
-                }}
-              />
+              <g key={wave.id} transform={`translate(0, ${waveOffsets[wave.id] || 0})`}>
+                <g>
+                  {isLive && wave.period && wave.period > 0 ? (
+                    <animateTransform 
+                      attributeName="transform" 
+                      type="translate" 
+                      from="0 0" 
+                      to={`-${wave.period} 0`} 
+                      dur={`${wave.dur || 3}s`} 
+                      repeatCount="indefinite" 
+                    />
+                  ) : null}
+                  <path
+                    d={wave.path}
+                    fill="none"
+                    stroke={wave.color}
+                    strokeWidth="1.2"
+                    vectorEffect="non-scaling-stroke"
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    style={{
+                      filter: `drop-shadow(0px 0px 4px ${wave.color}) drop-shadow(0px 0px 8px ${wave.color}80)`
+                    }}
+                  />
+                </g>
+              </g>
             ))}
-            {component.waveformPhases?.map((phase) =>
-              phase.x !== undefined && phase.y !== undefined ? (
+            {(!hasAnimatedWaves || !isLive) && component.waveformPhases?.map((phase) => {
+              if (phase.x === undefined || phase.y === undefined) return null;
+              
+              const yOffset = phase.waveId ? (waveOffsets[phase.waveId] || 0) : 0;
+              const y = phase.y + yOffset;
+              const labelY = (phase.labelY ?? phase.y - 10) + yOffset;
+              const x = phase.x;
+              const labelX = phase.labelX ?? phase.x;
+              const waveColor = waves.find(w => w.id === phase.waveId)?.color || waves[0]?.color || "#00FFFF";
+              
+              return (
                 <g 
                   key={phase.id} 
-                  className="cursor-pointer transition-transform hover:scale-[1.02] origin-center"
+                  className="cursor-pointer transition-transform hover:scale-[1.02] origin-center pointer-events-auto"
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedPhaseId(phase.id);
                   }}
-                  style={{ transformOrigin: `${phase.labelX ?? phase.x}px ${phase.labelY ?? phase.y - 10}px` }}
+                  style={{ transformOrigin: `${labelX}px ${labelY}px` }}
                 >
                   {/* Invisible Hitbox for easier clicking */}
                   <circle
-                    cx={phase.labelX ?? phase.x}
-                    cy={phase.labelY ?? phase.y - 10}
+                    cx={labelX}
+                    cy={labelY}
                     r="8"
                     fill="transparent"
                   />
                   {/* Line pointing to wave */}
                   <line
-                    x1={phase.labelX ?? phase.x}
-                    y1={phase.labelY ?? phase.y - 10}
-                    x2={phase.x}
-                    y2={phase.y}
+                    x1={labelX}
+                    y1={labelY}
+                    x2={x}
+                    y2={y}
                     stroke="#FFFFFF"
                     strokeWidth="0.5"
                     strokeDasharray="1,2"
                     className="opacity-50"
                   />
-
                   {/* Label Badge */}
                   <circle
-                    cx={phase.labelX ?? phase.x}
-                    cy={phase.labelY ?? phase.y - 10}
+                    cx={labelX}
+                    cy={labelY}
                     r="4.5"
-                    fill={selectedPhaseId === phase.id ? (waves[0]?.color || "#00FFFF") : "#000000"}
-                    stroke={waves[0]?.color || "#00FFFF"}
+                    fill={selectedPhaseId === phase.id ? waveColor : "#000000"}
+                    stroke={waveColor}
                     strokeWidth="1"
                     className="transition-colors duration-200"
                   />
                   <text
-                    x={phase.labelX ?? phase.x}
-                    y={(phase.labelY ?? phase.y - 10) + 1.5}
+                    x={labelX}
+                    y={labelY + 1.5}
                     fontSize="4"
-                    fill={selectedPhaseId === phase.id ? "#000000" : (waves[0]?.color || "#00FFFF")}
+                    fill={selectedPhaseId === phase.id ? "#000000" : waveColor}
                     textAnchor="middle"
                     fontWeight="bold"
                     className="transition-colors duration-200 pointer-events-none"
@@ -273,40 +470,56 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
                     {phase.id}
                   </text>
                 </g>
-              ) : null,
-            )}
+              );
+            })}
           </svg>
-          
-          {/* Overlay Info Popup */}
+
+          {/* Phase Details Area */}
           <AnimatePresence>
             {selectedPhase && (
               <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                transition={{ duration: 0.15 }}
-                className="absolute z-20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm sm:top-auto sm:left-auto sm:translate-x-0 sm:translate-y-0 sm:bottom-8 sm:right-4 sm:w-72 bg-[#0a0a0c]/95 border border-white/20 rounded-xl p-4 shadow-2xl backdrop-blur-sm max-h-[calc(100%-2rem)] overflow-y-auto"
+                key={selectedPhase.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className={`absolute left-2 right-2 sm:left-auto sm:right-4 sm:w-[320px] bg-transparent z-40 max-h-[70%] overflow-y-auto pointer-events-auto ${
+                  (selectedPhase.labelY ?? selectedPhase.y) > 50 ? 'top-4' : 'bottom-4'
+                }`}
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex justify-between items-start mb-2 shrink-0">
-                  <div className="flex items-center gap-2">
-                    <span className="bg-[#00FF00] text-black w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs">
-                      {selectedPhase.id}
-                    </span>
-                    <h5 className="text-[#00FF00] font-bold text-sm tracking-wide">
-                      {selectedPhase.title}
-                    </h5>
+                <div className="p-3 sm:p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="bg-[#00FF00] text-black w-5 h-5 rounded-full flex items-center justify-center font-black text-xs shrink-0 shadow-[0_0_10px_rgba(0,255,0,0.3)]">
+                        {selectedPhase.id}
+                      </span>
+                      <h5 className="text-[#00FF00] font-bold text-xs sm:text-sm tracking-wide leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                        {selectedPhase.title}
+                      </h5>
+                    </div>
+                    <button 
+                      onClick={() => setSelectedPhaseId(null)}
+                      className="text-white/70 hover:text-white transition-colors p-1 -mr-1 -mt-1 shrink-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => setSelectedPhaseId(null)}
-                    className="text-white/50 hover:text-white transition-colors p-1"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+                  <div className="text-zinc-50 text-[10px] sm:text-[11px] leading-relaxed font-sans mt-1.5 whitespace-pre-wrap drop-shadow-[0_2px_4px_rgba(0,0,0,1)] font-medium">
+                    {selectedPhase.description.split('\n').map((line, i) => {
+                      if (line.includes('**')) {
+                        const parts = line.split('**');
+                        return (
+                          <span key={i}>
+                            {parts.map((part, j) => j % 2 === 1 ? <strong key={j} className="text-white">{part}</strong> : part)}
+                            <br/>
+                          </span>
+                        );
+                      }
+                      return <span key={i}>{line}<br/></span>;
+                    })}
+                  </div>
                 </div>
-                <p className="text-zinc-300 text-xs leading-relaxed font-sans">
-                  {selectedPhase.description}
-                </p>
               </motion.div>
             )}
           </AnimatePresence>
