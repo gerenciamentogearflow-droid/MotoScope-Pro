@@ -190,8 +190,8 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
   const selectedPhase = component.waveformPhases?.find((p) => p.id === selectedPhaseId);
 
   const playAudioForPhase = (phaseId: number) => {
-    const url = `/audio/${encodeURIComponent(component.id + '-phase-' + phaseId)}.mp3`;
-    globalAudioPlayer.play(url);
+    const audioId = `${component.id}-phase-${phaseId}`;
+    globalAudioPlayer.play(audioId);
   };
 
   useEffect(() => {

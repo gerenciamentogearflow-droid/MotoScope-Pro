@@ -1,20 +1,36 @@
 import { Howl } from 'howler';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from './firebase';
 
 class AudioPlayer {
   private currentHowl: Howl | null = null;
   private cache: Record<string, Howl> = {};
 
-  public play(url: string) {
+  public async play(audioId: string) {
     this.stop();
 
-    let sound = this.cache[url];
+    let sound = this.cache[audioId];
     if (!sound) {
-      sound = new Howl({
-        src: [url],
-        html5: false, // Force Web Audio API (downloads fully, avoids iOS 206 Partial Content SW bug)
-        preload: true,
-      });
-      this.cache[url] = sound;
+      try {
+        const docRef = doc(db, 'audios', audioId);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const dataUri = docSnap.data().data;
+          sound = new Howl({
+            src: [dataUri],
+            html5: false, // Force Web Audio API
+            preload: true,
+          });
+          this.cache[audioId] = sound;
+        } else {
+          console.warn(`Audio ${audioId} not found in database.`);
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to fetch audio from database:", err);
+        return;
+      }
     }
 
     this.currentHowl = sound;
