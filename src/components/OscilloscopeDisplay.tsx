@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { ComponentData, WaveformPhase } from "../types";
 import { Battery, Activity, ArrowUp, ArrowDown, X, Maximize, Minimize, Play, Pause } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { globalAudioPlayer } from "../lib/audioPlayer";
 
 interface OscilloscopeDisplayProps {
   component: ComponentData;
@@ -188,55 +189,14 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
   
   const selectedPhase = component.waveformPhases?.find((p) => p.id === selectedPhaseId);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  // Cache data URLs in memory to avoid reading blobs multiple times
-  const audioDataUrlCache = useRef<Record<string, string>>({});
-
-  const playAudioForPhase = async (phaseId: number) => {
-    if (!audioRef.current) return;
-    
-    audioRef.current.pause();
-    audioRef.current.currentTime = 0;
-    
+  const playAudioForPhase = (phaseId: number) => {
     const url = `/audio/${encodeURIComponent(component.id + '-phase-' + phaseId)}.mp3`;
-    
-    try {
-      let srcToPlay = url;
-
-      // iOS Safari has a known issue playing audio from Service Worker caches because it demands
-      // HTTP 206 Partial Content, while SW caches usually return 200 OK.
-      // To bypass this, we fetch the audio (which SW will happily serve as 200),
-      // convert it to a Blob, then to a base64 Data URL, which Safari plays flawlessly.
-      if (!audioDataUrlCache.current[url]) {
-        const response = await fetch(url);
-        if (response.ok) {
-          const blob = await response.blob();
-          const base64Url = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          });
-          audioDataUrlCache.current[url] = base64Url;
-        }
-      }
-
-      if (audioDataUrlCache.current[url]) {
-        srcToPlay = audioDataUrlCache.current[url];
-      }
-
-      audioRef.current.src = srcToPlay;
-      await audioRef.current.play();
-    } catch (err) {
-      console.log("Erro ao tocar áudio:", err);
-    }
+    globalAudioPlayer.play(url);
   };
 
   useEffect(() => {
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
+      globalAudioPlayer.stop();
     };
   }, []);
 
@@ -246,7 +206,6 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
       ref={containerRef}
       className={`bg-gradient-to-b from-[#1a1c23] to-[#121318] p-3 sm:p-5 rounded-3xl shadow-2xl mx-auto w-full flex flex-col gap-3 sm:gap-5 border border-black/10 ring-1 ring-black/50 ${isFullscreen ? "max-w-none h-screen rounded-none p-0 sm:p-0 border-0 ring-0 overflow-hidden bg-black" : "max-w-4xl"}`}
     >
-      <audio ref={audioRef} className="hidden" />
       <style>{`
         @media (orientation: portrait) {
           .fullscreen-mobile-rotate {
@@ -289,9 +248,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
                   e.stopPropagation(); 
                   setIsLive(!isLive); 
                   setSelectedPhaseId(null); 
-                  if (audioRef.current) {
-                    audioRef.current.pause();
-                  }
+                  globalAudioPlayer.stop();
                 }}
                 className="flex items-center gap-1.5 bg-[#00FF00]/10 hover:bg-[#00FF00]/20 text-[#00FF00] px-3 py-1.5 rounded-md transition-colors mr-1 text-[10px] uppercase font-bold border border-[#00FF00]/30"
               >
@@ -342,9 +299,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
           className="relative flex-1 overflow-hidden flex flex-col justify-center items-center"
           onClick={() => {
             setSelectedPhaseId(null);
-            if (audioRef.current) {
-              audioRef.current.pause();
-            }
+            globalAudioPlayer.stop();
           }}
         >
           {/* Grid background */}
@@ -520,9 +475,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
                     <button 
                       onClick={() => {
                         setSelectedPhaseId(null);
-                        if (audioRef.current) {
-                          audioRef.current.pause();
-                        }
+                        globalAudioPlayer.stop();
                       }}
                       className="text-white/70 hover:text-white transition-colors p-1 -mr-1 -mt-1 shrink-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
                     >
