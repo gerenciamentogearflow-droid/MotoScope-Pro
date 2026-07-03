@@ -192,35 +192,61 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
 
   useEffect(() => {
     let active = true;
+    let currentBlobUrl: string | null = null;
 
-    if (selectedPhase) {
+    const loadAndPlayAudio = async () => {
+      if (!selectedPhase) return;
+
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
       
       const audioId = `${component.id}-phase-${selectedPhase.id}`;
-      const plainTextDescription = selectedPhase.description.replace(/\*\*/g, '').replace(/\*/g, '');
-      let textToSpeak = `${selectedPhase.title}. ${plainTextDescription}`;
+      const url = `/audio/${encodeURIComponent(audioId)}.mp3`;
       
-      // Fix pronunciation of specific terms for the TTS
-      textToSpeak = textToSpeak.replace(/Dwell/gi, 'Duél');
+      let blobUrl = url;
+      if ('caches' in window) {
+        try {
+          const cache = await caches.open('moto-audio-cache-v2');
+          const response = await cache.match(url);
+          if (response) {
+            const blob = await response.blob();
+            blobUrl = URL.createObjectURL(blob);
+          }
+        } catch (e) {
+          console.log("Error loading audio from cache", e);
+        }
+      }
 
-      const url = `/api/tts?id=${encodeURIComponent(audioId)}&text=${encodeURIComponent(textToSpeak)}`;
-      const audio = new Audio(url);
+      if (!active) return;
+      
+      currentBlobUrl = blobUrl;
+
+      const audio = new Audio(blobUrl);
       audioRef.current = audio;
 
       audio.play().catch((err) => {
-        console.log("Erro ao tocar áudio gerado:", err);
+        console.log("Erro ao tocar áudio:", err);
       });
-      
+    };
+
+    if (selectedPhase) {
+      loadAndPlayAudio();
     } else {
       if (audioRef.current) {
         audioRef.current.pause();
       }
     }
+
     return () => {
       active = false;
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      if (currentBlobUrl && currentBlobUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(currentBlobUrl);
+      }
     };
   }, [selectedPhase, component.id]);
 
