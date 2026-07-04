@@ -4,7 +4,7 @@ import { registerUser, getAllUsers, updateUserCredentials, deleteUser, adminUpda
 import { ArrowLeft, UserPlus, Users, Settings, KeyRound, Pencil, Trash2, Eye, EyeOff, AlertTriangle, X, FileText, Upload, CheckCircle2, Loader2, Copy } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { db } from "../lib/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
 import { componentsDB } from "../data/componentsDB";
 import { Mic } from "lucide-react";
 
@@ -38,6 +38,22 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
   const [editUsername, setEditUsername] = useState(adminUser.username);
   const [editPassword, setEditPassword] = useState("");
   const [profileMsg, setProfileMsg] = useState({ text: "", type: "" });
+
+  const [showCourse, setShowCourse] = useState(true);
+
+  useEffect(() => {
+    if (adminUser.role === "admin") {
+      const unsub = onSnapshot(doc(db, "app_settings", "visibility"), (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.showCourse !== undefined) {
+            setShowCourse(data.showCourse);
+          }
+        }
+      });
+      return () => unsub();
+    }
+  }, [adminUser]);
 
 
   useEffect(() => {
@@ -73,6 +89,12 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
     }
 
     setTimeout(() => setStatusMsg({ text: "", type: "" }), 4000);
+  };
+
+  const toggleCourseVisibility = async () => {
+    const newValue = !showCourse;
+    setShowCourse(newValue); // Optimistic UI
+    await setDoc(doc(db, "app_settings", "visibility"), { showCourse: newValue }, { merge: true });
   };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
@@ -229,6 +251,32 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
         
         {adminUser.role === "admin" && (
           <>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="bg-white border border-gray-300 rounded-xl p-5 shadow-sm mb-6"
+            >
+              <div className="flex items-center gap-2 mb-4 text-indigo-600">
+                <Settings className="w-5 h-5" />
+                <h2 className="font-semibold text-gray-900">
+                  Configurações Globais
+                </h2>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">Treinamento Básico</h3>
+                  <p className="text-xs text-gray-500">Exibir acesso ao treinamento na tela inicial.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={toggleCourseVisibility}
+                  className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${showCourse ? 'bg-emerald-500' : 'bg-gray-300'}`}
+                >
+                  <div className={`w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${showCourse ? 'translate-x-6' : 'translate-x-0'}`} />
+                </button>
+              </div>
+            </motion.div>
 
 
             <motion.div

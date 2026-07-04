@@ -296,6 +296,87 @@ Comportamento e Defeitos:
     },
   },
   {
+    id: "ignition-coil-secondary",
+    name: "Bobina de Ignição (Secundário)",
+    type: "actuator",
+    shortDescription: "Forma de onda de alta tensão medida no cabo de vela usando pinça capacitiva.",
+    fullDescription:
+      "A onda do secundário da bobina reflete diretamente o que está acontecendo dentro da câmara de combustão. Utilizando uma pinça capacitiva presa ao cabo de vela (ou uma pinça COP para bobinas tipo caneta), você consegue ler tensões que chegam a 30.000V. A análise desse gráfico é a forma definitiva de diagnosticar falhas de queima, misturas ricas/pobres, velas desgastadas ou cabos em curto.",
+    oscilloscopeSetup: {
+      timeDiv: "1ms a 2ms",
+      voltageDiv: "Usar pinça capacitiva (geralmente configura-se o canal para 10kV ou 20kV).",
+      triggerEdge: "Subida (Rising) ou Descida dependendo da polaridade da centelha",
+      triggerMode: "Normal",
+      triggerLevel: "3kV a 5kV (ajuste para capturar a queima)",
+    },
+    connectionInstructions:
+      "Obrigatório o uso de Pinça Capacitiva (Secundário) ou Pinça COP. Prenda a pinça ao redor do cabo de vela (ou sobre a bobina COP). Conecte o aterramento da pinça no negativo da bateria ou chassi. Se o gráfico ficar de cabeça para baixo, ative a opção 'Inverter' (Invert) no osciloscópio.",
+    waveformExplanation:
+      `O gráfico do secundário é muito parecido com o do primário, mas as tensões são gigantes (escala de kV) e o foco da análise é a linha de queima.
+
+• **Tensão de Disparo (Spike)**: É a voltagem que a bobina precisou gerar para romper o espaço (folga) da vela. Velas gastas ou mistura pobre exigem tensão muito alta.
+• **Tempo e Linha de Queima (Burn Line)**: Mostra quanto tempo a faísca durou dentro do cilindro. Se a linha for muito curta ou cheia de ruídos, a centelha está se apagando precocemente.
+• **Oscilações Residuais**: Igual ao primário, mostra a saúde da bobina após a queima.`,
+    waveformPhases: [
+      {
+        id: 1,
+        title: "Carregamento (Dwell Secundário)",
+        description: "Espelho do primário. A energia está se acumulando na bobina. O tempo deve ser igual ao do primário.",
+        x: 30,
+        y: 80,
+        labelX: 30,
+        labelY: 95,
+      },
+      {
+        id: 2,
+        title: "Tensão de Disparo (Spike)",
+        description: "É a força necessária para romper a resistência do ar na vela. O pico sobe até romper a folga (geralmente de 10kV a 15kV). Picos acima de 20kV indicam folga excessiva ou cabos ruins. Picos muito curtos indicam curto-circuito.",
+        x: 46,
+        y: 5,
+        labelX: 35,
+        labelY: 15,
+      },
+      {
+        id: 3,
+        title: "Linha de Queima (Burn Line)",
+        description: "O momento exato em que a faísca está acesa queimando a mistura ar-combustível. Deve durar entre 1.0ms e 2.0ms e ser o mais plana possível. Oscilações fortes aqui indicam mistura incorreta, bico sujo ou turbulência na câmara.",
+        x: 52,
+        y: 45,
+        labelX: 52,
+        labelY: 25,
+      },
+      {
+        id: 4,
+        title: "Pendente (Extinção)",
+        description: "O final da queima. A faísca apaga e a linha cai rapidamente de volta para a tensão da bateria.",
+        x: 58.5,
+        y: 25,
+        labelX: 68,
+        labelY: 15,
+      },
+      {
+        id: 5,
+        title: "Oscilações Residuais",
+        description: "Energia dissipando no circuito após a faísca se apagar. A ausência dessas oscilações indica um curto-circuito interno nas espiras da bobina.",
+        x: 62.5,
+        y: 70,
+        labelX: 75,
+        labelY: 85,
+      }
+    ],
+    waveType: "ignition",
+    multimeter: {
+      setting: "OHM_20K",
+      instructions: "Com o multímetro em Ohms 20k, meça a resistência do enrolamento secundário da bobina (entre a saída de alta tensão para o cabo de vela e um dos pinos do primário ou a carcaça).",
+      expectedValues: "Geralmente entre 10 kΩ e 15 kΩ (consulte o manual).",
+      variesByModel: true,
+      minValue: 10000,
+      maxValue: 15000,
+      unit: "Ω",
+      temperatureObservation: "A resistência pode subir quando a bobina esquenta e abrir o circuito internamente se houver defeito."
+    },
+  },
+  {
     id: "ignition-coil",
     name: "Bobina de Ignição (Primário)",
     type: "actuator",

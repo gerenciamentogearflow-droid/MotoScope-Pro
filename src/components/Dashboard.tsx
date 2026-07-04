@@ -34,6 +34,7 @@ import { hondaParameters } from "../data/hondaParameters";
 import { yamahaParameters } from "../data/yamahaParameters";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
+import { OscilloscopeCourseView } from "./OscilloscopeCourseView";
 
 import { updateUserCredentials } from "../lib/auth";
 
@@ -52,7 +53,7 @@ export function Dashboard({
   onLogout,
   onUserUpdate,
 }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState<"home" | "oscilloscope_menu" | "didactic" | "real_signals" | "multimeter" | "parameters" | "pinouts" | "diagnostic_worksheet">(
+  const [activeTab, setActiveTab] = useState<"home" | "oscilloscope_menu" | "didactic" | "real_signals" | "multimeter" | "parameters" | "pinouts" | "diagnostic_worksheet" | "course">(
     "home",
   );
   const [selectedRealSignalComponent, setSelectedRealSignalComponent] =
@@ -70,6 +71,7 @@ export function Dashboard({
     useState<string | null>(null);
   
   const [hiddenBrands, setHiddenBrands] = useState<string[]>([]);
+  const [showCourse, setShowCourse] = useState(true);
 
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [newUsername, setNewUsername] = useState(user.username);
@@ -99,7 +101,11 @@ export function Dashboard({
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "app_settings", "visibility"), (docSnap) => {
       if (docSnap.exists()) {
-        setHiddenBrands(docSnap.data().hiddenBrands || []);
+        const data = docSnap.data();
+        setHiddenBrands(data.hiddenBrands || []);
+        if (data.showCourse !== undefined) {
+          setShowCourse(data.showCourse);
+        }
       }
     });
     return () => unsub();
@@ -355,26 +361,44 @@ export function Dashboard({
                 </div>
               </div>
 
-              <div className="grid gap-6 sm:grid-cols-2">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {showCourse && (
+                  <button
+                    onClick={() => setActiveTab("course")}
+                    className="group flex flex-col items-start gap-4 bg-white hover:bg-gray-50 border border-gray-200/60 shadow-sm hover:border-blue-600/30 hover:shadow-blue-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="p-3.5 rounded-2xl bg-blue-600/10 text-blue-600 border border-blue-600/20 group-hover:scale-110 transition-transform">
+                      <BookOpen className="w-8 h-8" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900 mb-2 font-bold">Treinamento Básico</h2>
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        Treinamento básico com certificado de conclusão.
+                      </p>
+                    </div>
+                  </button>
+                )}
+
                 <button
                   onClick={() => setActiveTab("didactic")}
                   className="group flex flex-col items-start gap-4 bg-white hover:bg-gray-50 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="p-3.5 rounded-2xl bg-red-600/10 text-red-600 border border-red-600/20 group-hover:scale-110 transition-transform">
-                    <BookOpen className="w-8 h-8" />
+                    <Activity className="w-8 h-8" />
                   </div>
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-2 font-bold">Aprender sobre Ondas</h2>
                     <p className="text-gray-600 text-sm leading-relaxed">
-                      Aprenda teoria, identificação de defeitos e como analisar ondas.
+                      Simulador interativo para identificação de falhas e análise de ondas.
                     </p>
                   </div>
                 </button>
 
                 <button
                   onClick={() => setActiveTab("real_signals")}
-                  className="group flex flex-col items-start gap-4 bg-white hover:bg-gray-50 border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
+                  className="group flex flex-col items-start gap-4 bg-white hover:bg-gray-50 border border-gray-200/60 shadow-sm hover:border-emerald-600/30 hover:shadow-emerald-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden sm:col-span-2 lg:col-span-1"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="p-3.5 rounded-2xl bg-emerald-600/10 text-emerald-600 border border-emerald-600/20 group-hover:scale-110 transition-transform">
@@ -388,6 +412,16 @@ export function Dashboard({
                   </div>
                 </button>
               </div>
+            </motion.div>
+          ) : activeTab === "course" ? (
+            <motion.div
+              key="course"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              className="pb-8"
+            >
+              <OscilloscopeCourseView user={user} onBack={() => setActiveTab("oscilloscope_menu")} />
             </motion.div>
           ) : activeTab === "didactic" ? (
             <motion.div
