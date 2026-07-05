@@ -312,23 +312,32 @@ Comportamento e Defeitos:
     connectionInstructions:
       "Obrigatório o uso de Pinça Capacitiva (Secundário) ou Pinça COP. Prenda a pinça ao redor do cabo de vela (ou sobre a bobina COP). Conecte o aterramento da pinça no negativo da bateria ou chassi. Se o gráfico ficar de cabeça para baixo, ative a opção 'Inverter' (Invert) no osciloscópio.",
     waveformExplanation:
-      `O gráfico do secundário é muito parecido com o do primário, mas as tensões são gigantes (escala de kV) e o foco da análise é a linha de queima.
+      `O gráfico do **Secundário** é a leitura real da alta tensão que vai para a vela. Ao contrário do primário que começa em 12V e cai, o secundário começa em 0V e tem um formato ligeiramente diferente no disparo.
 
-• **Tensão de Disparo (Spike)**: É a voltagem que a bobina precisou gerar para romper o espaço (folga) da vela. Velas gastas ou mistura pobre exigem tensão muito alta.
-• **Tempo e Linha de Queima (Burn Line)**: Mostra quanto tempo a faísca durou dentro do cilindro. Se a linha for muito curta ou cheia de ruídos, a centelha está se apagando precocemente.
-• **Oscilações Residuais**: Igual ao primário, mostra a saúde da bobina após a queima.`,
+• **Tensão de Disparo (Spike)**: É a voltagem colossal que a bobina precisou gerar para romper a resistência do ar e pular a faísca (chega a 10kV ~ 30kV). Velas muito gastas exigem força excessiva e o pico sobe demais.
+• **Tempo e Linha de Queima (Burn Line)**: Mostra o exato momento e o tempo que a faísca ficou acesa queimando a mistura. Se for muito curta ou tremer demais, a centelha está 'apagando' cedo (mistura pobre, bico sujo).
+• **Oscilações Residuais**: Revela a saúde interna da bobina. Ausência dessas ondinhas é sinal de curto nas espiras internas.`,
     waveformPhases: [
       {
         id: 1,
+        title: "Pico de Fechamento",
+        description: "Pequena oscilação (geralmente negativa) gerada no momento exato em que o módulo aterra o circuito primário para iniciar o carregamento.",
+        x: 15.5,
+        y: 85,
+        labelX: 15.5,
+        labelY: 95,
+      },
+      {
+        id: 2,
         title: "Carregamento (Dwell Secundário)",
         description: "Espelho do primário. A energia está se acumulando na bobina. O tempo deve ser igual ao do primário.",
         x: 30,
         y: 80,
         labelX: 30,
-        labelY: 95,
+        labelY: 70,
       },
       {
-        id: 2,
+        id: 3,
         title: "Tensão de Disparo (Spike)",
         description: "É a força necessária para romper a resistência do ar na vela. O pico sobe até romper a folga (geralmente de 10kV a 15kV). Picos acima de 20kV indicam folga excessiva ou cabos ruins. Picos muito curtos indicam curto-circuito.",
         x: 46,
@@ -337,7 +346,7 @@ Comportamento e Defeitos:
         labelY: 15,
       },
       {
-        id: 3,
+        id: 4,
         title: "Linha de Queima (Burn Line)",
         description: "O momento exato em que a faísca está acesa queimando a mistura ar-combustível. Deve durar entre 1.0ms e 2.0ms e ser o mais plana possível. Oscilações fortes aqui indicam mistura incorreta, bico sujo ou turbulência na câmara.",
         x: 52,
@@ -346,25 +355,25 @@ Comportamento e Defeitos:
         labelY: 25,
       },
       {
-        id: 4,
+        id: 5,
         title: "Pendente (Extinção)",
-        description: "O final da queima. A faísca apaga e a linha cai rapidamente de volta para a tensão da bateria.",
+        description: "O final da queima. A faísca apaga e a tensão de ignição cai.",
         x: 58.5,
         y: 25,
-        labelX: 68,
+        labelX: 70,
         labelY: 15,
       },
       {
-        id: 5,
+        id: 6,
         title: "Oscilações Residuais",
         description: "Energia dissipando no circuito após a faísca se apagar. A ausência dessas oscilações indica um curto-circuito interno nas espiras da bobina.",
         x: 62.5,
-        y: 70,
+        y: 80,
         labelX: 75,
-        labelY: 85,
+        labelY: 95,
       }
     ],
-    waveType: "ignition",
+    waveType: "ignition-secondary",
     multimeter: {
       setting: "OHM_20K",
       instructions: "Com o multímetro em Ohms 20k, meça a resistência do enrolamento secundário da bobina (entre a saída de alta tensão para o cabo de vela e um dos pinos do primário ou a carcaça).",
@@ -393,13 +402,12 @@ Comportamento e Defeitos:
     connectionInstructions:
       "Use um atenuador 20:1 ou a pinça capacitiva para evitar queimar seu osciloscópio, pois o pico indutivo pode passar de 400V. Conecte a garra preta no negativo. Espete a ponta de prova (com atenuador) no fio de controle (pulso negativo da ECU) no conector primário da bobina.\n\n⚠️ IMPORTANTE: Só após todas as conexões estarem devidamente presas, LIGUE a chave de ignição e funcione o motor para realizar o teste.",
     waveformExplanation:
-      `O gráfico da bobina de ignição é como um 'eletrocardiograma' do coração do motor. Ele conta tudo sobre a força da faísca e como o combustível está queimando lá dentro do cilindro.
+      `O gráfico do **Primário** mostra o controle elétrico da bobina. Diferente do secundário, aqui medimos o circuito de 12V sendo aterrado pelo módulo.
 
-Comportamento e Defeitos (Preste muita atenção aqui):
-• **Tempo de Carregamento (Linha de Baixo)**: É o tempo que a bobina fica acumulando força. 
-• **O Tamanho da Faísca (Linha de Queima)**: Se a linha reta no meio for muito curta no tempo (menos de 0.8ms), a queima está fraca e a moto perde força. Isso acontece quando as velas estão muito gastas ou a mistura está muito pobre.
-• **Pico Inicial Muito Alto**: Se a linha saltar lá pro alto e o tempo de queima for curtíssimo, significa que tem muita resistência para a faísca pular. Pode ser cabo de vela partido ou vela com o gap (folga) enorme.
-• **As Ondinhas Finais (Oscilações Residuais)**: Essenciais! Mostram a energia que sobrou 'balançando' depois que a faísca apagou. Se essas ondinhas sumirem ou ficarem curtas e tortas, é tiro certo: **a bobina está em curto ou vazando corrente (fuga de faísca)**. Troque a bobina.`,
+• **Tempo de Carregamento (Dwell)**: O módulo aterra o circuito, a tensão cai para 0V. A bobina acumula força magnética.
+• **Pico de Disparo (Spike)**: O módulo corta o aterramento. O campo magnético desmorona e gera um pico de até 400V! Se esse pico for muito baixo, a bobina está ruim.
+• **Linha de Queima**: O reflexo da faísca na vela. Se durar menos que 0.8ms, a centelha está fraca (velas gastas ou mistura pobre).
+• **Oscilações Residuais**: A energia que sobra 'balança' no final. Se sumirem, a bobina está em curto (fuga de faísca). Troque a bobina.`,
     waveformPhases: [
       {
         id: 1,

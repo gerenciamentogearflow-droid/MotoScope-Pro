@@ -113,6 +113,9 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
       case "ignition":
         // Ignition Coil: Dwell -> Spark Spike -> Burn Line (noisy) -> Extinguish -> Ringing
         return "M 0 60 L 15 60 L 15.5 80 L 45 80 L 45.5 5 L 46 45 L 48 46 L 50 44 L 53 46 L 56 44 L 58 46 L 58.5 25 L 59.5 75 L 61 40 L 62.5 70 L 64 50 L 65.5 65 L 67 55 L 68.5 60 L 100 60";
+      case "ignition-secondary":
+        // Ignition Coil Secondary: 0kV -> Dwell (small dip) -> Spark Spike -> Burn Line -> Ringing -> 0kV
+        return "M 0 80 L 15 80 L 15.5 90 L 17 80 L 45 80 L 45.5 5 L 46 45 L 48 46 L 50 44 L 53 46 L 56 44 L 58 46 L 58.5 25 L 59.5 90 L 61 70 L 62.5 85 L 64 75 L 65.5 80 L 100 80";
       case "cdi":
         // CDI: No Dwell -> Instant Spark Spike -> Ringing down
         return "M 0 60 L 20 60 L 20.2 5 L 20.6 80 L 21.2 20 L 22 75 L 23 35 L 24.5 65 L 26.5 55 L 29 60 L 100 60";
@@ -460,12 +463,11 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
-                className={`absolute left-2 right-2 sm:left-auto sm:right-4 sm:w-[320px] bg-transparent z-40 max-h-[70%] overflow-y-auto pointer-events-auto ${
+                className={`absolute left-2 right-2 sm:left-auto sm:right-4 sm:w-[320px] z-40 max-h-[70%] overflow-y-auto pointer-events-none ${
                   (selectedPhase.labelY ?? selectedPhase.y) > 50 ? 'top-4' : 'bottom-4'
                 }`}
-                onClick={(e) => e.stopPropagation()}
               >
-                <div className="p-3 sm:p-4">
+                <div className="p-3 sm:p-4 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
                       <span className="bg-[#00FF00] text-black w-5 h-5 rounded-full flex items-center justify-center font-black text-xs shrink-0 shadow-[0_0_10px_rgba(0,255,0,0.3)]">

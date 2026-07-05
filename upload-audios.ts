@@ -26,7 +26,7 @@ async function upload() {
     } else {
       console.log(`${audioId} already exists in Firestore.`);
       // Force update for cdi-dc and cdi to make sure they are correct
-      if (audioId.includes('cdi')) {
+      if (audioId.includes('cdi') || audioId.includes('ignition-coil-secondary')) {
          console.log(`Force updating ${audioId}...`);
          const buffer = fs.readFileSync(filePath);
          const base64data = `data:audio/mp3;base64,${buffer.toString('base64')}`;
