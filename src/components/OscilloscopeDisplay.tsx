@@ -356,7 +356,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
 
           {/* Wave SVG */}
           <svg
-            className="absolute w-full h-full scale-y-[0.85] pointer-events-none"
+            className="absolute w-full h-full scale-y-[0.85] pointer-events-none z-50"
             preserveAspectRatio="none"
             viewBox="0 0 100 100"
             style={{ overflow: 'visible' }}
