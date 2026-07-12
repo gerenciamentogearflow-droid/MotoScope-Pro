@@ -136,7 +136,7 @@ export function Dashboard({
 
   const [showVariantModal, setShowVariantModal] = useState<{ groupComp: ComponentData, mode: "didactic" | "real" | "multimeter" | "parameters" | "pinouts" } | null>(null);
   const [showCkpDifferences, setShowCkpDifferences] = useState(false);
-  useBackButton(activeTab !== "home" && !selectedRealSignalComponent && !selectedMultimeterComponent && !selectedBrandParameters && !selectedBrandWorksheet && !selectedBrandPinouts && !showVariantModal && !showUserSettings && !showCkpDifferences, () => setActiveTab("home"));
+  useBackButton(activeTab !== "home", () => setActiveTab("home"));
 
   useBackButton(!!showVariantModal, () => setShowVariantModal(null));
   useBackButton(!!showUserSettings, () => setShowUserSettings(false));
@@ -922,49 +922,8 @@ export function Dashboard({
                       />
                     </div>
                     
-                    <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">
-                        Aparência
-                      </label>
-                      <div className="grid grid-cols-3 gap-2">
-                        <button
-                          onClick={() => setTheme("light")}
-                          className={`py-2 px-3 text-sm font-medium rounded-lg border flex items-center justify-center gap-2 transition-colors ${
-                            theme === "light" 
-                              ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400" 
-                              : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-800 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
-                          }`}
-                        >
-                          Claro
-                        </button>
-                        <button
-                          onClick={() => setTheme("dark")}
-                          className={`py-2 px-3 text-sm font-medium rounded-lg border flex items-center justify-center gap-2 transition-colors ${
-                            theme === "dark" 
-                              ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400" 
-                              : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-800 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
-                          }`}
-                        >
-                          Escuro
-                        </button>
-                        <button
-                          onClick={() => setTheme("auto")}
-                          className={`py-2 px-3 text-sm font-medium rounded-lg border flex items-center justify-center gap-2 transition-colors ${
-                            theme === "auto" 
-                              ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400" 
-                              : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-800 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
-                          }`}
-                        >
-                          Auto
-                        </button>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2">
-                        Auto: Tema escuro das 18h às 6h.
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="mt-8 flex gap-3">
+                  </div><div className="mt-8 flex gap-3">
                     <button
                       onClick={() => setShowUserSettings(false)}
                       className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl transition-colors"

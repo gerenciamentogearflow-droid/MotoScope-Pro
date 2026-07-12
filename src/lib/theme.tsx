@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-export type ThemeType = "light" | "dark" | "auto";
+export type ThemeType = "dark";
 
 interface ThemeContextProps {
   theme: ThemeType;
@@ -11,43 +11,13 @@ interface ThemeContextProps {
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<ThemeType>(() => {
-    const saved = localStorage.getItem("motostore_theme");
-    return (saved as ThemeType) || "auto";
-  });
-  const [isDark, setIsDark] = useState(false);
+  const [theme, setTheme] = useState<ThemeType>("dark");
+  const isDark = true;
 
   useEffect(() => {
-    localStorage.setItem("motostore_theme", theme);
-    
-    const applyTheme = () => {
-      let dark = false;
-      if (theme === "dark") {
-        dark = true;
-      } else if (theme === "auto") {
-        const hour = new Date().getHours();
-        dark = hour >= 18 || hour < 6;
-      }
-      setIsDark(dark);
-      if (dark) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    };
-
-    applyTheme();
-
-    let interval: any;
-    if (theme === "auto") {
-      // Re-check every minute to automatically switch when the hour changes
-      interval = setInterval(applyTheme, 60000); 
-    }
-    
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [theme]);
+    localStorage.setItem("motostore_theme", "dark");
+    document.documentElement.classList.add("dark");
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, isDark }}>
