@@ -43,7 +43,7 @@ export function OfflineStatus() {
             )}
             
             <div>
-              <p className="text-gray-900 font-medium text-sm">
+              <p className="text-gray-900 dark:text-gray-100 font-medium text-sm">
                 {offlineReady ? 'Dados Offline Prontos' : 'Nova atualização disponível'}
               </p>
               <p className="text-slate-600 text-xs mt-0.5">
@@ -65,7 +65,7 @@ export function OfflineStatus() {
             )}
             <button
               onClick={close}
-              className="px-3 py-2 text-slate-600 hover:text-gray-900 transition-colors"
+              className="px-3 py-2 text-slate-600 hover:text-gray-900 dark:text-gray-100 transition-colors"
             >
               Fechar
             </button>

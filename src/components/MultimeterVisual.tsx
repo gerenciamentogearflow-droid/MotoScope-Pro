@@ -75,9 +75,9 @@ export function MultimeterVisual({ setting, displayValue }: MultimeterVisualProp
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-gray-300/80 my-4 shadow-sm w-full max-w-sm mx-auto">
+    <div className="flex flex-col items-center justify-center p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-300 dark:border-gray-600/80 my-4 shadow-sm w-full max-w-sm mx-auto">
       <div className="mb-4 text-center">
-        <h4 className="text-gray-600 font-medium text-xs mb-1 uppercase tracking-wider">Ajuste do Multímetro</h4>
+        <h4 className="text-gray-600 dark:text-gray-400 font-medium text-xs mb-1 uppercase tracking-wider">Ajuste do Multímetro</h4>
         <p className="text-blue-600 font-bold text-base">
           {getSettingText()}
         </p>
@@ -90,7 +90,7 @@ export function MultimeterVisual({ setting, displayValue }: MultimeterVisualProp
         {/* Screen Area */}
         <div className="w-full flex flex-col items-center mb-4 mt-2">
           <div className="w-[85%] h-[65px] bg-[#8a9e92] rounded flex items-center justify-end px-4 shadow-[inset_0_3px_8px_rgba(0,0,0,0.5)] border-[2px] border-[#111] relative">
-            <span className="absolute top-1 left-2 text-[10px] text-gray-800 font-bold">HV</span>
+            <span className="absolute top-1 left-2 text-[10px] text-gray-800 dark:text-gray-200 font-bold">HV</span>
             <span className="font-mono text-[42px] text-black/90 font-bold tracking-widest leading-none drop-shadow-sm translate-y-1">
               {displayValue !== undefined ? displayValue : (isOhm ? "1 .  " : "0.00")}
             </span>
@@ -119,7 +119,7 @@ export function MultimeterVisual({ setting, displayValue }: MultimeterVisualProp
                 <React.Fragment key={item.id}>
                   {/* Detent Dot */}
                   <div 
-                    className="absolute w-[3px] h-[3px] bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2 opacity-70"
+                    className="absolute w-[3px] h-[3px] bg-white dark:bg-gray-900 rounded-full transform -translate-x-1/2 -translate-y-1/2 opacity-70"
                     style={{ left: `${xDetent}px`, top: `${yDetent}px` }}
                   />
                   {/* Label */}
@@ -161,7 +161,7 @@ export function MultimeterVisual({ setting, displayValue }: MultimeterVisualProp
               
               {/* Pointer handle */}
               <div className="absolute w-[20px] h-[100px] bg-[#222] rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.8)] border border-[#111] flex justify-center">
-                 <div className="w-[3px] h-[12px] bg-white mt-1.5 rounded-full shadow-[0_0_5px_rgba(255,255,255,0.5)]"></div>
+                 <div className="w-[3px] h-[12px] bg-white dark:bg-gray-900 mt-1.5 rounded-full shadow-[0_0_5px_rgba(255,255,255,0.5)]"></div>
               </div>
               
               {/* Center Cap */}

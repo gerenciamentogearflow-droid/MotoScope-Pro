@@ -1,3 +1,4 @@
+import { useBackButton } from "../hooks/useBackButton";
 import React, { useState, useEffect } from "react";
 import { User } from "../types";
 import { oscilloscopeCourse, CourseModule, CourseLesson } from "../data/oscilloscopeCourse";
@@ -11,6 +12,7 @@ interface OscilloscopeCourseViewProps {
 }
 
 export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewProps) {
+  useBackButton(true, onBack);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [completedQuizzes, setCompletedQuizzes] = useState<string[]>([]);
   const [activeLesson, setActiveLesson] = useState<{ moduleId: string, lessonId: string } | null>(null);
@@ -21,7 +23,7 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
 
   // Load progress from local storage
   useEffect(() => {
-    const savedLessons = localStorage.getItem(`course_progress_${user.id}`);
+    const savedLessons = localStorage.getItem(`course_progress_${user.username}`);
     if (savedLessons) {
       try {
         setCompletedLessons(JSON.parse(savedLessons));
@@ -30,7 +32,7 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
       }
     }
     
-    const savedQuizzes = localStorage.getItem(`course_quizzes_${user.id}`);
+    const savedQuizzes = localStorage.getItem(`course_quizzes_${user.username}`);
     if (savedQuizzes) {
       try {
         setCompletedQuizzes(JSON.parse(savedQuizzes));
@@ -38,16 +40,16 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
         console.error("Failed to load quiz progress");
       }
     }
-  }, [user.id]);
+  }, [user.username]);
 
   const saveProgress = (lessons: string[]) => {
     setCompletedLessons(lessons);
-    localStorage.setItem(`course_progress_${user.id}`, JSON.stringify(lessons));
+    localStorage.setItem(`course_progress_${user.username}`, JSON.stringify(lessons));
   };
   
   const saveQuizProgress = (quizzes: string[]) => {
     setCompletedQuizzes(quizzes);
-    localStorage.setItem(`course_quizzes_${user.id}`, JSON.stringify(quizzes));
+    localStorage.setItem(`course_quizzes_${user.username}`, JSON.stringify(quizzes));
   };
 
   const markLessonCompleted = (lessonId: string) => {
@@ -85,35 +87,35 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
 
   if (showCertificate) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col p-6 items-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800 flex flex-col p-6 items-center">
         <button
           onClick={() => setShowCertificate(false)}
-          className="self-start mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="self-start mb-6 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" /> Voltar ao Treinamento
         </button>
 
-        <div className="w-full max-w-4xl bg-white p-12 md:p-24 rounded-none shadow-2xl border-[16px] border-double border-gray-800 relative text-center">
+        <div className="w-full max-w-4xl bg-white dark:bg-gray-900 p-12 md:p-24 rounded-none shadow-2xl border-[16px] border-double border-gray-800 relative text-center">
           <div className="absolute top-12 left-1/2 -translate-x-1/2 opacity-5 pointer-events-none">
             <Award className="w-64 h-64" />
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4 tracking-wider uppercase">
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-4 tracking-wider uppercase">
             Certificado de Conclusão
           </h1>
-          <h2 className="text-xl md:text-2xl font-sans text-gray-600 mb-16 uppercase tracking-widest">
+          <h2 className="text-xl md:text-2xl font-sans text-gray-600 dark:text-gray-400 mb-16 uppercase tracking-widest">
             MotoScope Pro - Especialista
           </h2>
 
-          <p className="text-lg md:text-xl text-gray-700 font-serif mb-8">
+          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 font-serif mb-8">
             Certificamos que
           </p>
 
-          <p className="text-3xl md:text-5xl font-bold text-gray-900 mb-8 border-b-2 border-gray-300 pb-4 inline-block px-12">
+          <p className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-8 border-b-2 border-gray-300 dark:border-gray-600 pb-4 inline-block px-12">
             {user.username}
           </p>
 
-          <p className="text-lg md:text-xl text-gray-700 font-serif max-w-2xl mx-auto leading-relaxed mb-24">
+          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 font-serif max-w-2xl mx-auto leading-relaxed mb-24">
             Concluiu com êxito o treinamento completo de <strong>Diagnóstico Automotivo e Motociclístico com Osciloscópio</strong>,
             demonstrando proficiência em análise de ondas, leitura de sensores, atuadores e sistemas de ignição.
           </p>
@@ -121,8 +123,8 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
           <div className="flex flex-col md:flex-row justify-between items-center px-12 mt-12 gap-12 md:gap-0">
             <div className="text-center">
               <div className="w-48 h-px bg-gray-800 mb-2"></div>
-              <p className="text-gray-600 text-sm font-bold uppercase tracking-widest">Data de Emissão</p>
-              <p className="text-gray-800 font-serif">{new Date().toLocaleDateString('pt-BR')}</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm font-bold uppercase tracking-widest">Data de Emissão</p>
+              <p className="text-gray-800 dark:text-gray-200 font-serif">{new Date().toLocaleDateString('pt-BR')}</p>
             </div>
             
             <div className="w-24 h-24 rounded-full bg-red-600 flex items-center justify-center text-white shadow-lg border-4 border-white outline outline-4 outline-red-600 rotate-12">
@@ -131,8 +133,8 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
 
             <div className="text-center">
               <div className="w-48 h-px bg-gray-800 mb-2"></div>
-              <p className="text-gray-600 text-sm font-bold uppercase tracking-widest">Instrutor</p>
-              <p className="text-gray-800 font-serif font-bold italic">MotoScope Pro</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm font-bold uppercase tracking-widest">Instrutor</p>
+              <p className="text-gray-800 dark:text-gray-200 font-serif font-bold italic">MotoScope Pro</p>
             </div>
           </div>
         </div>
@@ -163,8 +165,8 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
     const nextModule = oscilloscopeCourse[moduleIndex + 1];
 
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <header className="px-6 py-4 bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800 flex flex-col">
+        <header className="px-6 py-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
           <div className="max-w-4xl mx-auto w-full flex items-center gap-4">
             <button
               onClick={() => {
@@ -172,25 +174,25 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
                 setQuizAnswers({});
                 setQuizSubmitted(false);
               }}
-              className="p-2.5 rounded-xl hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition-colors"
+              className="p-2.5 rounded-xl hover:bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
               <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{module.title}</p>
-              <h2 className="text-lg font-bold text-gray-900">{quiz.title}</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">{quiz.title}</h2>
             </div>
           </div>
         </header>
 
         <main className="flex-1 max-w-3xl mx-auto w-full p-6 py-12">
-          <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-900 mb-8">{quiz.title}</h1>
+          <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">{quiz.title}</h1>
             
             <div className="space-y-12">
               {quiz.questions.map((q, qIdx) => (
                 <div key={qIdx}>
-                  <h3 className="font-bold text-gray-900 text-lg mb-4">{qIdx + 1}. {q.question}</h3>
+                  <h3 className="font-bold text-gray-900 dark:text-gray-100 text-lg mb-4">{qIdx + 1}. {q.question}</h3>
                   <div className="space-y-3">
                     {q.options.map((opt, optIdx) => {
                       const isSelected = quizAnswers[qIdx] === optIdx;
@@ -201,14 +203,14 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
                       if (!quizSubmitted) {
                         btnClass += isSelected 
                           ? "border-blue-500 bg-blue-50 text-blue-800 font-medium shadow-sm" 
-                          : "border-gray-200 hover:border-blue-300 hover:bg-gray-50 text-gray-700";
+                          : "border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300";
                       } else {
                         if (isCorrect) {
                           btnClass += "border-green-500 bg-green-50 text-green-800 font-bold";
                         } else if (isSelected && !isCorrect) {
                           btnClass += "border-red-500 bg-red-50 text-red-800";
                         } else {
-                          btnClass += "border-gray-200 opacity-50";
+                          btnClass += "border-gray-200 dark:border-gray-700 opacity-50";
                         }
                       }
                       
@@ -256,7 +258,7 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
                           setQuizAnswers({});
                           setQuizSubmitted(false);
                         }}
-                        className="px-8 py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 font-bold rounded-xl transition-colors"
+                        className="px-8 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-900 dark:text-gray-100 font-bold rounded-xl transition-colors"
                       >
                         Refazer Prova
                       </button>
@@ -303,25 +305,25 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
     const nextModule = !nextLesson ? oscilloscopeCourse[moduleIndex + 1] : null;
 
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <header className="px-6 py-4 bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-800 flex flex-col">
+        <header className="px-6 py-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
           <div className="max-w-4xl mx-auto w-full flex items-center gap-4">
             <button
               onClick={() => setActiveLesson(null)}
-              className="p-2.5 rounded-xl hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition-colors"
+              className="p-2.5 rounded-xl hover:bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
               <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{module.title}</p>
-              <h2 className="text-lg font-bold text-gray-900">{lesson.title}</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">{lesson.title}</h2>
             </div>
           </div>
         </header>
 
         <main className="flex-1 max-w-3xl mx-auto w-full p-6 py-12">
-          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-gray-200">
-            <div className="max-w-none [&_h1]:font-bold [&_h1]:text-3xl [&_h1]:mb-6 [&_h1]:text-gray-900 [&_h3]:font-bold [&_h3]:text-xl [&_h3]:mt-8 [&_h3]:mb-4 [&_h3]:text-gray-900 [&_p]:text-gray-700 [&_p]:leading-relaxed [&_p]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-6 [&_ul]:text-gray-700 [&_li]:mb-2 [&_strong]:text-gray-900 [&_blockquote]:border-l-4 [&_blockquote]:border-blue-500 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-gray-600 [&_blockquote]:bg-blue-50 [&_blockquote]:py-2 [&_blockquote]:pr-4 [&_blockquote]:rounded-r-lg [&_blockquote]:my-6">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 md:p-12 shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="max-w-none [&_h1]:font-bold [&_h1]:text-3xl [&_h1]:mb-6 [&_h1]:text-gray-900 dark:text-gray-100 [&_h3]:font-bold [&_h3]:text-xl [&_h3]:mt-8 [&_h3]:mb-4 [&_h3]:text-gray-900 dark:text-gray-100 [&_p]:text-gray-700 dark:text-gray-300 [&_p]:leading-relaxed [&_p]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-6 [&_ul]:text-gray-700 dark:text-gray-300 [&_li]:mb-2 [&_strong]:text-gray-900 dark:text-gray-100 [&_blockquote]:border-l-4 [&_blockquote]:border-blue-500 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-gray-600 dark:text-gray-400 [&_blockquote]:bg-blue-50 [&_blockquote]:py-2 [&_blockquote]:pr-4 [&_blockquote]:rounded-r-lg [&_blockquote]:my-6">
               <Markdown>{lesson.content}</Markdown>
             </div>
           </div>
@@ -358,15 +360,15 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="bg-gray-50 hover:bg-gray-100 p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200/60 shadow-sm"
+            className="bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:bg-gray-800 p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-gray-700/60 shadow-sm"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-700" />
+            <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
           </button>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
               Treinamento Básico
             </h2>
-            <p className="text-sm text-gray-600">Treinamento básico</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Treinamento básico</p>
           </div>
         </div>
 
@@ -381,15 +383,15 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
         )}
       </div>
 
-      <div className="bg-white rounded-3xl p-6 border border-gray-200 shadow-sm mb-8">
+      <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm mb-8">
         <div className="flex justify-between items-end mb-2">
           <div>
-            <h3 className="font-bold text-gray-900">Seu Progresso</h3>
-            <p className="text-sm text-gray-600">{completedCount} de {totalLessons} concluídos</p>
+            <h3 className="font-bold text-gray-900 dark:text-gray-100">Seu Progresso</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{completedCount} de {totalLessons} concluídos</p>
           </div>
           <span className="text-2xl font-black text-blue-600">{progressPercentage}%</span>
         </div>
-        <div className="w-full bg-gray-100 h-4 rounded-full overflow-hidden">
+        <div className="w-full bg-gray-100 dark:bg-gray-800 h-4 rounded-full overflow-hidden">
           <div 
             className="bg-blue-600 h-full transition-all duration-1000 ease-out rounded-full"
             style={{ width: `${progressPercentage}%` }}
@@ -402,8 +404,8 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
           const isUnlocked = isModuleUnlocked(mIdx);
 
           return (
-          <div key={module.id} className={`bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm ${!isUnlocked ? 'opacity-80' : ''}`}>
-            <div className="bg-gray-50 border-b border-gray-200">
+          <div key={module.id} className={`bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm ${!isUnlocked ? 'opacity-80' : ''}`}>
+            <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
               {module.imageUrl ? (
                 <div className="w-full h-48 md:h-64 relative">
                   <img src={module.imageUrl} alt={module.title} className={`w-full h-full object-cover ${!isUnlocked ? 'grayscale' : ''}`} />
@@ -424,9 +426,9 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
                 <div className="p-6">
                   <div className="flex items-center gap-3">
                     {!isUnlocked && <Lock className="w-5 h-5 text-gray-500" />}
-                    <h3 className="text-xl font-bold text-gray-900">{module.title}</h3>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">{module.title}</h3>
                   </div>
-                  <p className="text-gray-600 mt-1">{module.description}</p>
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">{module.description}</p>
                 </div>
               )}
             </div>
@@ -438,13 +440,13 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
                     key={lesson.id}
                     disabled={!isUnlocked}
                     onClick={() => setActiveLesson({ moduleId: module.id, lessonId: lesson.id })}
-                    className={`w-full text-left p-4 sm:p-6 flex items-center justify-between group transition-colors ${isUnlocked ? 'hover:bg-gray-50' : 'cursor-not-allowed'}`}
+                    className={`w-full text-left p-4 sm:p-6 flex items-center justify-between group transition-colors ${isUnlocked ? 'hover:bg-gray-50 dark:bg-gray-800' : 'cursor-not-allowed'}`}
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border-2 transition-colors ${!isUnlocked ? 'bg-gray-100 border-gray-200 text-gray-400' : isCompleted ? 'bg-green-100 border-green-500 text-green-600' : 'bg-gray-50 border-gray-300 text-gray-400 group-hover:border-blue-500 group-hover:text-blue-500'}`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border-2 transition-colors ${!isUnlocked ? 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400' : isCompleted ? 'bg-green-100 border-green-500 text-green-600' : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-400 group-hover:border-blue-500 group-hover:text-blue-500'}`}>
                         {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : <span className="font-bold">{lIdx + 1}</span>}
                       </div>
-                      <span className={`font-semibold text-lg transition-colors ${!isUnlocked ? 'text-gray-400' : isCompleted ? 'text-gray-900' : 'text-gray-700 group-hover:text-blue-600'}`}>
+                      <span className={`font-semibold text-lg transition-colors ${!isUnlocked ? 'text-gray-400' : isCompleted ? 'text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300 group-hover:text-blue-600'}`}>
                         {lesson.title}
                       </span>
                     </div>
@@ -462,13 +464,13 @@ export function OscilloscopeCourseView({ user, onBack }: OscilloscopeCourseViewP
                     setQuizAnswers({});
                     setQuizSubmitted(false);
                   }}
-                  className={`w-full text-left p-4 sm:p-6 flex items-center justify-between group transition-colors ${isUnlocked ? 'hover:bg-blue-50/50 bg-slate-50' : 'bg-gray-50 cursor-not-allowed'}`}
+                  className={`w-full text-left p-4 sm:p-6 flex items-center justify-between group transition-colors ${isUnlocked ? 'hover:bg-blue-50/50 bg-slate-50' : 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed'}`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border-2 transition-colors ${!isUnlocked ? 'bg-gray-100 border-gray-200 text-gray-400' : completedQuizzes.includes(module.quiz.id) ? 'bg-green-100 border-green-500 text-green-600' : 'bg-white border-blue-200 text-blue-500 group-hover:border-blue-500'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border-2 transition-colors ${!isUnlocked ? 'bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400' : completedQuizzes.includes(module.quiz.id) ? 'bg-green-100 border-green-500 text-green-600' : 'bg-white dark:bg-gray-900 border-blue-200 text-blue-500 group-hover:border-blue-500'}`}>
                       {completedQuizzes.includes(module.quiz.id) ? <CheckCircle2 className="w-5 h-5" /> : <FileBadge2 className="w-5 h-5" />}
                     </div>
-                    <span className={`font-semibold text-lg transition-colors ${!isUnlocked ? 'text-gray-400' : completedQuizzes.includes(module.quiz.id) ? 'text-gray-900' : 'text-blue-900 group-hover:text-blue-600'}`}>
+                    <span className={`font-semibold text-lg transition-colors ${!isUnlocked ? 'text-gray-400' : completedQuizzes.includes(module.quiz.id) ? 'text-gray-900 dark:text-gray-100' : 'text-blue-900 group-hover:text-blue-600'}`}>
                       {module.quiz.title}
                     </span>
                   </div>

@@ -1,3 +1,4 @@
+import { useBackButton } from "../hooks/useBackButton";
 import React, { useState } from "react";
 import { ArrowLeft, ChevronDown, Share2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -31,7 +32,7 @@ const getHexFromColorName = (name: string) => {
 
 const WireColorVisualizer = ({ colorString }: { colorString: string }) => {
   if (!colorString || colorString.toUpperCase() === "VAZIO") {
-    return <span className="text-gray-600 text-xs italic font-medium">VAZIO</span>;
+    return <span className="text-gray-600 dark:text-gray-400 text-xs italic font-medium">VAZIO</span>;
   }
 
   const parts = colorString.split("/").map(p => p.trim());
@@ -52,6 +53,7 @@ const WireColorVisualizer = ({ colorString }: { colorString: string }) => {
 };
 
 export function PinoutsView({ brand, onBack }: PinoutsViewProps) {
+  useBackButton(true, onBack);
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
 
   const getModelsByBrand = () => {
@@ -68,17 +70,17 @@ export function PinoutsView({ brand, onBack }: PinoutsViewProps) {
 
   if (selectedModel) {
     return (
-      <div className="min-h-screen bg-transparent text-gray-900 flex flex-col">
-        <header className="px-6 pt-12 pb-5 border-b border-gray-200/80">
+      <div className="min-h-screen bg-transparent text-gray-900 dark:text-gray-100 flex flex-col">
+        <header className="px-6 pt-12 pb-5 border-b border-gray-200 dark:border-gray-700/80">
           <div className="flex items-center gap-4 max-w-4xl mx-auto w-full">
             <button
               onClick={() => setSelectedModelId(null)}
-              className="p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200/60 shadow-sm text-gray-700 hover:text-gray-900 transition-all active:scale-95"
+              className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 shadow-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 transition-all active:scale-95"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-gray-900 tracking-tight line-clamp-1">
+              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight line-clamp-1">
                 {selectedModel.name}
               </h1>
               <p className="text-[10px] uppercase tracking-widest text-rose-500 font-bold mt-0.5">Diagramas de Pinagem</p>
@@ -91,14 +93,14 @@ export function PinoutsView({ brand, onBack }: PinoutsViewProps) {
             
             {selectedModel.modules.map((mod, idx) => (
               <div key={idx} className="space-y-4">
-                <h3 className="text-sm font-bold text-rose-600 uppercase tracking-widest border-b border-gray-200/80 pb-2">
+                <h3 className="text-sm font-bold text-rose-600 uppercase tracking-widest border-b border-gray-200 dark:border-gray-700/80 pb-2">
                   {mod.name}
                 </h3>
                 
                 {mod.pinout.length > 0 ? (
-                  <div className="overflow-x-auto rounded-[1.5rem] border border-gray-200/60 shadow-sm bg-white backdrop-blur-sm shadow-xl">
+                  <div className="overflow-x-auto rounded-[1.5rem] border border-gray-200 dark:border-gray-700/60 shadow-sm bg-white dark:bg-gray-900 backdrop-blur-sm shadow-xl">
                     <table className="w-full text-xs sm:text-sm text-left">
-                      <thead className="bg-white text-gray-600">
+                      <thead className="bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400">
                         <tr>
                           <th className="px-4 py-4 font-semibold uppercase tracking-wider text-[11px] w-16 text-center">Pino</th>
                           <th className="px-4 py-4 font-semibold uppercase tracking-wider text-[11px] w-48 text-center">Cor do Fio</th>
@@ -107,20 +109,20 @@ export function PinoutsView({ brand, onBack }: PinoutsViewProps) {
                       </thead>
                       <tbody className="divide-y divide-white/5">
                         {mod.pinout.map((p: any, pIdx) => (
-                          <tr key={pIdx} className="hover:bg-gray-100 transition-colors">
-                            <td className="px-4 py-4 text-gray-900 font-mono text-center font-bold">{p.pin}</td>
+                          <tr key={pIdx} className="hover:bg-gray-100 dark:bg-gray-800 transition-colors">
+                            <td className="px-4 py-4 text-gray-900 dark:text-gray-100 font-mono text-center font-bold">{p.pin}</td>
                             <td className="px-4 py-4 align-middle">
                               <WireColorVisualizer colorString={p.color} />
                             </td>
-                            <td className="px-4 py-4 text-gray-600">{p.function}</td>
+                            <td className="px-4 py-4 text-gray-600 dark:text-gray-400">{p.function}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 ) : (
-                  <div className="text-center py-12 bg-white rounded-3xl border border-gray-200/60 shadow-sm">
-                    <p className="text-gray-600">Tabela vazia. Aguardando dados das imagens.</p>
+                  <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700/60 shadow-sm">
+                    <p className="text-gray-600 dark:text-gray-400">Tabela vazia. Aguardando dados das imagens.</p>
                   </div>
                 )}
               </div>
@@ -133,20 +135,20 @@ export function PinoutsView({ brand, onBack }: PinoutsViewProps) {
 
   // List of models
   return (
-    <div className="min-h-screen bg-transparent text-gray-900 flex flex-col">
-      <header className="px-6 pt-12 pb-5 border-b border-gray-200/80">
+    <div className="min-h-screen bg-transparent text-gray-900 dark:text-gray-100 flex flex-col">
+      <header className="px-6 pt-12 pb-5 border-b border-gray-200 dark:border-gray-700/80">
         <div className="flex items-center gap-4 max-w-4xl mx-auto w-full">
           <button
             onClick={onBack}
-            className="p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200/60 shadow-sm text-gray-700 hover:text-gray-900 transition-all active:scale-95"
+            className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 shadow-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 transition-all active:scale-95"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
               Pinagens: <span className="text-rose-600">{brand}</span>
             </h1>
-            <p className="text-[10px] uppercase tracking-widest text-gray-600 font-bold mt-0.5">Selecione o Modelo</p>
+            <p className="text-[10px] uppercase tracking-widest text-gray-600 dark:text-gray-400 font-bold mt-0.5">Selecione o Modelo</p>
           </div>
         </div>
       </header>
@@ -155,10 +157,10 @@ export function PinoutsView({ brand, onBack }: PinoutsViewProps) {
         <div className="max-w-4xl mx-auto space-y-8 pb-12">
           
           <div className="space-y-4">
-            <h2 className="text-sm font-bold text-gray-600 uppercase tracking-widest px-2">Modelos Disponíveis</h2>
+            <h2 className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest px-2">Modelos Disponíveis</h2>
             {models.length === 0 ? (
-               <div className="text-center py-16 bg-white rounded-3xl border border-gray-200/60 shadow-sm">
-                 <p className="text-gray-600">Nenhum modelo de pinagem cadastrado para {brand} ainda.</p>
+               <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700/60 shadow-sm">
+                 <p className="text-gray-600 dark:text-gray-400">Nenhum modelo de pinagem cadastrado para {brand} ainda.</p>
                </div>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
@@ -166,11 +168,11 @@ export function PinoutsView({ brand, onBack }: PinoutsViewProps) {
                   <button
                     key={model.id}
                     onClick={() => setSelectedModelId(model.id)}
-                    className="group w-full flex items-center justify-between p-5 bg-white border border-gray-200/60 shadow-sm rounded-2xl text-left hover:bg-gray-200/60 hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg transition-all shadow-sm active:scale-[0.98]"
+                    className="group w-full flex items-center justify-between p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-2xl text-left hover:bg-gray-200 dark:bg-gray-700/60 hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg transition-all shadow-sm active:scale-[0.98]"
                   >
-                    <span className="text-base font-semibold text-gray-900 group-hover:text-rose-600 transition-colors">{model.name}</span>
-                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-rose-600/10 transition-colors">
-                      <ChevronDown className="w-4 h-4 text-gray-600 group-hover:text-rose-600 -rotate-90 transition-colors" />
+                    <span className="text-base font-semibold text-gray-900 dark:text-gray-100 group-hover:text-rose-600 transition-colors">{model.name}</span>
+                    <div className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center group-hover:bg-rose-600/10 transition-colors">
+                      <ChevronDown className="w-4 h-4 text-gray-600 dark:text-gray-400 group-hover:text-rose-600 -rotate-90 transition-colors" />
                     </div>
                   </button>
                 ))}

@@ -16,7 +16,7 @@ async function generate() {
   }
 
   for (const component of componentsDB) {
-    if (!component.waveformPhases) continue;
+    if (!component || !component.waveformPhases) continue;
     
     for (const phase of component.waveformPhases) {
       const audioId = `${component.id}-phase-${phase.id}`;

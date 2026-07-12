@@ -1,3 +1,4 @@
+import { useBackButton } from "../hooks/useBackButton";
 import React, { useState, useEffect } from "react";
 import { User } from "../types";
 import { registerUser, getAllUsers, updateUserCredentials, deleteUser, adminUpdateUser } from "../lib/auth";
@@ -16,6 +17,8 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps) {
+  useBackButton(true, onBack);
+
   const [users, setUsers] = useState<any[]>([]);
   
   // State for editing other users
@@ -173,18 +176,18 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
 
 
   return (
-    <div className="min-h-screen bg-transparent text-gray-900 flex flex-col">
-      <header className="px-4 pt-12 pb-4 bg-white border-b border-gray-300 z-10 shadow-sm">
+    <div className="min-h-screen bg-transparent text-gray-900 dark:text-gray-100 flex flex-col">
+      <header className="px-4 pt-12 pb-4 bg-white dark:bg-gray-900 border-b border-gray-300 dark:border-gray-600 z-10 shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="p-2 -ml-2 rounded-full hover:bg-gray-200 text-gray-600 transition-colors"
+            className="p-2 -ml-2 rounded-full hover:bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 transition-colors"
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
           <div>
             <h1 className="text-xl font-bold tracking-tight">Configurações</h1>
-            <p className="text-xs text-gray-600">Perfil e conta</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">Perfil e conta</p>
           </div>
         </div>
       </header>
@@ -195,30 +198,30 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white border border-gray-300 rounded-xl p-5 shadow-sm"
+          className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-5 shadow-sm"
         >
           <div className="flex items-center gap-2 mb-4 text-red-700">
             <Settings className="w-5 h-5" />
-            <h2 className="font-semibold text-gray-900">
+            <h2 className="font-semibold text-gray-900 dark:text-gray-100">
               Minha Conta
             </h2>
           </div>
 
           <form onSubmit={handleProfileUpdate} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Nome de Login
               </label>
               <input
                 type="text"
                 value={editUsername}
                 onChange={(e) => setEditUsername(e.target.value)}
-                className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-red-600 shadow-sm"
+                className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-red-600 shadow-sm"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Nova Senha
               </label>
               <input
@@ -226,7 +229,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                 value={editPassword}
                 onChange={(e) => setEditPassword(e.target.value)}
                 placeholder="Deixe em branco para manter a atual"
-                className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder:text-gray-600 focus:outline-none focus:border-red-600 shadow-sm"
+                className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:border-red-600 shadow-sm"
               />
             </div>
 
@@ -255,17 +258,17 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
-              className="bg-white border border-gray-300 rounded-xl p-5 shadow-sm mb-6"
+              className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-5 shadow-sm mb-6"
             >
               <div className="flex items-center gap-2 mb-4 text-indigo-600">
                 <Settings className="w-5 h-5" />
-                <h2 className="font-semibold text-gray-900">
+                <h2 className="font-semibold text-gray-900 dark:text-gray-100">
                   Configurações Globais
                 </h2>
               </div>
               <div className="flex items-center justify-between py-2">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900">Treinamento Básico</h3>
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">Treinamento Básico</h3>
                   <p className="text-xs text-gray-500">Exibir acesso ao treinamento na tela inicial.</p>
                 </div>
                 <button
@@ -273,7 +276,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                   onClick={toggleCourseVisibility}
                   className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${showCourse ? 'bg-emerald-500' : 'bg-gray-300'}`}
                 >
-                  <div className={`w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${showCourse ? 'translate-x-6' : 'translate-x-0'}`} />
+                  <div className={`w-4 h-4 rounded-full bg-white dark:bg-gray-900 shadow-sm transition-transform ${showCourse ? 'translate-x-6' : 'translate-x-0'}`} />
                 </button>
               </div>
             </motion.div>
@@ -283,37 +286,37 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white border border-gray-300 rounded-xl p-5 shadow-sm"
+              className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-5 shadow-sm"
             >
               <div className="flex items-center gap-2 mb-4 text-emerald-600">
                 <UserPlus className="w-5 h-5" />
-                <h2 className="font-semibold text-gray-900">
+                <h2 className="font-semibold text-gray-900 dark:text-gray-100">
                   Cadastrar Novo Mecânico
                 </h2>
               </div>
 
               <form onSubmit={handleRegister} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                     Nome de Usuário
                   </label>
                   <input
                     type="text"
                     value={newUsername}
                     onChange={(e) => setNewUsername(e.target.value)}
-                    className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder:text-gray-600 focus:outline-none focus:border-emerald-500 shadow-sm"
+                    className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                     Senha
                   </label>
                   <input
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder:text-gray-600 focus:outline-none focus:border-emerald-500 shadow-sm"
+                    className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm"
                     required
                   />
                 </div>
@@ -339,21 +342,21 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white border border-gray-300 rounded-xl p-5 shadow-sm"
+              className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-5 shadow-sm"
             >
               <div className="flex items-center gap-2 mb-4 text-blue-600">
                 <Users className="w-5 h-5" />
-                <h2 className="font-semibold text-gray-900">Usuários Cadastrados</h2>
+                <h2 className="font-semibold text-gray-900 dark:text-gray-100">Usuários Cadastrados</h2>
               </div>
 
               <div className="space-y-2">
                 {users.map((u, i) => (
                   <div
                     key={i}
-                    className="flex justify-between items-center p-3 bg-white rounded-lg border border-gray-300"
+                    className="flex justify-between items-center p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-300 dark:border-gray-600"
                   >
                     <div className="flex flex-col">
-                      <span className="font-semibold text-gray-900 text-base">{u.username}</span>
+                      <span className="font-semibold text-gray-900 dark:text-gray-100 text-base">{u.username}</span>
                       <span
                         className={`text-[10px] w-max px-2 py-0.5 mt-1 rounded-full font-bold ${
                           u.role === "admin" ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"
@@ -366,7 +369,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => startEditUser(u)}
-                        className="p-2 text-gray-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
                         title="Editar usuário"
                       >
                         <Pencil className="w-4 h-4" />
@@ -375,7 +378,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                       {u.username !== adminUser.username && (
                         <button
                           onClick={() => confirmDeleteUser(u.username)}
-                          className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="Excluir usuário"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -410,35 +413,35 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-white border border-gray-300 rounded-2xl p-6 shadow-2xl relative"
+              className="w-full max-w-md bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-2xl p-6 shadow-2xl relative"
             >
               <button
                 onClick={() => setEditingUser(null)}
-                className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-gray-200 text-gray-600 hover:text-gray-700 transition-colors"
+                className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
                 <Settings className="w-5 h-5 text-red-700" /> Editar Usuário: {editingUser.username}
               </h3>
 
               <form onSubmit={handleEditUserSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
                     Nome de Usuário
                   </label>
                   <input
                     type="text"
                     value={editUserUsername}
                     onChange={(e) => setEditUserUsername(e.target.value)}
-                    className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-red-600 shadow-sm text-sm"
+                    className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-red-600 shadow-sm text-sm"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
                     Nova Senha
                   </label>
                   <div className="relative">
@@ -447,12 +450,12 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                       value={editUserPassword}
                       onChange={(e) => setEditUserPassword(e.target.value)}
                       placeholder="Deixe em branco para manter a atual"
-                      className="w-full bg-white border border-gray-300 rounded-lg pl-3 pr-10 py-2 text-gray-900 placeholder:text-gray-600 focus:outline-none focus:border-red-600 shadow-sm text-sm"
+                      className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg pl-3 pr-10 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:border-red-600 shadow-sm text-sm"
                     />
                     <button
                       type="button"
                       onClick={() => setEditUserShowPassword(!editUserShowPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-700 focus:outline-none"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 focus:outline-none"
                     >
                       {editUserShowPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -461,13 +464,13 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
 
                 {editingUser.username !== adminUser.username && (
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
                       Nível de Acesso
                     </label>
                     <select
                       value={editUserRole}
                       onChange={(e: any) => setEditUserRole(e.target.value)}
-                      className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:border-red-600 shadow-sm text-sm"
+                      className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-red-600 shadow-sm text-sm"
                     >
                       <option value="mechanic">Mecânico</option>
                       <option value="admin">Administrador</option>
@@ -487,7 +490,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                   <button
                     type="button"
                     onClick={() => setEditingUser(null)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors border border-gray-300"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:bg-gray-700 rounded-lg transition-colors border border-gray-300 dark:border-gray-600"
                   >
                     Cancelar
                   </button>
@@ -512,22 +515,22 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-sm bg-white border border-gray-300 rounded-2xl p-6 shadow-2xl relative"
+              className="w-full max-w-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-2xl p-6 shadow-2xl relative"
             >
               <div className="flex flex-col items-center text-center">
                 <div className="bg-red-50 p-3 rounded-full border border-red-100 mb-4 text-red-600">
                   <AlertTriangle className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">Excluir Usuário?</h3>
-                <p className="text-sm text-gray-600 mb-6">
-                  Tem certeza que deseja excluir o usuário <span className="font-semibold text-gray-800">"{userToDelete}"</span>? Esta ação não pode ser desfeita.
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">Excluir Usuário?</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                  Tem certeza que deseja excluir o usuário <span className="font-semibold text-gray-800 dark:text-gray-200">"{userToDelete}"</span>? Esta ação não pode ser desfeita.
                 </p>
 
                 <div className="flex w-full gap-2">
                   <button
                     type="button"
                     onClick={() => setUserToDelete(null)}
-                    className="flex-1 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors border border-gray-300"
+                    className="flex-1 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:bg-gray-700 rounded-lg transition-colors border border-gray-300 dark:border-gray-600"
                   >
                     Não, cancelar
                   </button>

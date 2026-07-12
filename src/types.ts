@@ -4,6 +4,8 @@ export interface OscilloscopeSetup {
   triggerEdge: string;
   triggerMode: string;
   triggerLevel: string;
+  coupling?: string;
+  axis?: string;
 }
 
 export interface WaveformPhase {
@@ -29,6 +31,9 @@ export interface ComponentData {
   waveformPhases?: WaveformPhase[];
   waveType: string;
   hidden?: boolean;
+  isGroup?: boolean;
+  variants?: { id: string; name: string; description?: string }[];
+  symptoms?: string[];
   multimeter?: {
     setting: string;
     instructions: string;
@@ -51,7 +56,11 @@ export interface RealSignal {
   componentId: string;
   motorcycleName: string;
   userName: string;
-  imageUrl: string;
+  userId?: string;
+  imageUrl: string; // Used for image or video thumbnail
+  mediaType?: "image" | "video";
+  hasChunks?: boolean;
+  status?: "ok" | "failure";
   createdAt: number;
 }
 

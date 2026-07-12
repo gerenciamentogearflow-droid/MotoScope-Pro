@@ -21,13 +21,13 @@ export function InstallPrompt() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 50, scale: 0.9 }}
         transition={{ type: "spring", damping: 20, stiffness: 300 }}
-        className="fixed bottom-4 left-4 right-4 md:bottom-8 md:left-auto md:right-8 md:w-96 z-50 bg-white backdrop-blur-xl rounded-3xl p-6 shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-black/10 flex flex-col gap-5 overflow-hidden"
+        className="fixed bottom-4 left-4 right-4 md:bottom-8 md:left-auto md:right-8 md:w-96 z-50 bg-white dark:bg-gray-900 backdrop-blur-xl rounded-3xl p-6 shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-black/10 flex flex-col gap-5 overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/10 rounded-full blur-[2rem] -z-10" />
 
         <button 
           onClick={() => setDismissed(true)}
-          className="absolute top-4 right-4 p-2 text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-full transition-all active:scale-95"
+          className="absolute top-4 right-4 p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:bg-gray-800 rounded-full transition-all active:scale-95"
         >
           <X className="w-4 h-4" />
         </button>
@@ -37,8 +37,8 @@ export function InstallPrompt() {
             <Download className="w-6 h-6 text-red-600" />
           </div>
           <div>
-            <h3 className="font-bold text-gray-900 tracking-tight">Instalar App</h3>
-            <p className="text-gray-600 text-xs leading-relaxed mt-1">
+            <h3 className="font-bold text-gray-900 dark:text-gray-100 tracking-tight">Instalar App</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-xs leading-relaxed mt-1">
               Adicione à tela inicial para acesso offline e melhor experiência.
             </p>
           </div>
@@ -52,18 +52,18 @@ export function InstallPrompt() {
             Instalar Agora
           </button>
         ) : isIOS ? (
-          <div className="bg-gray-50 p-4 rounded-2xl text-xs text-gray-700 border border-black/10 mt-1">
-            <p className="flex items-center gap-2 mb-3 font-bold text-gray-900 uppercase tracking-widest text-[10px]">
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl text-xs text-gray-700 dark:text-gray-300 border border-black/10 mt-1">
+            <p className="flex items-center gap-2 mb-3 font-bold text-gray-900 dark:text-gray-100 uppercase tracking-widest text-[10px]">
               Instalação no iOS
             </p>
             <ol className="space-y-2.5">
               <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-white flex items-center justify-center font-mono text-[10px] text-red-600 border border-gray-200/60 shadow-sm">1</span>
+                <span className="w-5 h-5 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center font-mono text-[10px] text-red-600 border border-gray-200 dark:border-gray-700/60 shadow-sm">1</span>
                 <span>Toque em <Share className="w-3.5 h-3.5 inline text-blue-600 mx-1" /> Compartilhar</span>
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-white flex items-center justify-center font-mono text-[10px] text-red-600 border border-gray-200/60 shadow-sm">2</span>
-                <span>Selecione <PlusSquare className="w-3.5 h-3.5 inline text-gray-600 mx-1" /> Adicionar à Tela de Início</span>
+                <span className="w-5 h-5 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center font-mono text-[10px] text-red-600 border border-gray-200 dark:border-gray-700/60 shadow-sm">2</span>
+                <span>Selecione <PlusSquare className="w-3.5 h-3.5 inline text-gray-600 dark:text-gray-400 mx-1" /> Adicionar à Tela de Início</span>
               </li>
             </ol>
           </div>

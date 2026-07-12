@@ -52,7 +52,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-[360px] bg-white border border-gray-200/60 shadow-sm rounded-[2rem] p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden"
+        className="w-full max-w-[360px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-[2rem] p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-48 h-48 bg-red-600/10 rounded-full blur-[3rem] -z-10" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-red-600/10 rounded-full blur-[3rem] -z-10" />
@@ -63,29 +63,29 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-center text-gray-900 mb-2 font-bold tracking-tight">
+        <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100 mb-2 font-bold tracking-tight">
           MotoScope Pro
         </h1>
-        <p className="text-gray-600 text-center text-xs uppercase tracking-widest font-bold mb-10">
+        <p className="text-gray-600 dark:text-gray-400 text-center text-xs uppercase tracking-widest font-bold mb-10">
           Acesso ao Sistema
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs uppercase tracking-widest font-bold text-gray-600 mb-2 pl-1">
+            <label className="block text-xs uppercase tracking-widest font-bold text-gray-600 dark:text-gray-400 mb-2 pl-1">
               Usuário
             </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-white border border-black/10 rounded-2xl px-5 py-4 text-base text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all shadow-inner"
+              className="w-full bg-white dark:bg-gray-900 border border-black/10 rounded-2xl px-5 py-4 text-base text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all shadow-inner"
               placeholder="Digite seu usuário"
               required
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-widest font-bold text-gray-600 mb-2 pl-1">
+            <label className="block text-xs uppercase tracking-widest font-bold text-gray-600 dark:text-gray-400 mb-2 pl-1">
               Senha
             </label>
             <div className="relative">
@@ -93,14 +93,14 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white border border-black/10 rounded-2xl pl-5 pr-12 py-4 text-base text-gray-900 placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all shadow-inner"
+                className="w-full bg-white dark:bg-gray-900 border border-black/10 rounded-2xl pl-5 pr-12 py-4 text-base text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all shadow-inner"
                 placeholder="••••••••"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-600 hover:text-gray-700 focus:outline-none transition-colors"
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 focus:outline-none transition-colors"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -113,9 +113,9 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
               id="remember"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="w-5 h-5 rounded border-black/10 bg-white text-red-600 focus:ring-red-600 focus:ring-offset-0"
+              className="w-5 h-5 rounded border-black/10 bg-white dark:bg-gray-900 text-red-600 focus:ring-red-600 focus:ring-offset-0"
             />
-            <label htmlFor="remember" className="ml-3 text-sm font-medium text-gray-600">
+            <label htmlFor="remember" className="ml-3 text-sm font-medium text-gray-600 dark:text-gray-400">
               Manter conectado
             </label>
           </div>
@@ -139,8 +139,8 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         </form>
       </motion.div>
       <div className="mt-10 text-center px-4 max-w-[360px] opacity-60 hover:opacity-100 transition-opacity">
-        <p className="text-gray-600 text-xs leading-relaxed font-mono">
-          Desenvolvido por <span className="font-bold text-gray-700">Mafran junior</span>
+        <p className="text-gray-600 dark:text-gray-400 text-xs leading-relaxed font-mono">
+          Desenvolvido por <span className="font-bold text-gray-700 dark:text-gray-300">Mafran junior</span>
           <br />
           31 9 8613-8576
           <br />

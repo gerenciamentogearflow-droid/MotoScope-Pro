@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useBackButton } from "../hooks/useBackButton";
 import { ComponentData } from "../types";
 import { OscilloscopeDisplay } from "./OscilloscopeDisplay";
 import {
@@ -18,23 +19,24 @@ interface ComponentDetailProps {
 }
 
 export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
+  useBackButton(true, onBack);
   const [activeTab, setActiveTab] = useState<"overview" | "oscilloscope">(
     "overview",
   );
 
   return (
-    <div className="min-h-screen bg-transparent text-gray-900 flex flex-col">
-      <header className="px-6 pt-12 pb-5 border-b border-gray-200/80">
+    <div className="min-h-screen bg-transparent text-gray-900 dark:text-gray-100 flex flex-col">
+      <header className="px-6 pt-12 pb-5 border-b border-gray-200 dark:border-gray-700/80">
         <div className="max-w-5xl mx-auto w-full">
           <div className="flex items-center gap-4">
             <button
               onClick={onBack}
-              className="p-2.5 rounded-xl hover:bg-gray-100 border border-transparent hover:border-gray-200/80 text-gray-600 hover:text-gray-900 transition-all"
+              className="p-2.5 rounded-xl hover:bg-gray-100 dark:bg-gray-800 border border-transparent hover:border-gray-200 dark:border-gray-700/80 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-all"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold tracking-tight leading-tight text-gray-900">
+              <h1 className="text-2xl font-bold tracking-tight leading-tight text-gray-900 dark:text-gray-100">
                 {component.name}
               </h1>
               <span
@@ -46,16 +48,16 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
           </div>
 
           {/* Tabs */}
-          <div className="flex mt-8 bg-white p-1.5 rounded-2xl border border-gray-200/60 shadow-sm">
+          <div className="flex mt-8 bg-white dark:bg-gray-900 p-1.5 rounded-2xl border border-gray-200 dark:border-gray-700/60 shadow-sm">
             <button
               onClick={() => setActiveTab("overview")}
-              className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === "overview" ? "bg-gray-200 text-gray-900 shadow-md shadow-black/50" : "text-gray-600 hover:text-gray-700 hover:bg-gray-100"}`}
+              className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === "overview" ? "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-md shadow-black/50" : "text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-800"}`}
             >
               <Info className="w-4 h-4" /> Funcionamento
             </button>
             <button
               onClick={() => setActiveTab("oscilloscope")}
-              className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === "oscilloscope" ? "bg-red-600/10 text-red-600 shadow-md shadow-black/50 border border-red-600/20" : "text-gray-600 hover:text-gray-700 hover:bg-gray-100"}`}
+              className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === "oscilloscope" ? "bg-red-600/10 text-red-600 shadow-md shadow-black/50 border border-red-600/20" : "text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-800"}`}
             >
               <Activity className="w-4 h-4" /> Osciloscópio
             </button>
@@ -74,11 +76,11 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
               transition={{ duration: 0.2 }}
               className="p-5 space-y-6 pb-12"
             >
-              <section className="bg-white border border-gray-200/60 shadow-sm rounded-3xl p-6 md:p-8">
-                <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-600 mb-4 uppercase tracking-widest">
+              <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-3xl p-6 md:p-8">
+                <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-400 mb-4 uppercase tracking-widest">
                   <Info className="w-4 h-4" /> Descrição Técnica
                 </h3>
-                <p className="text-gray-700 text-base leading-relaxed whitespace-pre-wrap">
+                <p className="text-gray-700 dark:text-gray-300 text-base leading-relaxed whitespace-pre-wrap">
                   {component.fullDescription}
                 </p>
               </section>
@@ -110,45 +112,61 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
             >
               <OscilloscopeDisplay component={component} />
 
-              <section className="bg-white border border-gray-200/60 shadow-sm rounded-3xl overflow-hidden backdrop-blur-sm">
-                <div className="bg-white px-6 py-4 flex items-center gap-3 border-b border-gray-200/80">
+              <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-3xl overflow-hidden backdrop-blur-sm">
+                <div className="bg-white dark:bg-gray-900 px-6 py-4 flex items-center gap-3 border-b border-gray-200 dark:border-gray-700/80">
                   <Settings2 className="w-5 h-5 text-red-600" />
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                     Setup de Captura Base
                   </h3>
                 </div>
-                <div className="p-6 grid grid-cols-2 gap-y-8 gap-x-6">
+                <div className="p-6 grid grid-cols-2 md:grid-cols-3 gap-y-8 gap-x-6">
                   <div>
-                    <span className="block text-xs uppercase tracking-widest text-gray-600 mb-1.5 font-semibold">
+                    <span className="block text-xs uppercase tracking-widest text-gray-600 dark:text-gray-400 mb-1.5 font-semibold">
                       Tempo / Div
                     </span>
-                    <span className="font-mono text-lg font-bold text-gray-900 tracking-tight">
+                    <span className="font-mono text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">
                       {component.oscilloscopeSetup.timeDiv}
                     </span>
                   </div>
                   <div>
-                    <span className="block text-xs uppercase tracking-widest text-gray-600 mb-1.5 font-semibold">
+                    <span className="block text-xs uppercase tracking-widest text-gray-600 dark:text-gray-400 mb-1.5 font-semibold">
                       Tensão / Div
                     </span>
-                    <span className="font-mono text-lg font-bold text-gray-900 tracking-tight">
+                    <span className="font-mono text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">
                       {component.oscilloscopeSetup.voltageDiv}
                     </span>
                   </div>
                   <div>
-                    <span className="block text-xs uppercase tracking-widest text-gray-600 mb-1.5 font-semibold">
+                    <span className="block text-xs uppercase tracking-widest text-gray-600 dark:text-gray-400 mb-1.5 font-semibold">
                       Trigger
                     </span>
-                    <span className="font-mono text-lg font-bold text-gray-900 tracking-tight">
+                    <span className="font-mono text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">
                       {component.oscilloscopeSetup.triggerEdge}
                     </span>
                   </div>
                   <div>
-                    <span className="block text-xs uppercase tracking-widest text-gray-600 mb-1.5 font-semibold">
+                    <span className="block text-xs uppercase tracking-widest text-gray-600 dark:text-gray-400 mb-1.5 font-semibold">
                       Modo / Nível
                     </span>
-                    <span className="font-mono text-lg font-bold text-gray-900 tracking-tight">
+                    <span className="font-mono text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">
                       {component.oscilloscopeSetup.triggerMode} @{" "}
                       {component.oscilloscopeSetup.triggerLevel}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="block text-xs uppercase tracking-widest text-gray-600 dark:text-gray-400 mb-1.5 font-semibold">
+                      Acoplamento
+                    </span>
+                    <span className="font-mono text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">
+                      {component.oscilloscopeSetup.coupling || "DC"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="block text-xs uppercase tracking-widest text-gray-600 dark:text-gray-400 mb-1.5 font-semibold">
+                      Eixo
+                    </span>
+                    <span className="font-mono text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">
+                      {component.oscilloscopeSetup.axis || "Y/T"}
                     </span>
                   </div>
                 </div>
@@ -164,49 +182,49 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
                     {component.waveformPhases.map((phase) => (
                       <div
                         key={phase.id}
-                        className="bg-white border border-gray-200/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg transition-colors rounded-3xl p-6 flex gap-5 items-start"
+                        className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg transition-colors rounded-3xl p-6 flex gap-5 items-start"
                       >
                         <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-red-600/10 border border-red-600/20 flex items-center justify-center text-red-600 font-bold">
                           {phase.id}
                         </div>
                         <div>
-                          <h4 className="text-gray-900 font-semibold mb-2 text-lg">
+                          <h4 className="text-gray-900 dark:text-gray-100 font-semibold mb-2 text-lg">
                             {phase.title}
                           </h4>
-                          <p className="text-gray-600 text-sm leading-relaxed">
+                          <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                             {phase.description}
                           </p>
                         </div>
                       </div>
                     ))}
 
-                    <div className="mt-4 bg-white border border-gray-200/60 shadow-sm rounded-3xl p-6">
-                      <p className="text-gray-600 text-sm leading-relaxed italic border-l-2 border-gray-300 pl-4">
+                    <div className="mt-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-3xl p-6">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed italic border-l-2 border-gray-300 dark:border-gray-600 pl-4">
                         {component.waveformExplanation}
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white border border-gray-200/60 shadow-sm rounded-3xl p-6 md:p-8">
-                    <p className="text-gray-700 text-base leading-relaxed whitespace-pre-line">
+                  <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-3xl p-6 md:p-8">
+                    <p className="text-gray-700 dark:text-gray-300 text-base leading-relaxed whitespace-pre-line">
                       {component.waveformExplanation}
                     </p>
                   </div>
                 )}
               </section>
 
-              <section className="bg-white border border-gray-200/60 shadow-sm rounded-3xl overflow-hidden mt-8">
-                <div className="bg-gray-50 px-6 py-4 border-b border-gray-200/80">
-                  <h3 className="flex items-center gap-2 font-bold text-gray-900">
+              <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-3xl overflow-hidden mt-8">
+                <div className="bg-gray-50 dark:bg-gray-800 px-6 py-4 border-b border-gray-200 dark:border-gray-700/80">
+                  <h3 className="flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100">
                     <Activity className="w-5 h-5 text-red-600" /> Parâmetros de Medição (Menu Parameter)
                   </h3>
-                  <p className="text-sm text-gray-600 mt-1">Guia de configuração para leitura dos valores na tela do osciloscópio.</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Guia de configuração para leitura dos valores na tela do osciloscópio.</p>
                 </div>
 
                 <div className="p-6 border-b border-gray-100">
                   <div className="mb-4">
-                    <h4 className="font-semibold text-gray-900 mb-4 text-lg">O que ativar para o teste do(a) {component.name}?</h4>
-                    <p className="text-sm text-gray-600 mb-6 bg-blue-50 text-blue-800 p-3 rounded-xl border border-blue-100">
+                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-4 text-lg">O que ativar para o teste do(a) {component.name}?</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 bg-blue-50 text-blue-800 p-3 rounded-xl border border-blue-100">
                       <strong>Dica:</strong> Em vez de ativar "A-on" (que polui a tela com todos os valores), ative individualmente apenas os parâmetros recomendados abaixo usando o menu do seu osciloscópio para uma análise mais limpa.
                     </p>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
@@ -277,7 +295,7 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
                         
                         const params = getParameterDetails(component.waveType, component.name);
                         return params.map(param => (
-                          <div key={param.id} className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                          <div key={param.id} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
                             <div className="flex items-center gap-3 mb-3">
                               <span className="bg-red-600/10 text-red-700 border border-red-600/20 px-3 py-1.5 rounded-lg text-sm font-bold tracking-wide">
                                 {param.name}
@@ -285,8 +303,8 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
                             </div>
                             <div className="space-y-3">
                               <div>
-                                <strong className="text-gray-900 block text-sm mb-1">Por que ativar?</strong>
-                                <p className="text-gray-600 text-sm leading-relaxed">{param.reason}</p>
+                                <strong className="text-gray-900 dark:text-gray-100 block text-sm mb-1">Por que ativar?</strong>
+                                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{param.reason}</p>
                               </div>
                               <div className="bg-amber-50/50 p-3 rounded-xl border border-amber-100">
                                 <strong className="text-amber-900 block text-sm mb-1">O que observar no teste:</strong>
@@ -301,34 +319,34 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
                 </div>
 
                 <div className="p-6 bg-gray-50/30">
-                  <h4 className="font-semibold text-gray-900 mb-4 text-lg">Glossário Completo de Parâmetros</h4>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-4 text-lg">Glossário Completo de Parâmetros</h4>
                   <div className="flex flex-col gap-3">
                     {[
-                      { button: "A-on", meaning: "All On (Todos Ligados)", desc: "Liga todos os parâmetros na tela simultaneamente. (Não recomendado, polui a visão).", color: "text-gray-900" },
-                      { button: "A-off", meaning: "All Off (Todos Desligados)", desc: "Limpa a tela escondendo todos os parâmetros.", color: "text-gray-900" },
+                      { button: "A-on", meaning: "All On (Todos Ligados)", desc: "Liga todos os parâmetros na tela simultaneamente. (Não recomendado, polui a visão).", color: "text-gray-900 dark:text-gray-100" },
+                      { button: "A-off", meaning: "All Off (Todos Desligados)", desc: "Limpa a tela escondendo todos os parâmetros.", color: "text-gray-900 dark:text-gray-100" },
                       { button: "Freq", meaning: "Frequência", desc: "Mede giros/velocidade. Essencial para testar CKP e sensores de velocidade da roda (ABS).", color: "text-blue-600" },
-                      { button: "Peri", meaning: "Período", desc: "Tempo de um ciclo completo. Inverso da Frequência.", color: "text-gray-900" },
-                      { button: "Duty+", meaning: "Duty Cycle Positivo (%)", desc: "Informa a % do tempo que o sinal fica ligado em nível alto (positivo).", color: "text-gray-900" },
-                      { button: "Duty-", meaning: "Duty Cycle Negativo (%)", desc: "Informa a % do tempo que o sinal fica ligado em nível baixo (negativo). Comum em válvulas IACV controladas por negativo.", color: "text-gray-900" },
-                      { button: "Wid+", meaning: "Largura de Pulso Positivo", desc: "O tempo exato (em milissegundos) que o componente recebe sinal positivo.", color: "text-gray-900" },
-                      { button: "Wid-", meaning: "Largura de Pulso Negativo", desc: <><strong className="text-gray-900">Crucial para Injeção.</strong> Mede o <strong className="text-gray-900">Tempo de Injeção (ms)</strong>, pois o módulo aciona o injetor via negativo. Também serve para medir o Dwell da bobina.</>, color: "text-red-600" },
+                      { button: "Peri", meaning: "Período", desc: "Tempo de um ciclo completo. Inverso da Frequência.", color: "text-gray-900 dark:text-gray-100" },
+                      { button: "Duty+", meaning: "Duty Cycle Positivo (%)", desc: "Informa a % do tempo que o sinal fica ligado em nível alto (positivo).", color: "text-gray-900 dark:text-gray-100" },
+                      { button: "Duty-", meaning: "Duty Cycle Negativo (%)", desc: "Informa a % do tempo que o sinal fica ligado em nível baixo (negativo). Comum em válvulas IACV controladas por negativo.", color: "text-gray-900 dark:text-gray-100" },
+                      { button: "Wid+", meaning: "Largura de Pulso Positivo", desc: "O tempo exato (em milissegundos) que o componente recebe sinal positivo.", color: "text-gray-900 dark:text-gray-100" },
+                      { button: "Wid-", meaning: "Largura de Pulso Negativo", desc: <><strong className="text-gray-900 dark:text-gray-100">Crucial para Injeção.</strong> Mede o <strong className="text-gray-900 dark:text-gray-100">Tempo de Injeção (ms)</strong>, pois o módulo aciona o injetor via negativo. Também serve para medir o Dwell da bobina.</>, color: "text-red-600" },
                       { button: "Vmax", meaning: "Tensão Máxima", desc: "Mostra picos altos. Vital para ver o pico indutivo de Injetores (ex: 60V-100V) e Bobinas de Ignição (ex: 300V-400V).", color: "text-green-600" },
-                      { button: "Vmin", meaning: "Tensão Mínima", desc: "O ponto de tensão mais baixo. Avalia quedas excessivas ou aterramento ruim.", color: "text-gray-900" },
-                      { button: "Vp-p", meaning: "Tensão Pico a Pico", desc: <>A distância total de Vmax a Vmin. <strong className="text-gray-900">A melhor leitura para o CKP Indutivo</strong>, pois avalia o vigor do sinal completo de ponta a ponta.</>, color: "text-purple-600" },
-                      { button: "Amp", meaning: "Amplitude", desc: "Amplitude central do sinal, semelhante ao Vp-p mas pode ignorar ruídos extremos (spikes).", color: "text-gray-900" },
-                      { button: "Vrms", meaning: "Tensão RMS", desc: <>O mesmo valor lido num multímetro (tensão eficaz). Muito usado ao testar tensão alternada de saída do <strong className="text-gray-900">Estator</strong>.</>, color: "text-gray-900" },
-                      { button: "Avg", meaning: "Tensão Média", desc: <>Usado para ver a tensão constante em sinais lentos/analógicos (<strong className="text-gray-900">TPS, Sonda Lambda, MAP</strong>).</>, color: "text-gray-900" }
+                      { button: "Vmin", meaning: "Tensão Mínima", desc: "O ponto de tensão mais baixo. Avalia quedas excessivas ou aterramento ruim.", color: "text-gray-900 dark:text-gray-100" },
+                      { button: "Vp-p", meaning: "Tensão Pico a Pico", desc: <>A distância total de Vmax a Vmin. <strong className="text-gray-900 dark:text-gray-100">A melhor leitura para o CKP Indutivo</strong>, pois avalia o vigor do sinal completo de ponta a ponta.</>, color: "text-purple-600" },
+                      { button: "Amp", meaning: "Amplitude", desc: "Amplitude central do sinal, semelhante ao Vp-p mas pode ignorar ruídos extremos (spikes).", color: "text-gray-900 dark:text-gray-100" },
+                      { button: "Vrms", meaning: "Tensão RMS", desc: <>O mesmo valor lido num multímetro (tensão eficaz). Muito usado ao testar tensão alternada de saída do <strong className="text-gray-900 dark:text-gray-100">Estator</strong>.</>, color: "text-gray-900 dark:text-gray-100" },
+                      { button: "Avg", meaning: "Tensão Média", desc: <>Usado para ver a tensão constante em sinais lentos/analógicos (<strong className="text-gray-900 dark:text-gray-100">TPS, Sonda Lambda, MAP</strong>).</>, color: "text-gray-900 dark:text-gray-100" }
                     ].map((item) => (
-                      <div key={item.button} className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm flex flex-col md:flex-row md:items-center gap-2 md:gap-6 hover:shadow-md transition-shadow">
+                      <div key={item.button} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-4 rounded-xl shadow-sm flex flex-col md:flex-row md:items-center gap-2 md:gap-6 hover:shadow-md transition-shadow">
                         <div className="md:w-32 flex-shrink-0">
-                          <span className={`font-mono font-bold ${item.color} bg-gray-50 px-2 py-1 rounded border border-gray-100`}>
+                          <span className={`font-mono font-bold ${item.color} bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded border border-gray-100`}>
                             {item.button}
                           </span>
                         </div>
-                        <div className="md:w-56 font-semibold text-gray-800 text-sm">
+                        <div className="md:w-56 font-semibold text-gray-800 dark:text-gray-200 text-sm">
                           {item.meaning}
                         </div>
-                        <div className="text-gray-600 text-sm flex-1 leading-relaxed">
+                        <div className="text-gray-600 dark:text-gray-400 text-sm flex-1 leading-relaxed">
                           {item.desc}
                         </div>
                       </div>

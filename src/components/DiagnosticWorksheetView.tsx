@@ -1,3 +1,4 @@
+import { useBackButton } from "../hooks/useBackButton";
 import React, { useState, useEffect } from "react";
 import { DiagnosticModel, ComponentData } from "../types";
 import { ArrowLeft, ChevronDown, CheckCircle2, AlertCircle, FileText, Download, X, Info, Activity } from "lucide-react";
@@ -149,7 +150,9 @@ const pvIgnitionComponent: ComponentData = {
     voltageDiv: "50V/div ou 100V/div",
     triggerMode: "Normal/Auto",
     triggerEdge: "Subida/Descida",
-    triggerLevel: "Varia"
+    triggerLevel: "Varia",
+    coupling: "DC",
+    axis: "Y/T"
   },
   waveformExplanation: "",
   waveformPhases: [
@@ -387,6 +390,7 @@ const evaluateStatus = (padrao: string, input: string): 'ok' | 'nok' | 'pending'
 };
 
 export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWorksheetViewProps) {
+  useBackButton(true, onBack);
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
   const [selectedAbbr, setSelectedAbbr] = useState<{ key: string; description: string } | null>(null);
   const [selectedTutorial, setSelectedTutorial] = useState<{ key: string; title: string; steps: string[] } | null>(null);
@@ -452,18 +456,18 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
 
   if (selectedModel) {
     return (
-      <div className="min-h-screen bg-transparent text-gray-900 flex flex-col">
-        <header className="px-6 pt-12 pb-5 border-b border-gray-200/80 sticky top-0 bg-gray-50/80 backdrop-blur-xl z-30">
+      <div className="min-h-screen bg-transparent text-gray-900 dark:text-gray-100 flex flex-col">
+        <header className="px-6 pt-12 pb-5 border-b border-gray-200 dark:border-gray-700/80 sticky top-0 bg-gray-50/80 backdrop-blur-xl z-30">
           <div className="flex items-center justify-between max-w-5xl mx-auto w-full gap-4">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSelectedModelId(null)}
-                className="p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200/60 shadow-sm text-gray-700 hover:text-gray-900 transition-all active:scale-95"
+                className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 shadow-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 transition-all active:scale-95"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-900 tracking-tight line-clamp-1">
+                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight line-clamp-1">
                   Relatório Técnico: {selectedModel.name}
                 </h1>
                 <p className="text-[10px] uppercase tracking-widest text-emerald-500 font-bold mt-0.5">Diagnóstico em Andamento</p>
@@ -473,7 +477,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
             <div className="flex items-center gap-2">
               <button
                 onClick={clearForm}
-                className="px-4 py-2 text-xs font-bold text-gray-600 hover:text-white bg-white border border-gray-300 rounded-lg transition-colors"
+                className="px-4 py-2 text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-white bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg transition-colors"
               >
                 Limpar
               </button>
@@ -496,7 +500,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
 
             {selectedModel.tables.map((table, tIdx) => (
               <div key={tIdx} className="space-y-4">
-                <h3 className="text-sm font-bold text-gray-700 flex items-center justify-between uppercase tracking-widest border-b border-gray-200/80 pb-2">
+                <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center justify-between uppercase tracking-widest border-b border-gray-200 dark:border-gray-700/80 pb-2">
                   <span>{table.name}</span>
                   {table.notes && (
                     <span className="text-[10px] font-bold text-amber-700 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20">
@@ -551,16 +555,16 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                     }
                     
                     return (
-                      <div key={rowKey} className="flex flex-col sm:flex-row gap-4 p-4 sm:p-5 bg-white border border-gray-200/60 shadow-sm rounded-2xl transition-all hover:bg-white hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg">
+                      <div key={rowKey} className="flex flex-col sm:flex-row gap-4 p-4 sm:p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-2xl transition-all hover:bg-white dark:bg-gray-900 hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg">
                         {/* Info Section */}
                         <div className="flex-1 space-y-2">
                           <div className="flex items-start justify-between">
-                            <h4 className="font-semibold text-gray-900 text-sm leading-snug">
+                            <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-snug">
                               {row.localizacao}
                             </h4>
                             <button 
                               onClick={() => handleAbbrClick(row.tipo)}
-                              className="inline-block px-2 py-0.5 bg-gray-200 hover:bg-gray-200 border border-gray-400 rounded text-gray-600 font-mono font-bold text-[10px] transition-colors active:scale-95"
+                              className="inline-block px-2 py-0.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-200 dark:bg-gray-700 border border-gray-400 rounded text-gray-600 dark:text-gray-400 font-mono font-bold text-[10px] transition-colors active:scale-95"
                             >
                               {row.tipo}
                             </button>
@@ -595,7 +599,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                               value={currentValue}
                               onChange={(e) => handleValueChange(rowKey, e.target.value, row.padrao)}
                               placeholder={placeholderText}
-                              className="w-full bg-gray-50/80 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-all placeholder:text-gray-500 font-mono"
+                              className="w-full bg-gray-50/80 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-all placeholder:text-gray-500 font-mono"
                             />
                           </div>
 
@@ -605,7 +609,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                               className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
                                 currentStatus === 'ok' 
                                   ? 'bg-emerald-500/20 text-emerald-600 border-emerald-500/50' 
-                                  : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-200'
+                                  : 'bg-white dark:bg-gray-900 text-gray-500 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:bg-gray-700'
                               }`}
                             >
                               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -616,7 +620,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                               className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
                                 currentStatus === 'nok' 
                                   ? 'bg-red-500/20 text-red-600 border-red-500/50' 
-                                  : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-200'
+                                  : 'bg-white dark:bg-gray-900 text-gray-500 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:bg-gray-700'
                               }`}
                             >
                               <AlertCircle className="w-3.5 h-3.5" />
@@ -638,7 +642,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white backdrop-blur-sm"
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white dark:bg-gray-900 backdrop-blur-sm"
               onClick={() => setSelectedAbbr(null)}
             >
               <motion.div
@@ -646,7 +650,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white border border-gray-300 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+                className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
               >
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-mono font-bold text-red-600">
@@ -654,12 +658,12 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                   </h3>
                   <button
                     onClick={() => setSelectedAbbr(null)}
-                    className="p-2 text-gray-600 hover:text-gray-900 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors"
+                    className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 rounded-full transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                <p className="text-gray-700 text-base leading-relaxed">
+                <p className="text-gray-700 dark:text-gray-300 text-base leading-relaxed">
                   {selectedAbbr.description}
                 </p>
               </motion.div>
@@ -672,7 +676,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white backdrop-blur-sm"
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white dark:bg-gray-900 backdrop-blur-sm"
               onClick={() => setSelectedTutorial(null)}
             >
               <motion.div
@@ -680,11 +684,11 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white border border-gray-300 rounded-2xl p-6 max-w-md w-full shadow-2xl flex flex-col max-h-[85vh]"
+                className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-2xl p-6 max-w-md w-full shadow-2xl flex flex-col max-h-[85vh]"
               >
                 <div className="flex items-center justify-between mb-6 shrink-0">
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                       <Info className="w-5 h-5 text-red-600" />
                       Como testar - {selectedTutorial.title}
                     </h3>
@@ -692,7 +696,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                   </div>
                   <button
                     onClick={() => setSelectedTutorial(null)}
-                    className="p-2 text-gray-600 hover:text-gray-900 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors self-start"
+                    className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 rounded-full transition-colors self-start"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -707,7 +711,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                     
                     if (isHeader) {
                       return (
-                        <div key={idx} className="mt-4 mb-1 border-b border-gray-200 pb-1">
+                        <div key={idx} className="mt-4 mb-1 border-b border-gray-200 dark:border-gray-700 pb-1">
                           <p className="font-bold text-red-600 text-xs tracking-wider">{step}</p>
                         </div>
                       );
@@ -730,7 +734,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                     }
 
                     return (
-                      <div key={idx} className={`flex gap-3 ${isWaveform ? 'flex-col bg-white p-3 rounded-lg border border-gray-200 mt-4' : ''}`}>
+                      <div key={idx} className={`flex gap-3 ${isWaveform ? 'flex-col bg-white dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 mt-4' : ''}`}>
                         <div className="flex gap-3">
                           {numberStr && (
                             <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-600/10 border border-red-600/20 flex items-center justify-center text-red-600 text-xs font-bold font-mono mt-0.5">
@@ -744,13 +748,13 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                                 PADRÃO DA ONDA
                               </p>
                             )}
-                            <p className="text-gray-700 text-sm leading-relaxed">
+                            <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                               {content}
                             </p>
                           </div>
                         </div>
                         {isWaveform && selectedTutorial.title.includes("BOBINA DE IGNIÇÃO") && (
-                          <div className="mt-4 pt-4 border-t border-gray-200/80">
+                          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700/80">
                             <OscilloscopeDisplay component={pvIgnitionComponent} />
                           </div>
                         )}
@@ -768,20 +772,20 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
 
   // List of models
   return (
-    <div className="min-h-screen bg-transparent text-gray-900 flex flex-col">
-      <header className="px-6 pt-12 pb-5 border-b border-gray-200/80">
+    <div className="min-h-screen bg-transparent text-gray-900 dark:text-gray-100 flex flex-col">
+      <header className="px-6 pt-12 pb-5 border-b border-gray-200 dark:border-gray-700/80">
         <div className="flex items-center gap-4 max-w-4xl mx-auto w-full">
           <button
             onClick={onBack}
-            className="p-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200/60 shadow-sm text-gray-700 hover:text-gray-900 transition-all active:scale-95"
+            className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 shadow-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 transition-all active:scale-95"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
               Ficha de Diagnóstico: <span className="text-emerald-600">{brand}</span>
             </h1>
-            <p className="text-[10px] uppercase tracking-widest text-gray-600 font-bold mt-0.5">Selecione a Motocicleta</p>
+            <p className="text-[10px] uppercase tracking-widest text-gray-600 dark:text-gray-400 font-bold mt-0.5">Selecione a Motocicleta</p>
           </div>
         </div>
       </header>
@@ -790,10 +794,10 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
         <div className="max-w-4xl mx-auto space-y-8 pb-12">
           
           <div className="space-y-4">
-            <h2 className="text-sm font-bold text-gray-600 uppercase tracking-widest px-2">Modelos Disponíveis</h2>
+            <h2 className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest px-2">Modelos Disponíveis</h2>
             {models.length === 0 ? (
-               <div className="text-center py-16 bg-white rounded-3xl border border-gray-200/60 shadow-sm">
-                 <p className="text-gray-600">Nenhum modelo cadastrado para {brand}.</p>
+               <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700/60 shadow-sm">
+                 <p className="text-gray-600 dark:text-gray-400">Nenhum modelo cadastrado para {brand}.</p>
                </div>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
@@ -801,11 +805,11 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                   <button
                     key={model.id}
                     onClick={() => setSelectedModelId(model.id)}
-                    className="group w-full flex items-center justify-between p-5 bg-white border border-gray-200/60 shadow-sm rounded-2xl text-left hover:bg-gray-200/60 hover:border-emerald-500/30 transition-all shadow-sm active:scale-[0.98]"
+                    className="group w-full flex items-center justify-between p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-2xl text-left hover:bg-gray-200 dark:bg-gray-700/60 hover:border-emerald-500/30 transition-all shadow-sm active:scale-[0.98]"
                   >
-                    <span className="text-base font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors">{model.name}</span>
-                    <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-emerald-600/10 transition-colors">
-                      <ChevronDown className="w-4 h-4 text-gray-600 group-hover:text-emerald-600 -rotate-90 transition-colors" />
+                    <span className="text-base font-semibold text-gray-900 dark:text-gray-100 group-hover:text-emerald-700 transition-colors">{model.name}</span>
+                    <div className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center group-hover:bg-emerald-600/10 transition-colors">
+                      <ChevronDown className="w-4 h-4 text-gray-600 dark:text-gray-400 group-hover:text-emerald-600 -rotate-90 transition-colors" />
                     </div>
                   </button>
                 ))}

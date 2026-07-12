@@ -302,10 +302,14 @@ A onda do secundário reflete diretamente o que ocorre **dentro da câmara de co
 
 Como as tensões chegam a 30.000V (30kV), a leitura através da pinça é segura e obrigatória.
 
-### Fases do Gráfico (Espelho do Primário, mas em kV)
-1. **Tensão de Disparo (Spike):** O pico sobe até romper a resistência do ar na vela (folga). Velas gastas ou mistura pobre exigem mais força e fazem o pico ser muito alto. 
-2. **Linha de Queima (Burn Line):** Quanto tempo a faísca durou (1 a 2ms). Linhas curtas ou tortas (ruídos) indicam centelha instável, falha de ignição ou turbulência severa (mistura errada).
-3. **Extinção e Oscilações Residuais:** Assim como no primário, a energia que sobra deve fazer o gráfico oscilar no final.
+### Fases do Gráfico (Sistemas Injetados / TCI)
+1. **Carregamento (Dwell):** Igual ao primário, tempo que a energia é acumulada.
+2. **Tensão de Disparo (Spike):** O pico sobe até romper a resistência do ar na vela (folga). Velas gastas ou mistura pobre exigem mais força e fazem o pico ser muito alto. 
+3. **Linha de Queima (Burn Line):** Quanto tempo a faísca durou (1 a 2ms). Linhas curtas ou tortas (ruídos) indicam centelha instável, falha de ignição ou turbulência severa (mistura errada).
+4. **Extinção e Oscilações Residuais:** Assim como no primário, a energia que sobra deve fazer o gráfico oscilar no final.
+
+### Sistemas Carburados (CDI)
+Em motos carburadas com ignição por CDI, há uma diferença considerável. Como o osciloscópio está apenas capturando a **indução do cabo de vela** através da pinça, o sinal exibe o comportamento da descarga capacitiva: ausência total do tempo de carregamento (Dwell), seguido de um pico de tensão de disparo muito rápido e linhas de queima com fortes oscilações instantâneas.
 
 **Dica de Ouro:** A linha de queima é o raio-X da queima do combustível!
         `

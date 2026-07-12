@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ComponentData, WaveformPhase } from "../types";
-import { Battery, Activity, ArrowUp, ArrowDown, X, Maximize, Minimize, Play, Pause } from "lucide-react";
+import { Battery, Activity, ArrowUp, ArrowDown, ArrowRight, X, Maximize, Minimize, Play, Pause } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { globalAudioPlayer } from "../lib/audioPlayer";
 
@@ -116,6 +116,15 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
       case "ignition-secondary":
         // Ignition Coil Secondary: 0kV -> Dwell (small dip) -> Spark Spike -> Burn Line -> Ringing -> 0kV
         return "M 0 80 L 15 80 L 15.5 90 L 17 80 L 45 80 L 45.5 5 L 46 45 L 48 46 L 50 44 L 53 46 L 56 44 L 58 46 L 58.5 25 L 59.5 90 L 61 70 L 62.5 85 L 64 75 L 65.5 80 L 100 80";
+      case "ignition-secondary-cdi":
+        // CDI Secondary (Pinça): Instant Spike -> Short noisy burn line -> Ringing -> 0kV
+        return "M 0 60 L 20 60 L 20.5 5 L 21 80 L 22 45 L 23 55 L 24 48 L 25 52 L 26 49 L 28 85 L 30 40 L 32 70 L 34 55 L 37 60 L 100 60";
+      case "ignition-secondary-cdi-prox":
+        // Ignition Coil Secondary CDI (Proximity): Flat -> Spike UP -> Deep Spike DOWN -> Curve UP (Burn Time) -> Second Peak UP -> Second Dip DOWN -> Return to zero
+        return "M 0 50 L 35 50 L 35.1 5 L 35.2 95 Q 38 65 50 60 L 52 50 L 55 68 Q 60 50 68 50 L 100 50";
+      case "pulse-single":
+        // Bobina de pulso carburada: Single positive and negative pulse per revolution
+        return "M 0 50 L 30 50 L 33 20 L 36 50 L 60 50 L 63 80 L 66 50 L 100 50";
       case "cdi":
         // CDI: No Dwell -> Instant Spark Spike -> Ringing down
         return "M 0 60 L 20 60 L 20.2 5 L 20.6 80 L 21.2 20 L 22 75 L 23 35 L 24.5 65 L 26.5 55 L 29 60 L 100 60";
@@ -208,10 +217,33 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
 
 
   return (
-    <div 
-      ref={containerRef}
-      className={`bg-gradient-to-b from-[#1a1c23] to-[#121318] p-3 sm:p-5 rounded-3xl shadow-2xl mx-auto w-full flex flex-col gap-3 sm:gap-5 border border-black/10 ring-1 ring-black/50 ${isFullscreen ? "max-w-none h-screen rounded-none p-0 sm:p-0 border-0 ring-0 overflow-hidden bg-black" : "max-w-4xl"}`}
-    >
+    <div className={`relative ${isFullscreen ? "h-screen w-full" : "max-w-4xl mx-auto pl-6 sm:pl-8 pb-6 sm:pb-8"}`}>
+      {/* Axes Indicators (Outside) */}
+      {!isFullscreen && (
+        <>
+          {/* Y Axis */}
+          <div className="absolute left-0 top-0 bottom-8 w-6 sm:w-8 flex flex-col items-center justify-center pointer-events-none opacity-60">
+            <div className="text-[10px] sm:text-[12px] font-bold text-gray-700 dark:text-gray-300 mb-1">Y</div>
+            <ArrowUp className="w-3 h-3 text-gray-700 dark:text-gray-300 -mb-1 z-10" />
+            <div className="w-[1.5px] h-3/4 bg-gray-400"></div>
+          </div>
+
+          {/* T Axis */}
+          <div className="absolute bottom-0 left-6 sm:left-8 right-0 h-6 sm:h-8 flex items-center justify-center pointer-events-none opacity-60">
+            <div className="w-3/4 h-[1.5px] bg-gray-400"></div>
+            <ArrowRight className="w-3 h-3 text-gray-700 dark:text-gray-300 -ml-1 z-10" />
+            <div className="text-[10px] sm:text-[12px] font-bold text-gray-700 dark:text-gray-300 ml-1">T</div>
+          </div>
+          
+          {/* Origin Point */}
+          <div className="absolute left-[10px] sm:left-[14px] bottom-[10px] sm:bottom-[14px] w-[5px] h-[5px] rounded-full bg-gray-400 opacity-60 pointer-events-none"></div>
+        </>
+      )}
+
+      <div 
+        ref={containerRef}
+        className={`bg-gradient-to-b from-[#1a1c23] to-[#121318] p-3 sm:p-5 rounded-3xl shadow-2xl w-full flex flex-col gap-3 sm:gap-5 border border-black/10 ring-1 ring-black/50 ${isFullscreen ? "max-w-none h-screen rounded-none p-0 sm:p-0 border-0 ring-0 overflow-hidden bg-black" : "max-w-4xl"}`}
+      >
       <style>{`
         @media (orientation: portrait) {
           .fullscreen-mobile-rotate {
@@ -326,6 +358,7 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
             ))}
           </div>
 
+          
           {/* HTML Overlay for Channel Indicators */}
           {waves.length > 1 && waves.map((wave, index) => {
             const yOffset = waveOffsets[wave.id] || 0;
@@ -526,11 +559,13 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
             <ArrowUp
               className={`w-3.5 h-3.5 ${component.oscilloscopeSetup.triggerEdge.includes("Descida") ? "rotate-180 text-red-600" : "text-red-600"}`}
             />
-            <span className="font-bold tracking-wider text-gray-600">X10</span>
-            <span className="font-bold tracking-wider text-gray-600">DC</span>
+            <span className="font-bold tracking-wider text-gray-600 dark:text-gray-400">X10</span>
+            <span className="font-bold tracking-wider text-gray-600 dark:text-gray-400">{component.oscilloscopeSetup.coupling || "DC"}</span>
+            <span className="font-bold tracking-wider text-gray-600 dark:text-gray-400 ml-1">{component.oscilloscopeSetup.axis || "Y/T"}</span>
           </div>
         </div>
-      </div>
+              </div>
+    </div>
     </div>
   );
 }

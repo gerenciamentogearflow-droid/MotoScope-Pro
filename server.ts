@@ -18,7 +18,8 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   // API Routes
   app.get("/api/health", (req, res) => {
@@ -138,7 +139,7 @@ REGRAS CRÍTICAS:
         console.log("File result:", JSON.stringify(fileResult));
         sendUpdate("A IA está lendo o PDF e procurando parâmetros mecânicos (etapa demorada)...", 50);
         const response = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-3.5-flash",
           contents: [
             {
               fileData: {
@@ -149,7 +150,6 @@ REGRAS CRÍTICAS:
             { text: prompt }
           ],
           config: {
-            responseMimeType: "application/json",
             temperature: 0.2,
             maxOutputTokens: 8192,
             responseSchema: {
@@ -251,6 +251,78 @@ REGRAS CRÍTICAS:
     }
   });
 
+  app.post("/api/manual-chat/upload", upload.single("manual"), async (req, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+      if (!process.env.GEMINI_API_KEY) return res.status(500).json({ error: "GEMINI_API_KEY is not set" });
+      
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const fileResult = await ai.files.upload({
+        file: req.file.path,
+        config: { mimeType: req.file.mimetype }
+      });
+      fs.unlinkSync(req.file.path);
+
+      res.json({ fileUri: fileResult.uri, mimeType: fileResult.mimeType || req.file.mimetype, name: fileResult.name });
+    } catch (e: any) {
+      console.error("Error uploading to Gemini:", e);
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.post("/api/manual-chat/message", async (req, res) => {
+    try {
+      const { fileUri, mimeType, message, history } = req.body;
+      if (!fileUri || !message) {
+        return res.status(400).json({ error: "Missing fileUri or message" });
+      }
+      
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      
+      const prompt = `Você é um assistente de IA estritamente focado e especialista no manual fornecido em anexo.
+Aja como um mecânico experiente, falando em português de forma natural e amigável, mas EXTREMAMENTE TÉCNICA E PRECISA.
+Regras inquebráveis:
+1. ATERRAMENTO TOTAL: Responda APENAS E EXCLUSIVAMENTE com base nas informações contidas no documento PDF anexado. É TERMINANTEMENTE PROIBIDO inventar informações, adivinhar, usar conhecimentos prévios ou deduzir dados técnicos.
+2. Se a informação NÃO estiver no PDF, diga APENAS: "Não encontrei essa informação no manual enviado."
+3. Seja consistente. Sempre forneça a mesma resposta técnica baseada no manual.
+4. OBRIGATÓRIO: Ao final de toda resposta, você DEVE citar a página exata do PDF de onde tirou a informação. ATENÇÃO MÁXIMA: A página deve ser o ÍNDICE ABSOLUTO da página do arquivo PDF (começando em 1, onde a capa é a página 1). NÃO use o número impresso no rodapé da página.
+5. OBRIGATÓRIO: Para garantir que encontraremos a página correta caso o índice falhe, forneça também um trecho curto e ÚNICO (cerca de 5 a 10 palavras seguidas) copiado EXATAMENTE como está no texto original do PDF. Evite copiar textos de tabelas com formatação complexa.
+Use EXATAMENTE este formato nas últimas linhas (sem formatação markdown ao redor destas tags):
+[Página X]
+[Citação: "trecho exato copiado do manual"]`;
+
+      const mappedContents = (history || []).map((h: any) => ({
+        role: h.role,
+        parts: [{ text: h.text }]
+      }));
+
+      mappedContents.push({
+        role: "user",
+        parts: [{ text: message }]
+      });
+
+      // Inject the file in the first user message
+      if (mappedContents.length > 0 && mappedContents[0].role === "user") {
+          mappedContents[0].parts.unshift({ fileData: { fileUri, mimeType: mimeType || "application/pdf" } });
+      }
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: mappedContents,
+        config: {
+          systemInstruction: prompt,
+          temperature: 0.1,
+          topP: 0.4
+        }
+      });
+      
+      res.json({ text: response.text });
+    } catch (e: any) {
+      console.error("Error generating manual chat response:", e);
+      res.status(500).json({ error: e.message });
+    }
+  });
+
   // Generate TTS Audio on the fly using node-edge-tts
   app.get("/api/tts", async (req, res) => {
     try {
@@ -337,7 +409,6 @@ REGRAS CRÍTICAS:
     }
   });
 
-  // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
