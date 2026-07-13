@@ -4,6 +4,7 @@ import { Battery, Activity, ArrowUp, ArrowDown, ArrowRight, X, Maximize, Minimiz
 import { motion, AnimatePresence } from "framer-motion";
 import { globalAudioPlayer } from "../lib/audioPlayer";
 
+
 interface OscilloscopeDisplayProps {
   component: ComponentData;
 }
@@ -203,11 +204,6 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
   const hasAnimatedWaves = waves.some(w => w.period && w.period > 0);
   
   const selectedPhase = component.waveformPhases?.find((p) => p.id === selectedPhaseId);
-
-  const playAudioForPhase = (phaseId: number) => {
-    const audioId = `${component.id}-phase-${phaseId}`;
-    globalAudioPlayer.play(audioId);
-  };
 
   useEffect(() => {
     return () => {
@@ -438,8 +434,16 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
                   className="cursor-pointer transition-transform hover:scale-[1.02] origin-center pointer-events-auto"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setSelectedPhaseId(phase.id);
-                    playAudioForPhase(phase.id);
+                    if (selectedPhaseId === phase.id) {
+                      setSelectedPhaseId(null);
+                      globalAudioPlayer.stop();
+                    } else {
+                      setSelectedPhaseId(phase.id);
+                      const audioId = `${component.id}-phase-${phase.id}`;
+                      const plainTextDescription = phase.description.replace(/\*\*/g, '').replace(/\*/g, '');
+                      const textToSpeak = `Parte ${phase.id}. ${phase.title}. ${plainTextDescription}`;
+                      globalAudioPlayer.play(audioId, textToSpeak);
+                    }
                   }}
                   style={{ transformOrigin: `${labelX}px ${labelY}px` }}
                 >
@@ -487,57 +491,8 @@ export function OscilloscopeDisplay({ component }: OscilloscopeDisplayProps) {
             })}
           </svg>
 
-          {/* Phase Details Area */}
-          <AnimatePresence>
-            {selectedPhase && (
-              <motion.div
-                key={selectedPhase.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className={`absolute left-2 right-2 sm:left-auto sm:right-4 sm:w-[320px] z-40 max-h-[70%] overflow-y-auto pointer-events-none ${
-                  (selectedPhase.labelY ?? selectedPhase.y) > 50 ? 'top-4' : 'bottom-4'
-                }`}
-              >
-                <div className="p-3 sm:p-4 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-[#00FF00] text-black w-5 h-5 rounded-full flex items-center justify-center font-black text-xs shrink-0 shadow-[0_0_10px_rgba(0,255,0,0.3)]">
-                        {selectedPhase.id}
-                      </span>
-                      <h5 className="text-[#00FF00] font-bold text-xs sm:text-sm tracking-wide leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                        {selectedPhase.title}
-                      </h5>
-                    </div>
-                    <button 
-                      onClick={() => {
-                        setSelectedPhaseId(null);
-                        globalAudioPlayer.stop();
-                      }}
-                      className="text-white/70 hover:text-white transition-colors p-1 -mr-1 -mt-1 shrink-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="text-zinc-50 text-[10px] sm:text-[11px] leading-relaxed font-sans mt-1.5 whitespace-pre-wrap drop-shadow-[0_2px_4px_rgba(0,0,0,1)] font-medium">
-                    {selectedPhase.description.split('\n').map((line, i) => {
-                      if (line.includes('**')) {
-                        const parts = line.split('**');
-                        return (
-                          <span key={i}>
-                            {parts.map((part, j) => j % 2 === 1 ? <strong key={j} className="text-white">{part}</strong> : part)}
-                            <br/>
-                          </span>
-                        );
-                      }
-                      return <span key={i}>{line}<br/></span>;
-                    })}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Phase Details Area Removed */}
+
         </div>
 
         {/* Bottom Status Bar */}

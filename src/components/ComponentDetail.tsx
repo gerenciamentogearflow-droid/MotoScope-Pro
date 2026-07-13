@@ -2,14 +2,20 @@ import React, { useState } from "react";
 import { useBackButton } from "../hooks/useBackButton";
 import { ComponentData } from "../types";
 import { OscilloscopeDisplay } from "./OscilloscopeDisplay";
+import { WhatsAppAudioPlayer } from "./WhatsAppAudioPlayer";
+import { globalAudioPlayer } from "../lib/audioPlayer";
 import {
   ArrowLeft,
+  Play,
+  Square,
   Sliders,
   Info,
   Zap,
   Settings2,
   Activity,
   Cable,
+  GraduationCap,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -19,10 +25,16 @@ interface ComponentDetailProps {
 }
 
 export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
-  useBackButton(true, onBack);
-  const [activeTab, setActiveTab] = useState<"overview" | "oscilloscope">(
+    const [activeTab, setActiveTab] = useState<"overview" | "oscilloscope">(
     "overview",
   );
+    useBackButton(true, onBack);
+  
+  React.useEffect(() => {
+    return () => {
+      globalAudioPlayer.stop();
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-transparent text-gray-900 dark:text-gray-100 flex flex-col">
@@ -110,7 +122,15 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
               transition={{ duration: 0.2 }}
               className="p-5 space-y-8 pb-12"
             >
+              
               <OscilloscopeDisplay component={component} />
+
+              {component.detailedTeacherExplanation && (
+                <div className="mt-4 mb-4">
+                  <WhatsAppAudioPlayer audioId={`${component.id}-explanation`} textToSpeak={component.detailedTeacherExplanation} />
+                </div>
+              )}
+
 
               <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-3xl overflow-hidden backdrop-blur-sm">
                 <div className="bg-white dark:bg-gray-900 px-6 py-4 flex items-center gap-3 border-b border-gray-200 dark:border-gray-700/80">
@@ -357,6 +377,8 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
             </motion.div>
           )}
         </AnimatePresence>
+
+        
       </main>
     </div>
   );

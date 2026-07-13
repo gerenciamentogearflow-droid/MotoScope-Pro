@@ -1,0 +1,380 @@
+import { ComponentData } from "../types";
+export const componentsDB: ComponentData[] = [
+  {
+    "id": "group-ckp",
+    "name": "Sensor de Rotação (CKP / Pulso)",
+    "type": "sensor",
+    "shortDescription": "Sinais de rotação, fase e PMS (Indutivo, Hall ou Pulso).",
+    "fullDescription": "Escolha o tipo de sensor de rotação utilizado na motocicleta para ver os detalhes e testes.",
+    "oscilloscopeSetup": {
+      "timeDiv": "",
+      "voltageDiv": "",
+      "triggerEdge": "",
+      "triggerMode": "",
+      "triggerLevel": "",
+      "coupling": ""
+    },
+    "waveformExplanation": "",
+    "waveType": "",
+    "isGroup": true,
+    "variants": [
+      {
+        "id": "ckp-indutivo",
+        "detailedTeacherExplanation": "Sensor de Rotação e Fase CKP do tipo Indutivo. O eixo vertical mede a voltagem e o horizontal o tempo. \n\nEste sensor funciona como um pequeno gerador. Ele fica lendo a passagem dos dentes da roda fônica do motor. Quando um dente passa por ele, o magnetismo muda e o sensor gera uma onda suave que sobe e desce. Por isso, no osciloscópio, o sinal é uma sequência contínua de ondas senoidais, parecendo montanhas e vales.\n\nA amplitude, ou seja, a altura da onda, depende da rotação do motor. Em marcha lenta, as ondas têm cerca de 5 a 10 volts. Se você acelerar, as ondas vão se espremer e a voltagem vai subir bastante, podendo passar dos 50 volts. \n\nO mais importante desse gráfico é o ponto de falha, ou roda fônica. No meio dessas ondas contínuas, você notará que a onda fica muito esticada e atinge um pico bem maior. Esse é o espaço sem dentes na roda fônica, que serve para avisar o módulo: 'Ei, o pistão está chegando no topo!'. Se houver ruídos nessa onda longa, ou se ela sumir, a moto perde a referência de ponto, falha, ou simplesmente não pega.",
+        "name": "Indutivo (Injetada TCI)"
+      },
+      {
+        "id": "ckp-hall",
+        "detailedTeacherExplanation": "Sensor de Rotação e Fase CKP do tipo Efeito Hall ou Ativo. O eixo Y é voltagem e o X é tempo.\n\nDiferente do indutivo que gera sua própria energia, o sensor Hall recebe alimentação do módulo, geralmente 5 ou 12 volts, e entrega um sinal perfeitamente quadrado. No osciloscópio, o gráfico não tem curvas, são linhas retas que vão do zero ao topo, formando retângulos, o famoso sinal digital.\n\nCada retângulo perfeito indica a passagem de um dente da roda fônica. Uma grande vantagem do sensor Hall é que a altura do sinal (a voltagem) nunca muda, não importa se o motor está devagar ou acelerando muito. \n\nA falha da roda fônica é representada por um espaço muito mais largo (uma parte baixa do gráfico mais longa). Se os 'dentes' quadrados estiverem com as bordas arredondadas ou o sinal não cair até zerar, o sensor pode estar defeituoso ou há sujeira magnética na ponta dele, enganando a injeção eletrônica.",
+        "name": "Efeito Hall (Injetada)"
+      },
+      {
+        "id": "ckp-pulso-carburada",
+        "detailedTeacherExplanation": "Sensor de Pulso ou Bobina de Pulso para motos carburadas. O eixo Y é voltagem, eixo X é o tempo.\n\nEste é o sistema mais simples de rotação, geralmente com apenas um ou dois pequenos ressaltos no volante do motor. Diferente de uma roda fônica cheia de dentes, a bobina de pulso fica inerte a maior parte do tempo. O gráfico mostrará uma longa linha reta no zero.\n\nQuando o ressalto do volante passa pelo sensor, você verá um pico agudo positivo e um pico negativo rapidamente (ou vice-versa), e depois o sinal volta a ficar reto no zero. É literalmente um pulso rápido!\n\nA altura desse pico varia de 2 a 10 volts, dependendo da rotação. Se a moto não dá faísca, e o osciloscópio mostrar que essa linha não tem pulso, apenas um traço reto contínuo, a bobina de pulso está queimada ou o fio se partiu, e o CDI não sabe a hora de mandar a centelha.",
+        "name": "Bobina de Pulso (Carburada CDI)"
+      }
+    ]
+  },
+  {
+    "id": "group-ignition-secondary",
+    "name": "Bobina de Ignição (Secundário)",
+    "detailedTeacherExplanation": "Bem-vindo à análise do Secundário da Bobina de Ignição. Aqui estamos medindo a altíssima tensão que vai direto para a vela de ignição, usando uma pinça especial no cabo de vela. O eixo vertical mede os quilovolts, ou seja, milhares de volts, e o horizontal o tempo.\n\nO gráfico do secundário é o raio-X perfeito da saúde da queima de combustível. Ele começa com a linha de repouso. Em seguida, temos a linha de carregamento, refletindo o Dwell do primário. \n\nEntão, ocorre o disparo! A linha sobe numa agulha finíssima, alcançando de 10 mil a 20 mil volts. Essa é a tensão necessária para romper a resistência do ar e do combustível e criar a centelha. Esse é o pico de disparo.\n\nLogo após o pico, a linha cai para um platô mais baixo, por volta de 1 a 2 mil volts. Essa é a famosa linha de queima ou tempo de queima. Ela dura alguns milissegundos. Se essa linha estiver muito curta, a mistura pode estar pobre ou a bobina fraca. Se estiver muito enrugada, pode haver defeito na vela ou nos cabos.\n\nQuando a queima termina, a linha cai e forma as oscilações residuais, as ondinhas que indicam que sobrou energia na bobina. Uma bobina saudável sempre tem oscilações residuais. Analise sempre: Pico de disparo alto, linha de queima reta e de bom tamanho, e oscilações residuais no final.",
+    "type": "actuator",
+    "shortDescription": "Forma de onda de alta tensão medida no cabo de vela usando pinça.",
+    "fullDescription": "Escolha o tipo de sistema de ignição da motocicleta para ver a forma de onda do secundário (cabo de vela).",
+    "oscilloscopeSetup": {
+      "timeDiv": "",
+      "voltageDiv": "",
+      "triggerEdge": "",
+      "triggerMode": "",
+      "triggerLevel": "",
+      "coupling": ""
+    },
+    "waveformExplanation": "",
+    "waveType": "",
+    "isGroup": true,
+    "variants": [
+      {
+        "id": "ignition-coil-secondary",
+        "detailedTeacherExplanation": "Este é o sinal do Secundário da Bobina de Ignição para sistemas Injetados, o TCI. Estamos captando a altíssima tensão do cabo de vela. O eixo vertical mostra quilovolts e o horizontal, o tempo.\n\nNo início, a linha desce suavemente mostrando o carregamento magnético da bobina. Quando o módulo corta o primário, o gráfico dá um salto violento para cima, a linha de disparo, chegando muitas vezes a 15 mil volts. Esse pico gigantesco é a energia rasgando a mistura de ar e combustível para iniciar o fogo.\n\nImediatamente após o pico, a linha despenca e estabiliza num patamar horizontal. Este patamar é a Linha de Queima, o momento em que a faísca está acesa entre os eletrodos da vela, durando geralmente cerca de 1 a 2 milissegundos. Fique de olho nela! Uma linha de queima inclinada para cima indica resistência excessiva, como um cabo de vela rompido ou vela gasta.\n\nQuando a faísca apaga, a linha cai e forma ondas decrescentes chamadas de Oscilações Residuais. Sem essas ondinhas no final, a bobina está em curto-circuito interno e precisa ser trocada.",
+        "name": "Injetada (TCI)"
+      },
+      {
+        "id": "ignition-coil-secondary-cdi",
+        "detailedTeacherExplanation": "Aqui vemos o sinal do Secundário para um sistema de ignição Carburada com módulo CDI. Usando uma pinça no cabo de vela, medimos a tensão no eixo vertical e o tempo no eixo horizontal.\n\nNo CDI, o gráfico secundário é bem mais agressivo e curto do que no TCI. Você não vê a fase lenta de carregamento. O gráfico sai do zero e explode imediatamente num pico altíssimo, positivo e negativo. O capacitor do CDI envia um soco de energia, e a bobina multiplica isso para milhares de volts.\n\nA característica principal do sinal secundário do CDI é que ele tem múltiplas agulhas finas subindo e descendo, parecendo uma mola apertada, com uma duração muito curta. Não existe aquela 'linha de queima' plana e longa como nas motos injetadas. A faísca do CDI é extremamente intensa, mas muito rápida.\n\nProblemas comuns aqui envolvem o pico principal estar muito baixo. Isso pode significar vela encharcada, bobina de ignição em curto ou um CDI fraco que não consegue descarregar o capacitor corretamente.",
+        "name": "Carburada (CDI) - Pinça Capacitiva"
+      },
+      {
+        "id": "ignition-coil-secondary-cdi-prox",
+        "detailedTeacherExplanation": "Secundário por Aproximação. Quando a pinça não entra, a gente apenas encosta a ponta do osciloscópio no cabo. O sinal não terá voltagem real calculada, mas o formato revela a saúde da queima e se existe aquela oscilação residual salvadora indicando que a bobina está boa.",
+        "name": "Carburada (CDI) - Aproximação"
+      }
+    ]
+  },
+  {
+    "id": "group-ignition-primary",
+    "name": "Bobina de Ignição (Primário)",
+    "type": "actuator",
+    "shortDescription": "Sinal elétrico de controle da bobina (12V ou descarga de CDI).",
+    "fullDescription": "Escolha o tipo de sistema de ignição da motocicleta para ver o sinal do primário da bobina de ignição.",
+    "oscilloscopeSetup": {
+      "timeDiv": "",
+      "voltageDiv": "",
+      "triggerEdge": "",
+      "triggerMode": "",
+      "triggerLevel": "",
+      "coupling": ""
+    },
+    "waveformExplanation": "",
+      "detailedTeacherExplanation": "Bem-vindo ao estudo da Bobina de Ignição, lado Primário. O primário é a porta de entrada da energia. Vamos analisar o sinal em detalhes no osciloscópio. O eixo vertical, o Y, mede a voltagem. O eixo horizontal, o X, mede o tempo. \n\nNo momento inicial, você vê a linha subir e estabilizar em 12 volts ou cair a 0 volts, dependendo do sistema, mostrando que o módulo começou a carregar a bobina. Essa fase reta e contínua é o tempo de carregamento, conhecido como tempo de Dwell. É o tempo que a bobina tem para criar o campo magnético.\n\nLogo em seguida, ocorre o corte abrupto dessa alimentação pelo módulo. É aí que a mágica acontece. A linha dá um salto violento para cima, criando um pico gigantesco, muitas vezes passando dos 300 ou 400 volts. Esse é o momento do disparo, também chamado de Flyback. Essa energia induz a altíssima tensão no secundário para gerar a faísca na vela.\n\nDepois do pico de disparo, o sinal cai rapidamente e começa a tremer, formando pequenas ondinhas chamadas de oscilações residuais. Essas ondinhas são o resto da energia se dissipando. Se você vir o carregamento, o pico de disparo forte e as ondinhas no final, parabéns, a bobina e o módulo estão saudáveis! Se faltarem as ondinhas, a bobina pode estar em curto. Se não houver o pico, o capacitor do módulo ou a própria bobina podem estar danificados. Fique sempre de olho nesses três momentos: Carregamento, Pico de Disparo e Oscilação Residual.",
+    "waveType": "",
+    "isGroup": true,
+    "variants": [
+      {
+        "id": "ignition-coil",
+        "detailedTeacherExplanation": "Neste gráfico da Bobina de Ignição Primária do tipo TCI, Injetada, o eixo vertical mede a voltagem e o horizontal o tempo. No início, a linha está na voltagem da bateria, cerca de 12 a 14 volts. \n\nQuando o módulo decide carregar a bobina, ele aterra o circuito, e a linha cai instantaneamente para quase zero volts. Essa fase reta embaixo é o tempo de Dwell, o período em que a bobina está se enchendo de energia magnética.\n\nDe repente, o módulo corta esse aterramento. Sem o terra, o campo magnético colapsa violentamente e gera um pico gigantesco de tensão, que salta a linha para cima de 300 a 400 volts! Esse é o pico de disparo primário ou Flyback.\n\nImediatamente após o pico, a vela solta a faísca (o que vemos como a linha de queima) e, logo depois que a queima acaba, a energia que sobrou na bobina se dissipa, formando ondulações no gráfico, as chamadas oscilações residuais. Se o sinal tiver um Dwell limpo, um pico de disparo bem alto e essas ondinhas no final, seu sistema primário de ignição está perfeito. Falta de ondinhas indica espiras em curto na bobina.",
+        "name": "Injetada (TCI - 12V Dwell)"
+      },
+      {
+        "id": "cdi-dc",
+        "detailedTeacherExplanation": "Aqui temos o Primário da Bobina de Ignição para motos Carburadas com módulo CDI alimentado por Bateria, o famoso CDI DC. No osciloscópio, o eixo Y é a tensão e o X é o tempo.\n\nDiferente do TCI, o CDI tem um capacitor interno que guarda energia e descarrega tudo de uma vez na bobina. O gráfico começa no zero, pois a bobina está em repouso. De repente, no momento exato do ponto de ignição, vemos um pico finíssimo e altíssimo, que dispara lá para cima, passando facilmente de 200 volts. \n\nEsse é o momento em que o capacitor do CDI injetou toda a sua carga no primário da bobina. É um evento extremamente rápido, dura frações de milissegundo. Imediatamente após esse pico positivo, o sinal costuma dar um rebote negativo, caindo abaixo de zero e depois oscilando até zerar novamente. \n\nO que analisar aqui? A altura desse primeiro pico! Se ele estiver baixinho, com menos de 100 volts, o CDI está com defeito e não está carregando o capacitor direito, ou a bateria da moto está fraca, já que esse CDI precisa de 12 volts contínuos para trabalhar.",
+        "name": "Carburada (CDI DC - Bateria)"
+      },
+      {
+        "id": "cdi-ac",
+        "detailedTeacherExplanation": "Nesta tela, analisamos o Primário da Bobina de Ignição de um sistema CDI AC, aquele CDI antigo alimentado diretamente pelo estator, sem depender da bateria. O eixo Y é voltagem, o eixo X é tempo.\n\nAssim como no CDI de bateria, o funcionamento baseia-se num disparo rápido de um capacitor interno. A linha do gráfico fica zerada e, de forma repentina, dispara em um pico vertiginoso que cruza a tela, chegando a 150 ou 200 volts num instante mínimo. Esse é o despejo de energia na bobina.\n\nApós esse salto violento, a tensão rebota para baixo de zero, formando picos negativos, e oscila até estabilizar no centro novamente. Como esse sistema depende da energia gerada pelo estator (bobina de força), se esse pico no primário estiver fraco ou inexistente, você deve primeiro investigar se o estator está mandando a voltagem alternada (AC) correta para alimentar o CDI. Se a alimentação chega e o pico primário sai fraco, o defeito está no módulo CDI.",
+        "name": "Carburada (CDI AC - Estator)"
+      }
+    ]
+  },
+  {
+    "id": "cdi-dc",
+    "detailedTeacherExplanation": "Aqui temos o Primário da Bobina de Ignição para motos Carburadas com módulo CDI alimentado por Bateria, o famoso CDI DC. No osciloscópio, o eixo Y é a tensão e o X é o tempo.\n\nDiferente do TCI, o CDI tem um capacitor interno que guarda energia e descarrega tudo de uma vez na bobina. O gráfico começa no zero, pois a bobina está em repouso. De repente, no momento exato do ponto de ignição, vemos um pico finíssimo e altíssimo, que dispara lá para cima, passando facilmente de 200 volts. \n\nEsse é o momento em que o capacitor do CDI injetou toda a sua carga no primário da bobina. É um evento extremamente rápido, dura frações de milissegundo. Imediatamente após esse pico positivo, o sinal costuma dar um rebote negativo, caindo abaixo de zero e depois oscilando até zerar novamente. \n\nO que analisar aqui? A altura desse primeiro pico! Se ele estiver baixinho, com menos de 100 volts, o CDI está com defeito e não está carregando o capacitor direito, ou a bateria da moto está fraca, já que esse CDI precisa de 12 volts contínuos para trabalhar.",
+    "hidden": true,
+    "name": "Bobina de Ignição (Primário) - Carburada (CDI DC)",
+    "type": "actuator",
+    "shortDescription": "Módulo de ignição alimentado pela bateria (12V) que descarrega energia na bobina.",
+    "fullDescription": "O CDI DC (Corrente Contínua) possui um conversor interno que eleva os 12V da bateria para cerca de 200V a 400V, armazenando em um capacitor. Ao receber o sinal do CKP, ele descarrega essa energia instantaneamente no primário da bobina de ignição, gerando a faísca. A grande diferença para o CDI AC é que a alimentação vem da bateria pós-chave e não do estator.",
+    "oscilloscopeSetup": {
+      "timeDiv": "5ms a 10ms",
+      "voltageDiv": "50V a 100V (Atenção: picos podem passar de 200V, use atenuador!)",
+      "triggerEdge": "Subida",
+      "triggerMode": "Normal",
+      "triggerLevel": "20V a 50V",
+      "coupling": "DC",
+      "axis": "Y/T"
+    },
+    "connectionInstructions": "Conecte a garra jacaré preta ao negativo da bateria ou chassi. Conecte a ponta de prova (canal 1), OBRIGATORIAMENTE com atenuador (ex: 20:1) se não suportar altas tensões, no fio que vai do CDI para a Bobina de Ignição.",
+    "waveformExplanation": "A forma de onda de saída do CDI DC para a bobina é semelhante à do CDI AC: um pico de tensão positivo de curtíssima duração, seguido de oscilações amortecidas.\n\nComportamento em Falhas:\n• Sem pico de tensão: Verifique se chegam 12V no CDI (pós-chave). Sem bateria carregada, o CDI DC não funciona.\n• Oscilação muito curta: Curto no primário da bobina de ignição ou fuga de corrente no sistema de ignição.",
+    "waveformPhases": [
+      {
+        "id": 1,
+        "title": "Disparo do Capacitor",
+        "description": "O CDI libera a energia armazenada (elevada a partir dos 12V) para o primário da bobina de ignição.",
+        "x": 20,
+        "y": 20,
+        "labelX": 10,
+        "labelY": 10
+      },
+      {
+        "id": 2,
+        "title": "Oscilação Amortecida",
+        "description": "Dissipação da energia restante no circuito da bobina após o disparo principal.",
+        "x": 30,
+        "y": 60,
+        "labelX": 40,
+        "labelY": 80
+      }
+    ],
+    "waveType": "cdi",
+    "multimeter": {
+      "setting": "Tensão Contínua (DCV) e Pico de Tensão (Peak Hold)",
+      "instructions": "1. No fio de alimentação do CDI, meça tensão contínua (deve ter próximo de 12V).\n2. No fio de saída para a bobina, use adaptador de Pico (Peak Hold) para capturar o pico de disparo na partida.",
+      "expectedValues": "Alimentação 12V constante (DCV). Disparo com pico alto na partida (Peak).",
+      "variesByModel": false
+    ,
+      "teacherExplanation": "Fala meu amigo, beleza? Vamos falar agora sobre como testar a peça Bobina de Ignição (Primário) - Carburada (CDI AC) usando o multímetro, um teste fundamental que a gente faz na oficina no dia a dia. Pega seu multímetro e coloca na escala de Pico de Tensão (Peak Hold) em VDC ou Multímetro com Adaptador de Pico. Presta atenção que esse detalhe da escala é crucial, se colocar na escala errada o teste vai dar um falso positivo ou não vai ler nada. O procedimento que o manual pede é o seguinte: 1. Conecte a ponta preta ao terra (chassi ou negativo da bateria).\n2. Conecte a ponta vermelha no fio de saída do CDI para a bobina de ignição (ex: Preto/Amarelo).\n3. Dê partida no motor (start ou pedal).. Quando você fizer isso, o que a gente espera ver no visor do aparelho? A gente espera ler os seguintes valores: Mínimo de 100V de pico (varia conforme o modelo e estado do estator).. Mas por que esses valores? Bom, esse componente funciona enviando ou recebendo um sinal elétrico que precisa ter uma resistência ou tensão muito específica para a central entender o que tá acontecendo. Se o valor der muito abaixo do esperado, pode ser que a peça esteja em curto-circuito, ou seja, a corrente tá passando direto. Se o valor der infinito ou muito acima, é sinal de circuito aberto, significa que o fio ou a bobina interna rompeu e a energia não passa. Um macete de oficina importante é sempre verificar a temperatura da peça, porque o calor do motor altera a resistência dos fios de cobre lá dentro. Se o multímetro ficar oscilando e não estabilizar o valor, desconfie de mau contato no conector ou fio quebrado por dentro da capa, aquele famoso defeito intermitente que dá uma dor de cabeça pra achar. Então faz esse passo a passo com calma, anota o valor que deu, e compara com a tolerância do manual. Qualquer dúvida, refaz o teste garantindo que as pontas de prova tão bem encostadas pra não dar resistência falsa. Tamo junto!"
+    },
+    "symptoms": [
+      "Motor não pega se a bateria estiver descarregada"
+    }
+  },
+  {
+    "id": "tps",
+    "detailedTeacherExplanation": "Sensor de Posição da Borboleta (TPS) - O acelerador eletrônico da moto!\n\nO que ele é?\nUm simples potenciômetro. O módulo manda 5V e ele devolve um valor que varia de acordo com a aceleração. Geralmente começa perto de 0.5V (fechado) e vai até quase 4.5V (aberto 100%).\n\nComo achar defeito (A prova dos 9):\n- Teste com a chave ligada e motor desligado.\n- Configure o tempo da tela para ficar bem lento (ex: 1 ou 2 segundos por divisão).\n- Acelere o punho BEM DEVAGAR, desde o repouso até o máximo, e depois volte devagar.\n- O que ver no gráfico? A linha deve subir suavemente como uma rampa lisa e descer igual.\n- O DEFEITO: Se no meio da subida a linha der um 'pulo' para baixo ou para cima (um chiado/ruído), a pista do sensor está gasta (arranhada) exatamente naquela posição do acelerador. É aí que a moto engasga e dá 'buracos' na aceleração quando o cliente segura o punho naquela posição. Limpar raramente resolve a longo prazo, a troca é recomendada.",
+    "name": "Sensor TPS (Borboleta)",
+    "type": "sensor",
+    "shortDescription": "Mede a abertura do acelerador.",
+    "fullDescription": "O TPS é um potenciômetro alimentado com 5V pela ECU. Ele varia a resistência conforme você acelera a moto, enviando um sinal de tensão de retorno (geralmente de 0.4V a 4.5V) para a ECU saber a demanda de carga do piloto.",
+    "oscilloscopeSetup": {
+      "timeDiv": "200ms a 500ms",
+      "voltageDiv": "1V",
+      "triggerEdge": "Subida",
+      "triggerMode": "Auto",
+      "triggerLevel": "1V",
+      "coupling": "DC",
+      "axis": "Y/T"
+    },
+    "connectionInstructions": "Aterre a garra preta no negativo da bateria. O TPS possui três fios (5V, Terra e Sinal). Espete a ponta de prova no fio de sinal. Gire o acelerador lentamente e observe a rampa de tensão subindo no osciloscópio.\n\n⚠️ IMPORTANTE: Conecte todas as garras e espete o fio com a chave desligada. Só então LIGUE a chave de ignição (o motor não precisa funcionar) para alimentar o potenciômetro e realizar o teste.",
+    "waveformExplanation": "O TPS (Sensor de Posição da Borboleta) é como o 'botão de volume' de um rádio, mas conectado no cabo do acelerador. Ele avisa o módulo o quanto você quer acelerar.\n\nComportamento e Defeitos:\n• **A Rampa**: Conforme você acelera devagarzinho com a moto desligada, a linha deve subir fazendo uma rampa perfeita e super lisa, do zero ao máximo.\n• **Defeito de Pista Gasta**: Se bem no meio da rampa a linha der um pulo para baixo (cair pro zero) e voltar rapidamente, isso significa que a trilha por onde o contato passa está raspada/gasta. O módulo se perde na hora, corta o combustível naquele momento e a moto dá aquele famoso 'buraco' (engasga e dá soco) bem naquela posição do acelerador.",
+    "waveformPhases": [
+      {
+        "id": 1,
+        "title": "Marcha Lenta",
+        "description": "Acelerador solto, tensão estável e baixa. O valor mínimo é geralmente de 0.4V e o máximo tolerável na marcha lenta é de 0.8V (aprox. 0.5V típico). Qualquer flutuação com a mão parada acusa desgaste.",
+        "x": 10,
+        "y": 85,
+        "labelX": 10,
+        "labelY": 70
+      },
+      {
+        "id": 2,
+        "title": "Aceleração",
+        "description": "Ao acelerar, a linha sobe como uma rampa lisa e perfeita. Quedas instantâneas para zero durante a subida acusam trilha raspada/gasta. Isso fará o módulo cortar o bico e a moto engasgar violentamente nessa posição do acelerador.",
+        "x": 50,
+        "y": 50,
+        "labelX": 40,
+        "labelY": 35
+      },
+      {
+        "id": 3,
+        "title": "Carga Máxima (WOT)",
+        "description": "Acelerador no máximo (WOT). A linha fica reta no topo, pedindo carga máxima do motor. A tensão atinge o seu valor máximo, com o mínimo tolerável de 4.2V e o pico máximo em torno de 4.8V a 5.0V.",
+        "x": 90,
+        "y": 15,
+        "labelX": 90,
+        "labelY": 30
+      }
+    ],
+    "waveType": "tps",
+    "multimeter": {
+      "setting": "DCV_20",
+      "instructions": "Chave ligada, motor desligado. Escala de 20V DC. 1) Verifique alimentação (5V) e Terra (0V). 2) Espete o fio de sinal e acelere o punho devagar até o fim.",
+      "expectedValues": "Alimentação: ~5.0V. Sinal: Inicia em ~0.4V a 0.7V e sobe gradativamente, sem falhas, até ~4.5V em aceleração máxima.",
+      "variesByModel": true,
+      "minValue": 0.4,
+      "maxValue": 4.5,
+      "unit": "V",
+      "temperatureObservation": "Não sofre tanta variação térmica. Com defeitos, ocorre queda para 0V durante o curso do punho (trilha danificada)."
+    ,
+      "teacherExplanation": "E aí, galera da oficina, beleza? Aqui é o seu instrutor, e hoje a gente vai mergulhar de cabeça num componente CRÍTICO pra injeção eletrônica da sua moto: o Sensor TPS, ou Sensor de Posição da Borboleta.\n\nSe você está tendo problemas de aceleração, engasgos, marcha lenta irregular ou consumo alto, o TPS é um dos primeiros lugares onde a gente precisa fuçar. Ele é basicamente o 'olho' da ECU sobre o quanto o piloto está pedindo de motor.\n\nPensa nele como um potenciômetro, igual àquele botão de volume do rádio. Conforme você gira o punho, ele gira junto com a borboleta e muda a sua resistência interna, que por sua vez, altera uma voltagem de sinal que é enviada pra ECU. A ECU 'lê' essa voltagem e sabe exatamente qual a posição da borboleta, ajustando a injeção de combustível e o ponto de ignição. Por que a gente testa isso? Porque se o TPS mente, a moto mente pro piloto.\n\nVamos lá pro aulão do teste com multímetro, passo a passo, e o PORQUÊ de cada coisa.\n\nPrimeiro, pega o seu multímetro. A gente vai usar a configuração DCV_20. Por que 20V? Porque a alimentação do sensor é 5V, e a escala de 20V é a que te dá a melhor precisão pra esses valores baixos, sem saturar. Se você usar a escala de 200V, por exemplo, os números ficam mais arredondados, menos exatos.\n\nAgora, a condição do teste: Chave ligada, motor desligado. Por que? Porque a gente precisa que a ECU esteja energizada e mandando a voltagem de referência de 5V pro sensor trabalhar. E o motor desligado evita vibrações, ruídos elétricos e o próprio risco de trabalhar com o motor ligado, garantindo uma leitura mais estável e segura.\n\nBeleza, multímetro configurado, moto na condição certa. Vamos começar.\n\nPasso 1: Verificar Alimentação e Terra (A Fundação do Sensor!)\n\nEssa parte é crucial. Um sensor, por mais perfeito que seja, não funciona se não tiver energia limpa e um bom terra.\n\nPra verificar os 5V de alimentação:\n1.  Localize o conector do TPS. Geralmente são três fios: um é os 5V de alimentação que vem da ECU, outro é o Terra (GND) que também volta pra ECU, e o terceiro é o fio de Sinal, que é o que a gente quer ler.\n2.  Com as pontas de prova do multímetro, você vai 'espetar' (ou fazer um back-probe, que é o ideal pra não danificar a fiação) no fio que você suspeita ser o 5V de alimentação. A ponta vermelha nesse fio e a ponta preta num bom ponto de terra da moto, tipo o negativo da bateria.\n3.  O multímetro tem que ler ali perto de 5.0V. Se der zero, ou muito baixo (tipo 1V ou 2V), temos um problema: pode ser a ECU que não está enviando os 5V, um chicote rompido, ou um curto-circuito puxando essa voltagem pra baixo. Isso JÁ indica um defeito sério que precisa ser investigado antes mesmo de testar o sinal.\n\nPra verificar o Terra (GND):\n1.  Agora, a gente vai verificar se o sensor está aterrado corretamente. Ponta vermelha no positivo da bateria e a ponta preta no fio que você suspeita ser o terra do sensor.\n2.  O multímetro tem que ler a voltagem da bateria, tipo uns 12.5V a 12.8V. Por que isso? Porque se o terra do sensor estiver bom e conectado à ECU (que por sua vez está aterrada na bateria), não há diferença de potencial significativa entre o fio de terra do sensor e o negativo da bateria. Medindo entre o positivo da bateria e o terra do sensor, você \"fecha o circuito\" pela bateria, e o multímetro te mostra a voltagem total da bateria. Se desse zero ou um valor muito baixo aqui, significaria que o fio de terra do sensor está rompido ou com alta resistência, e o sensor não conseguiria fechar seu circuito.\n\nPasso 2: Verificar o Fio de Sinal (A Rampa de Voltagem!)\n\nAgora que sabemos que o sensor tem alimentação e terra, vamos ver o que ele está enviando pra ECU.\n\n1.  Com o multímetro ainda na escala DCV_20, você vai 'espetar' (back-probe, sempre!) a ponta vermelha no fio de sinal do TPS (aquele terceiro fio). A ponta preta continua no negativo da bateria ou em um bom ponto de terra.\n2.  Com a mão, acelere o punho BEM devagar, do zero até o final. Faça isso lentamente, prestando MUITA atenção no display do multímetro.\n3.  O que você tem que ver:\n    *   No início (borboleta fechada, marcha lenta), o valor tem que estar entre 0.4V e 0.7V. Esse é o ponto de partida padrão para a maioria dos TPS.\n    *   Conforme você acelera suavemente, a voltagem TEM que subir de forma contínua, suave, sem tropeços, sem picos repentinos, sem quedas bruscas. Pense numa rampa sem degraus.\n    *   Ao chegar na aceleração máxima (borboleta totalmente aberta), a voltagem tem que atingir algo em torno de 4.5V.\n\nO que estamos procurando aqui é a \"rampa de voltagem\" perfeita. Ela mostra que o potenciômetro interno do TPS está funcionando em toda a sua extensão, sem falhas.\n\nDefeitos e o que eles significam:\n*   Se a voltagem não subir de jeito nenhum, ou ficar travada em 0.5V mesmo acelerando: O sensor pode estar morto, travado, ou o fio de sinal pode estar em curto com o terra. A ECU vai pensar que a moto está sempre em marcha lenta.\n*   Se você vê a voltagem \"dar um pulão\" ou \"descer do nada\" no meio do caminho, por um microssegundo, e depois voltar a subir: Isso é um defeito clássico de \"ponto morto\" ou uma trilha resistiva interna gasta no sensor. A ECU \"perde a referência\" por um instante, e a moto engasga, falha, ou não responde direito naquele ponto da aceleração. É como se a ECU ficasse cega por um momento.\n*   Se a voltagem não atingir os 4.5V na aceleração máxima: Pode indicar que o sensor não está lendo a abertura total da borboleta, ou que está mal posicionado (em modelos que permitem ajuste).\n*   Se a voltagem inicial estiver muito alta (tipo 1.5V na lenta): Pode ser o sensor mal ajustado, informando à ECU que a borboleta já está aberta, mesmo em marcha lenta.\n\nMacete de Oficina:\n*   Sempre faça o back-probe! Use agulhas finas ou sondas específicas. NUNCA fure a isolação dos fios com as pontas do multímetro, isso causa oxidação e futuros problemas!\n*   Vá devagar: Acelere a borboleta o mais lento possível. Se for muito rápido, você pode perder um ponto de falha intermitente. Se tiver um multímetro analógico, é até melhor pra ver a suavidade do ponteiro.\n*   Observe, não só leia: Mais importante que os números exatos é a *suavidade* da transição.\n*   Conexões limpas: Antes de condenar o sensor, certifique-se que o conector está limpo, sem oxidação. Um mau contato pode simular um defeito no sensor.\n\nEsse teste é simples, mas revela MUITO sobre a saúde do seu TPS. Com ele, você tira a dúvida se o problema é o sensor, ou se a investigação tem que ir pra outro lugar no sistema de injeção. Treine, faça, e você vai pegar o jeito rapidinho. Tamo junto!"
+    }
+  },
+  {
+    "id": "lambda"
+    }
+  },
+  {
+    "id": "abs-hall",
+    "detailedTeacherExplanation": "Sensor de Velocidade de Roda ABS do tipo Hall (Ativo ou Magnetoresistivo). Eixo Y voltagem e eixo X tempo.\n\nEste é um sensor eletrônico avançado que requer alimentação. Ele não gera ondinhas senoidais; ele produz uma onda digital em formato quadrado, variando a voltagem (por exemplo, de 0 para 5 volts) ou, em muitos casos modernos, variando a corrente em miliamperes. \n\nGirando a roda, o osciloscópio desenhará uma sequência de caixotes perfeitos. A vantagem gigante desse sensor é que ele consegue ler movimentos incrivelmente lentos da roda com precisão total e sem perder a voltagem.\n\nQualquer caixote (onda quadrada) que apareça mais largo que o normal ou com uma falha na sua formação indica que há um problema físico na roda fônica magnética ou que a distância do sensor para a roda fônica (o entreferro) está errada, possivelmente devido a um rolamento de roda estourado.",
+    "hidden": true,
+    "name": "Sensor ABS - Ativo (Hall)",
+    "type": "sensor",
+    "shortDescription": "Sensor ABS digital, gera onda quadrada.",
+    "fullDescription": "O sensor ABS ativo utiliza elemento Hall ou Magnetoresistivo para ler uma roda fônica ou um anel magnético no rolamento. Ele gera um sinal digital de onda quadrada limpa, mesmo em baixíssimas velocidades. É muito superior ao indutivo em precisão.",
+    "oscilloscopeSetup": {
+      "timeDiv": "20ms a 50ms",
+      "voltageDiv": "2V",
+      "triggerEdge": "Subida",
+      "triggerMode": "Normal",
+      "triggerLevel": "2.5V",
+      "coupling": "DC",
+      "axis": "Y/T"
+    },
+    "connectionInstructions": "TESTE NA MOTO: Aterre a garra preta do osciloscópio no negativo da bateria. Identifique os fios do sensor ABS. Espete a ponta de prova do canal 1 no fio de Sinal.\n\nTESTE EM BANCADA (Roda Girando ou Furadeira):\n1. Levante a roda e gire-a com a mão.\n2. Para testar fora, alimente o sensor com a tensão correta (geralmente 12V). Gire uma roda fônica ou ímã multipolar (anexo a uma furadeira) próximo ao sensor para ver a onda quadrada.\n\n⚠️ IMPORTANTE: Conecte tudo com a ignição desligada. LIGUE a chave de ignição somente após as conexões estarem prontas para que o módulo alimente o sensor com segurança.",
+    "waveformExplanation": "O sensor de ABS Hall é a versão digital. Ele envia para o módulo do freio ondas quadradas perfeitas. A maioria das motos hoje usa este tipo.\n\nComportamento e Defeitos:\n• **Giro da Roda**: Mesmo girando a roda bem devagarinho, a onda quadrada sobe e desce da mesma altura. O que muda é apenas o espaçamento entre elas.\n• **Ondas Inconstantes ou Amassadas**: Se os quadrados começarem a perder a forma, não encostando no zero, é um indicativo forte de sujeira extrema no sensor, mal contato no conector, ou problema nos fios de alimentação (esse sensor precisa de energia, geralmente de 5 a 12V, para funcionar).",
+    "waveformPhases": [
+      {
+        "id": 1,
+        "title": "Nível Lógico Baixo (0V)",
+        "description": "Fio de sinal vai a 0V indicando dente lido. Tem que ser limpo. Uma falha aqui muitas vezes resulta de ferrugem no sensor isolando o contato.",
+        "x": 20,
+        "y": 80,
+        "labelX": 20,
+        "labelY": 95
+      },
+      {
+        "id": 2,
+        "title": "Borda de Subida",
+        "description": "Bordas perfeitas em 90 graus para evitar qualquer erro de cálculo do módulo ABS de que a roda possivelmente parou (travou).",
+        "x": 25,
+        "y": 50,
+        "labelX": 10,
+        "labelY": 50
+      },
+      {
+        "id": 3,
+        "title": "Nível Lógico Alto",
+        "description": "Crista alta do sinal digital. Fica alerta: ruídos esquisitos nessa parte de cima costumam acusar chicote machucado roçando no quadro da moto acompanhando o trabalho da suspensão.",
+        "x": 32,
+        "y": 20,
+        "labelX": 32,
+        "labelY": 10
+      }
+    ],
+    "waveType": "square",
+    "multimeter": {
+      "teacherExplanation": "Fala meu amigo, beleza? Vamos falar agora sobre como testar a peça Sensor ABS - Ativo (Hall) usando o multímetro, um teste fundamental que a gente faz na oficina no dia a dia. Pega seu multímetro e coloca na escala de DCV_20. Presta atenção que esse detalhe da escala é crucial, se colocar na escala errada o teste vai dar um falso positivo ou não vai ler nada. O procedimento que o manual pede é o seguinte: Chave ligada. Multímetro em DC 20V. Meça tensão de alimentação do sensor (geralmente 12V). Para sinal, conecte a roda e gire lentamente. Requer equipamento específico para leitura correta do pulso rápido, mas pode observar variação na tensão DC média.. Quando você fizer isso, o que a gente espera ver no visor do aparelho? A gente espera ler os seguintes valores: Alimentação: 12V (ou 5V dependendo do sistema). Sinal DC: Variação discreta ou valor médio (ex: 6V). Osciloscópio é necessário para diagnóstico preciso.. Mas por que esses valores? Bom, esse componente funciona enviando ou recebendo um sinal elétrico que precisa ter uma resistência ou tensão muito específica para a central entender o que tá acontecendo. Se o valor der muito abaixo do esperado, pode ser que a peça esteja em curto-circuito, ou seja, a corrente tá passando direto. Se o valor der infinito ou muito acima, é sinal de circuito aberto, significa que o fio ou a bobina interna rompeu e a energia não passa. Um macete de oficina importante é sempre verificar a temperatura da peça, porque o calor do motor altera a resistência dos fios de cobre lá dentro. Se o multímetro ficar oscilando e não estabilizar o valor, desconfie de mau contato no conector ou fio quebrado por dentro da capa, aquele famoso defeito intermitente que dá uma dor de cabeça pra achar. Então faz esse passo a passo com calma, anota o valor que deu, e compara com a tolerância do manual. Qualquer dúvida, refaz o teste garantindo que as pontas de prova tão bem encostadas pra não dar resistência falsa. Tamo junto!"
+    }
+  },
+  {
+    "id": "retificador",
+    "detailedTeacherExplanation": "Regulador / Retificador de Voltagem.\n\nEle pega aquela onda bagunçada e alternada do estator e transforma em Corrente Contínua (DC) limpinha, limitada a cerca de 14.5V, para não explodir a bateria e os módulos.\n\nTestando no osciloscópio:\n- Pontas direto nos bornes da bateria. Moto ligada em marcha lenta e acelerando.\n- O que esperar: Uma linha DC reta, próximo a 14.2V, com 'ondulações' muito pequenas no topo (ripple).\n- DEFEITO 1 (Diodo queimado): Se você ver 'dentes' fundos na linha DC ou tensão muito baixa, a conversão falhou, a bateria não carrega.\n- DEFEITO 2 (Regulador pifou): Acelerando a moto, a linha passa dos 15V, 16V, 17V! Desligue rápido! O retificador não está cortando o excesso. Isso ferve a bateria e queima lâmpadas e módulos de injeção. É o pior cenário!\n- Falso Defeito: Bateria viciada não absorve energia. A tensão pode pular rápido para 14V e a linha ficar cheia de ruídos bizarros. Teste com uma bateria sabidamente boa antes de condenar o retificador.",
+    "name": "Retificador de Voltagem (Regulador/Retificador)",
+    "type": "sensor",
+    "shortDescription": "Converte AC do estator em DC e regula a tensão (13.5V a 14.8V).",
+    "fullDescription": "O Retificador/Regulador tem duas funções essenciais: 1) Retificar a Corrente Alternada (AC) gerada pelo estator transformando-a em Corrente Contínua (DC). 2) Regular a voltagem, cortando excessos para manter entre 13.5V e 14.8V, protegendo a bateria e módulos. Se falhar, a bateria descarrega ou ferve pelo excesso de carga.",
+    "oscilloscopeSetup": {
+      "timeDiv": "2ms a 5ms",
+      "voltageDiv": "5V a 10V",
+      "triggerEdge": "Subida",
+      "triggerMode": "Auto",
+      "triggerLevel": "0V",
+      "coupling": "DC",
+      "axis": "Y/T"
+    },
+    "connectionInstructions": "Conecte a garra preta do osciloscópio no terminal negativo da bateria. Espete a ponta de prova (Canal 1) no fio positivo de saída do retificador (geralmente vermelho ou vermelho/branco) OU diretamente no polo positivo da bateria.\n\n⚠️ IMPORTANTE: O teste é feito com a moto ligada. Acelere a moto a 3000-5000 RPM e observe o comportamento da onda.",
+    "waveformExplanation": "O Retificador/Regulador é o porteiro da bateria. Ele recebe aquela energia maluca do estator (Corrente Alternada que sobe e desce) e converte em energia lisa e contínua (Corrente Contínua a 14V) para carregar a bateria.\n\nComportamento e Defeitos:\n• **A Linha Base**: Você vai ver uma linha reta flutuando perto de 14 Volts.\n• **Os Dentes de Serra (Ripple)**: Em cima dessa linha reta, você verá umas ondinhas pequenas (ripple). Isso é normal, é a sobra da conversão de energia.\n• **Diodo Queimado (Defeito)**: Se essas ondinhas ficarem GIGANTES, passando de 1 Volt de altura de diferença, ou se der picos enormes para baixo, os diodos internos do retificador queimaram. Ele está vazando energia ruim (Alternada) para a bateria, o que ferve e estraga a bateria em poucos dias.\n• **Excesso de Carga**: Se a linha reta subir para 16V, 17V ou mais acelerando, o regulador não está cortando e vai fritar a bateria e os módulos eletrônicos.",
+    "waveformPhases": [
+      {
+        "id": 1,
+        "title": "Tensão de Carga",
+        "description": "É a Corrente Contínua domada (DC). O retificador limpa a bagunça do estator e entrega os 14V contínuos para recarregar a bateria. Abaixo de 13V o sistema não alimenta a moto; Acima de 15V o retificador está fritando e destruirá sua bateria (excesso de carga).",
+        "x": 25,
+        "y": 30,
+        "labelX": 25,
+        "labelY": 20
+      },
+      {
+        "id": 2,
+        "title": "Ripple de Diodos",
+        "description": "Ripple de Diodos. São esses dentes de serra minúsculos (resíduos AC). Se eles assumirem alturas enormes, rasgando o gráfico para cima e para baixo (excedendo 1V a 2V de Ripple), os diodos internos furaram e estão deixando energia alternada matar a bateria.",
+        "x": 75,
+        "y": 30,
+        "labelX": 75,
+        "labelY": 40
+      }
+    ],
+    "waveType": "dc-ripple",
+    "multimeter": {
+      "setting": "DCV_20",
+      "instructions": "Motor ligado, acelerado a ~4000 RPM. Multímetro em DC 20V. Meça a tensão diretamente nos polos da bateria. Para medir fuga, com motor desligado, desconecte o negativo da bateria e coloque o multímetro em série na escala de 10A (DCA).",
+      "expectedValues": "Tensão de Carga: Entre 13.5V e 14.8V. Fuga de corrente: Máximo aceitável em torno de 1mA a 3mA (consulte manual da moto).",
+      "variesByModel": true,
+      "minValue": 13.5,
+      "maxValue": 14.8,
+      "unit": "V",
+      "temperatureObservation": "Alguns retificadores com defeito param de regular a tensão (ou param de carregar) após esquentarem. Avalie frio e quente (após ligar a ventoinha)."
+    ,
+      "teacherExplanation": "Fala meu amigo, beleza? Vamos falar agora sobre como testar a peça Retificador de Voltagem (Regulador/Retificador) usando o multímetro, um teste fundamental que a gente faz na oficina no dia a dia. Pega seu multímetro e coloca na escala de DCV_20. Presta atenção que esse detalhe da escala é crucial, se colocar na escala errada o teste vai dar um falso positivo ou não vai ler nada. O procedimento que o manual pede é o seguinte: Motor ligado, acelerado a ~4000 RPM. Multímetro em DC 20V. Meça a tensão diretamente nos polos da bateria. Para medir fuga, com motor desligado, desconecte o negativo da bateria e coloque o multímetro em série na escala de 10A (DCA).. Quando você fizer isso, o que a gente espera ver no visor do aparelho? A gente espera ler os seguintes valores: Tensão de Carga: Entre 13.5V e 14.8V. Fuga de corrente: Máximo aceitável em torno de 1mA a 3mA (consulte manual da moto).. Mas por que esses valores? Bom, esse componente funciona enviando ou recebendo um sinal elétrico que precisa ter uma resistência ou tensão muito específica para a central entender o que tá acontecendo. Se o valor der muito abaixo do esperado, pode ser que a peça esteja em curto-circuito, ou seja, a corrente tá passando direto. Se o valor der infinito ou muito acima, é sinal de circuito aberto, significa que o fio ou a bobina interna rompeu e a energia não passa. Um macete de oficina importante é sempre verificar a temperatura da peça, porque o calor do motor altera a resistência dos fios de cobre lá dentro. Se o multímetro ficar oscilando e não estabilizar o valor, desconfie de mau contato no conector ou fio quebrado por dentro da capa, aquele famoso defeito intermitente que dá uma dor de cabeça pra achar. Então faz esse passo a passo com calma, anota o valor que deu, e compara com a tolerância do manual. Qualquer dúvida, refaz o teste garantindo que as pontas de prova tão bem encostadas pra não dar resistência falsa. Tamo junto!"
+    }
+  },
+  {
+    "id": "cdi-ac",
+    "detailedTeacherExplanation": "Nesta tela, analisamos o Primário da Bobina de Ignição de um sistema CDI AC, aquele CDI antigo alimentado diretamente pelo estator, sem depender da bateria. O eixo Y é voltagem, o eixo X é tempo.\n\nAssim como no CDI de bateria, o funcionamento baseia-se num disparo rápido de um capacitor interno. A linha do gráfico fica zerada e, de forma repentina, dispara em um pico vertiginoso que cruza a tela, chegando a 150 ou 200 volts num instante mínimo. Esse é o despejo de energia na bobina.\n\nApós esse salto violento, a tensão rebota para baixo de zero, formando picos negativos, e oscila até estabilizar no centro novamente. Como esse sistema depende da energia gerada pelo estator (bobina de força), se esse pico no primário estiver fraco ou inexistente, você deve primeiro investigar se o estator está mandando a voltagem alternada (AC) correta para alimentar o CDI. Se a alimentação chega e o pico primário sai fraco, o defeito está no módulo CDI.",
+    "hidden": true,
+    "name": "Bobina de Ignição (Primário) - Carburada (CDI AC)",
+    "type": "actuator",
+    "shortDescription": "Módulo de ignição de motos carburadas (descarrega energia na bobina).",
+    "fullDescription": "O CDI (Capacitor Discharge Ignition) armazena a energia gerada pela bobina de força do estator em um capacitor interno e, ao receber o sinal do sensor de pulso (CKP), descarrega essa energia (um pulso de tensão positiva de alta voltagem) instantaneamente no primário da bobina de ignição, gerando a faísca na vela.",
+    "oscilloscopeSetup": {
+      "timeDiv": "5ms a 10ms",
+      "voltageDiv": "50V a 100V (Atenção: picos podem passar de 200V, use atenuador!)",
+      "triggerEdge": "Subida",
+      "triggerMode": "Normal",
+      "triggerLevel": "20V a 50V",
+      "coupling": "DC",
+      "axis": "Y/T"
+    },
+    "connectionInstructions": "Conecte a garra jacaré preta ao negativo da bateria ou chassi. Conecte a ponta de prova (canal 1), OBRIGATORIAMENTE com atenuador (ex: 20:1) se não suportar altas tensões, no fio que vai do CDI para a Bobina de Ignição (geralmente Preto/Amarelo na Honda).",
+    "waveformExplanation": "A forma de onda do CDI é um pico de tensão extremamente alto e de curtíssima duração. É a descarga do capacitor. Logo após o pico principal, podem ocorrer algumas oscilações amortecidas. Diferente da ignição TCI (indutiva), não há o longo tempo de 'dwell' (carregamento) antes do disparo, a subida de tensão é instantânea.\n\nComportamento em Falhas:\n• Pico muito baixo ou inexistente: O CDI pode não estar recebendo alimentação do estator (bobina de força), o capacitor interno estourou, ou não está recebendo sinal do CKP (pulso).\n• Sem oscilação residual (amortecida): Pode indicar um curto-circuito no primário da bobina de ignição, que drena a energia muito rápido sem criar ressonância.",
+    "waveformPhases": [
+      {
+        "id": 1,
+        "title": "Disparo do Capacitor",
+        "description": "O momento exato em que o CDI libera a energia (100V a 400V) para o primário da bobina de ignição.",
+        "x": 20,
+        "y": 20,
+        "labelX": 10,
+        "labelY": 10
+      },
+      {
+        "id": 2,
+        "title": "Oscilação Amortecida",
+        "description": "Dissipação da energia restante entre a bobina e o capacitor após a faísca.",
+        "x": 30,
+        "y": 60,
+        "labelX": 40,
+        "labelY": 80
+      }
+    ],
+    "waveType": "cdi",
+    "multimeter": {
+      "teacherExplanation": "Fala meu amigo, beleza? Vamos falar agora sobre como testar a peça Bobina de Ignição (Primário) - Carburada (CDI AC) usando o multímetro, um teste fundamental que a gente faz na oficina no dia a dia. Pega seu multímetro e coloca na escala de Pico de Tensão (Peak Hold) em VDC ou Multímetro com Adaptador de Pico. Presta atenção que esse detalhe da escala é crucial, se colocar na escala errada o teste vai dar um falso positivo ou não vai ler nada. O procedimento que o manual pede é o seguinte: 1. Conecte a ponta preta ao terra (chassi ou negativo da bateria).\n2. Conecte a ponta vermelha no fio de saída do CDI para a bobina de ignição (ex: Preto/Amarelo).\n3. Dê partida no motor (start ou pedal).. Quando você fizer isso, o que a gente espera ver no visor do aparelho? A gente espera ler os seguintes valores: Mínimo de 100V de pico (varia conforme o modelo e estado do estator).. Mas por que esses valores? Bom, esse componente funciona enviando ou recebendo um sinal elétrico que precisa ter uma resistência ou tensão muito específica para a central entender o que tá acontecendo. Se o valor der muito abaixo do esperado, pode ser que a peça esteja em curto-circuito, ou seja, a corrente tá passando direto. Se o valor der infinito ou muito acima, é sinal de circuito aberto, significa que o fio ou a bobina interna rompeu e a energia não passa. Um macete de oficina importante é sempre verificar a temperatura da peça, porque o calor do motor altera a resistência dos fios de cobre lá dentro. Se o multímetro ficar oscilando e não estabilizar o valor, desconfie de mau contato no conector ou fio quebrado por dentro da capa, aquele famoso defeito intermitente que dá uma dor de cabeça pra achar. Então faz esse passo a passo com calma, anota o valor que deu, e compara com a tolerância do manual. Qualquer dúvida, refaz o teste garantindo que as pontas de prova tão bem encostadas pra não dar resistência falsa. Tamo junto!",
+      "setting": "Pico de Tensão (Peak Hold) em VDC ou Multímetro com Adaptador de Pico",
+      "instructions": "1. Conecte a ponta preta ao terra (chassi ou negativo da bateria).\n2. Conecte a ponta vermelha no fio de saída do CDI para a bobina de ignição (ex: Preto/Amarelo).\n3. Dê partida no motor (start ou pedal).",
+      "expectedValues": "Mínimo de 100V de pico (varia conforme o modelo e estado do estator).",
+      "variesByModel": true
+    }
+  }
+];

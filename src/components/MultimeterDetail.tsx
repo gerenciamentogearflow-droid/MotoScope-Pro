@@ -1,9 +1,11 @@
 import { useBackButton } from "../hooks/useBackButton";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ComponentData } from "../types";
 import { ArrowLeft, Zap, Info, Activity, Thermometer } from "lucide-react";
 import { motion } from "motion/react";
 import { MultimeterVisual } from "./MultimeterVisual";
+import { globalAudioPlayer } from "../lib/audioPlayer";
+import { WhatsAppAudioPlayer } from "./WhatsAppAudioPlayer";
 
 interface MultimeterDetailProps {
   component: ComponentData;
@@ -13,6 +15,12 @@ interface MultimeterDetailProps {
 export function MultimeterDetail({ component, onBack }: MultimeterDetailProps) {
   useBackButton(true, onBack);
   const [displayType, setDisplayType] = useState<"min" | "max" | null>(null);
+
+  useEffect(() => {
+    return () => {
+      globalAudioPlayer.stop();
+    };
+  }, []);
 
   if (!component.multimeter) {
     return (
@@ -86,6 +94,26 @@ export function MultimeterDetail({ component, onBack }: MultimeterDetailProps) {
                </div>
              )}
           </div>
+
+          {mm.teacherExplanation && (
+            <div className="bg-orange-500/5 border border-orange-600/20 rounded-3xl p-6 mb-4">
+               <h3 className="text-orange-600 text-sm font-bold tracking-widest uppercase mb-3 flex items-center gap-2">
+                 <Info className="w-4 h-4" />
+                 Explicação Detalhada
+               </h3>
+               
+               <div className="mb-4">
+                 <WhatsAppAudioPlayer 
+                   audioId={`multimeter/${component.id}`}
+                   textToSpeak={mm.teacherExplanation}
+                 />
+               </div>
+
+               <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm whitespace-pre-wrap">
+                 {mm.teacherExplanation}
+               </p>
+            </div>
+          )}
 
           {mm.temperatureObservation && (
             <div className="bg-blue-500/5 border border-blue-600/20 rounded-3xl p-6 flex gap-4">

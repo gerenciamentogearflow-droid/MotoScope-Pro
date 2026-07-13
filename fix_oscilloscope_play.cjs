@@ -2,31 +2,6 @@ const fs = require('fs');
 let code = fs.readFileSync('src/components/OscilloscopeDisplay.tsx', 'utf8');
 
 code = code.replace(
-`  const [selectedPhaseId, setSelectedPhaseId] = useState<number | null>(null);
-  const [playTrigger, setPlayTrigger] = useState<number>(0);`,
-`  const [selectedPhaseId, setSelectedPhaseId] = useState<number | null>(null);`
-);
-
-code = code.replace(
-`import { WhatsAppAudioPlayer } from "./WhatsAppAudioPlayer";`,
-``
-);
-
-code = code.replace(
-`  const selectedPhase = component.waveformPhases?.find((p) => p.id === selectedPhaseId);
-
-  useEffect(() => {`,
-`  const selectedPhase = component.waveformPhases?.find((p) => p.id === selectedPhaseId);
-
-  const playAudioForPhase = (phaseId: number, textToSpeak?: string) => {
-    const audioId = \`\${component.id}-phase-\${phaseId}\`;
-    globalAudioPlayer.play(audioId, textToSpeak);
-  };
-
-  useEffect(() => {`
-);
-
-code = code.replace(
 `                  onClick={(e) => {
                     e.stopPropagation();
                     setSelectedPhaseId(phase.id);
@@ -35,7 +10,8 @@ code = code.replace(
 `                  onClick={(e) => {
                     e.stopPropagation();
                     setSelectedPhaseId(phase.id);
-                    playAudioForPhase(phase.id, phase.description);
+                    const audioId = \`\${component.id}-phase-\${phase.id}\`;
+                    globalAudioPlayer.play(audioId, phase.description);
                   }}`
 );
 
@@ -56,6 +32,16 @@ code = code.replace(
               </motion.div>
             )}
           </AnimatePresence>`
+);
+
+code = code.replace(
+`import { WhatsAppAudioPlayer } from "./WhatsAppAudioPlayer";\n`,
+``
+);
+
+code = code.replace(
+`  const [playTrigger, setPlayTrigger] = useState<number>(0);\n`,
+``
 );
 
 fs.writeFileSync('src/components/OscilloscopeDisplay.tsx', code);

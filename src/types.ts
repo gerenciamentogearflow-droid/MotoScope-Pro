@@ -28,11 +28,12 @@ export interface ComponentData {
   oscilloscopeSetup: OscilloscopeSetup;
   connectionInstructions?: string;
   waveformExplanation: string;
+  detailedTeacherExplanation?: string;
   waveformPhases?: WaveformPhase[];
   waveType: string;
   hidden?: boolean;
   isGroup?: boolean;
-  variants?: { id: string; name: string; description?: string }[];
+  variants?: any[];
   symptoms?: string[];
   multimeter?: {
     setting: string;
@@ -43,6 +44,7 @@ export interface ComponentData {
     maxValue?: number;
     unit?: string;
     temperatureObservation?: string;
+    teacherExplanation?: string;
   };
 }
 
