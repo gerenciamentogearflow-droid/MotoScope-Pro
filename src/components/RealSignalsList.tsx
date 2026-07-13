@@ -326,7 +326,7 @@ export function RealSignalsList({ component,
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={onBack}
-          className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-[#273654]/60 shadow-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 transition-all active:scale-95"
+          className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 transition-all active:scale-95"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -348,7 +348,7 @@ export function RealSignalsList({ component,
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-[#273654]/60 shadow-sm rounded-3xl p-6 md:p-8 mb-8 backdrop-blur-sm"
+          className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm rounded-3xl p-6 md:p-8 mb-8 backdrop-blur-sm"
         >
           <h3 className="font-semibold text-lg mb-6 text-gray-900 dark:text-gray-100 tracking-wide">
             Enviar Novo Sinal
@@ -373,7 +373,7 @@ export function RealSignalsList({ component,
                 className={`flex-1 py-3 px-4 rounded-xl flex items-center justify-center gap-2 border transition-all ${
                   signalStatus === "ok"
                     ? "bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm"
-                    : "bg-white dark:bg-gray-900 border-gray-200 dark:border-[#273654] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-800"
+                    : "bg-white dark:bg-gray-900 border-gray-200 dark:border-[#2A3B5C] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-800"
                 }`}
               >
                 <CheckCircle2 className="w-5 h-5" />
@@ -386,7 +386,7 @@ export function RealSignalsList({ component,
                 className={`flex-1 py-3 px-4 rounded-xl flex items-center justify-center gap-2 border transition-all ${
                   signalStatus === "failure"
                     ? "bg-red-50 border-red-500 text-red-700 shadow-sm"
-                    : "bg-white dark:bg-gray-900 border-gray-200 dark:border-[#273654] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-800"
+                    : "bg-white dark:bg-gray-900 border-gray-200 dark:border-[#2A3B5C] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:bg-gray-800"
                 }`}
               >
                 <AlertTriangle className="w-5 h-5" />
@@ -406,7 +406,7 @@ export function RealSignalsList({ component,
           {uploading ? (
             <div className="flex flex-col items-center py-8">
               <Loader2 className="w-8 h-8 animate-spin text-emerald-500 mb-4" />
-              <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-full h-2 mb-3 overflow-hidden border border-gray-200 dark:border-[#273654]/60 shadow-sm">
+              <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-full h-2 mb-3 overflow-hidden border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm">
                 <div className="bg-emerald-500 h-2 rounded-full transition-all duration-300 w-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
               </div>
               <span className="text-sm text-gray-600 dark:text-gray-400 font-medium tracking-wide">
@@ -452,10 +452,10 @@ export function RealSignalsList({ component,
                 key={signal.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-[#273654]/60 shadow-sm rounded-[2rem] overflow-hidden backdrop-blur-sm relative"
+                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm rounded-[2rem] overflow-hidden backdrop-blur-sm relative"
               >
                 <div 
-                  className="w-full aspect-video bg-gray-900 relative border-b border-gray-200 dark:border-[#273654]/80 cursor-pointer group"
+                  className="w-full aspect-video bg-gray-900 relative border-b border-gray-200 dark:border-[#2A3B5C]/80 cursor-pointer group"
                   onClick={() => handleViewMedia(signal)}
                 >
                   {loadingVideo === signal.id ? (
@@ -521,7 +521,7 @@ export function RealSignalsList({ component,
                     </p>
                   </div>
                   <div className="flex items-center justify-between md:justify-end gap-4">
-                    <div className="text-xs font-mono text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#273654]/60 shadow-sm">
+                    <div className="text-xs font-mono text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm">
                       {new Date(signal.createdAt).toLocaleDateString("pt-BR")} às{" "}
                       {new Date(signal.createdAt).toLocaleTimeString("pt-BR", {
                         hour: "2-digit",
@@ -548,7 +548,7 @@ export function RealSignalsList({ component,
                                 e.stopPropagation();
                                 setDeletingId(null);
                               }}
-                              className="px-3 py-1.5 text-xs font-bold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:bg-[#1C283F] rounded-lg transition-colors"
+                              className="px-3 py-1.5 text-xs font-bold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:bg-[#232F46] rounded-lg transition-colors"
                             >
                               Cancelar
                             </button>
@@ -574,7 +574,7 @@ export function RealSignalsList({ component,
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-[#273654]/60 shadow-sm border-dashed">
+          <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm border-dashed">
             <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Camera className="w-8 h-8 text-gray-600 dark:text-gray-400" />
             </div>

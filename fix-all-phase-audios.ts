@@ -43,7 +43,7 @@ async function generateAllPhaseAudios() {
       
       try {
         await tts.ttsPromise(textToSpeak, filePath);
-        console.log(`Done for ${audioId}`);
+        fs.copyFileSync(filePath, path.join(process.cwd(), "dist", "audio", fileName)); console.log(`Done for ${audioId}`);
         count++;
       } catch(e) {
         console.error(`Failed for ${audioId}:`, e);

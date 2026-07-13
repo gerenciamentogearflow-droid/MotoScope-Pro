@@ -214,7 +214,7 @@ export function Dashboard({
 
   return (
     <div className={`bg-transparent text-gray-900 dark:text-gray-100 flex flex-col min-h-screen`}>
-        <header className="px-6 pt-12 pb-5 border-b border-gray-200 dark:border-[#273654]/80 shrink-0">
+        <header className="px-6 pt-12 pb-5 border-b border-gray-200 dark:border-[#2A3B5C]/80 shrink-0">
           <div className="flex justify-between items-center max-w-5xl mx-auto w-full">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gradient-to-tr from-red-600 to-red-500 rounded-xl shadow-lg shadow-red-600/20">
@@ -229,7 +229,7 @@ export function Dashboard({
               {user.role === "admin" ? (
                 <button
                   onClick={onAdminClick}
-                  className="p-2.5 rounded-full hover:bg-gray-100 dark:bg-[#162032] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-colors"
+                  className="p-2.5 rounded-full hover:bg-gray-100 dark:bg-[#1A2235] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-colors"
                   title="Painel Admin"
                 >
                   <Settings className="w-5 h-5" />
@@ -237,7 +237,7 @@ export function Dashboard({
               ) : (
                 <button
                   onClick={() => setShowUserSettings(true)}
-                  className="p-2.5 rounded-full hover:bg-gray-100 dark:bg-[#162032] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-colors"
+                  className="p-2.5 rounded-full hover:bg-gray-100 dark:bg-[#1A2235] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-colors"
                   title="Configurações da Conta"
                 >
                   <Settings className="w-5 h-5" />
@@ -270,7 +270,7 @@ export function Dashboard({
 
               <button
                 onClick={() => setActiveTab("diagnostic_worksheet")}
-                className="group flex flex-col items-start gap-4 bg-white dark:bg-[#162032] hover:bg-gray-50 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden col-span-full"
+                className="group flex flex-col items-start gap-4 bg-white dark:bg-[#1A2235] hover:bg-gray-50 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden col-span-full"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="p-3.5 rounded-2xl bg-emerald-600/10 text-emerald-600 border border-emerald-600/20 group-hover:scale-110 transition-transform">
@@ -286,7 +286,7 @@ export function Dashboard({
 
               <button
                 onClick={() => setActiveTab("oscilloscope_menu")}
-                className="group flex flex-col items-start gap-4 bg-white dark:bg-[#162032] hover:bg-gray-50 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden md:col-span-2"
+                className="group flex flex-col items-start gap-4 bg-white dark:bg-[#1A2235] hover:bg-gray-50 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden md:col-span-2"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="p-3.5 rounded-2xl bg-red-600/10 text-red-600 border border-red-600/20 group-hover:scale-110 transition-transform">
@@ -302,7 +302,7 @@ export function Dashboard({
 
               <button
                 onClick={() => setActiveTab("multimeter")}
-                className="group flex flex-col items-start gap-4 bg-white dark:bg-[#162032] hover:bg-gray-50 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
+                className="group flex flex-col items-start gap-4 bg-white dark:bg-[#1A2235] hover:bg-gray-50 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="p-3.5 rounded-2xl bg-orange-600/10 text-orange-600 border border-orange-600/20 group-hover:scale-110 transition-transform">
@@ -318,7 +318,7 @@ export function Dashboard({
 
               <button
                 onClick={() => setActiveTab("parameters")}
-                className="group flex flex-col items-start gap-4 bg-white dark:bg-[#162032] hover:bg-gray-50 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
+                className="group flex flex-col items-start gap-4 bg-white dark:bg-[#1A2235] hover:bg-gray-50 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="p-3.5 rounded-2xl bg-purple-600/10 text-purple-600 border border-purple-600/20 group-hover:scale-110 transition-transform">
@@ -334,7 +334,7 @@ export function Dashboard({
 
               <button
                 onClick={() => setActiveTab("pinouts")}
-                className="group flex flex-col items-start gap-4 bg-white dark:bg-[#162032] hover:bg-gray-50 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden md:col-span-2 lg:col-span-1"
+                className="group flex flex-col items-start gap-4 bg-white dark:bg-[#1A2235] hover:bg-gray-50 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden md:col-span-2 lg:col-span-1"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="p-3.5 rounded-2xl bg-rose-600/10 text-rose-600 border border-rose-600/20 group-hover:scale-110 transition-transform">
@@ -359,7 +359,7 @@ export function Dashboard({
               <div className="flex items-center gap-4 mb-8">
                 <button
                   onClick={() => setActiveTab("home")}
-                  className="bg-gray-50 dark:bg-[#162032] hover:bg-gray-100 dark:bg-[#162032] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#273654]/60 shadow-sm"
+                  className="bg-gray-50 dark:bg-[#1A2235] hover:bg-gray-100 dark:bg-[#1A2235] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm"
                 >
                   <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                 </button>
@@ -375,7 +375,7 @@ export function Dashboard({
                 {showCourse && (
                   <button
                     onClick={() => setActiveTab("course")}
-                    className="group flex flex-col items-start gap-4 bg-white dark:bg-[#162032] hover:bg-gray-50 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-blue-600/30 hover:shadow-blue-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
+                    className="group flex flex-col items-start gap-4 bg-white dark:bg-[#1A2235] hover:bg-gray-50 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-blue-600/30 hover:shadow-blue-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div className="p-3.5 rounded-2xl bg-blue-600/10 text-blue-600 border border-blue-600/20 group-hover:scale-110 transition-transform">
@@ -392,7 +392,7 @@ export function Dashboard({
 
                 <button
                   onClick={() => setActiveTab("didactic")}
-                  className="group flex flex-col items-start gap-4 bg-white dark:bg-[#162032] hover:bg-gray-50 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
+                  className="group flex flex-col items-start gap-4 bg-white dark:bg-[#1A2235] hover:bg-gray-50 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="p-3.5 rounded-2xl bg-red-600/10 text-red-600 border border-red-600/20 group-hover:scale-110 transition-transform">
@@ -408,7 +408,7 @@ export function Dashboard({
 
                 <button
                   onClick={() => setActiveTab("real_signals")}
-                  className="group flex flex-col items-start gap-4 bg-white dark:bg-[#162032] hover:bg-gray-50 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-emerald-600/30 hover:shadow-emerald-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden sm:col-span-2 lg:col-span-1"
+                  className="group flex flex-col items-start gap-4 bg-white dark:bg-[#1A2235] hover:bg-gray-50 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-emerald-600/30 hover:shadow-emerald-600/10 hover:shadow-lg p-6 rounded-3xl transition-all active:scale-[0.98] text-left relative overflow-hidden sm:col-span-2 lg:col-span-1"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="p-3.5 rounded-2xl bg-emerald-600/10 text-emerald-600 border border-emerald-600/20 group-hover:scale-110 transition-transform">
@@ -444,7 +444,7 @@ export function Dashboard({
               <div className="flex items-center gap-4 mb-8">
                 <button
                   onClick={() => setActiveTab("oscilloscope_menu")}
-                  className="bg-gray-50 dark:bg-[#162032] hover:bg-gray-100 dark:bg-[#162032] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#273654]/60 shadow-sm"
+                  className="bg-gray-50 dark:bg-[#1A2235] hover:bg-gray-100 dark:bg-[#1A2235] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm"
                 >
                   <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                 </button>
@@ -477,7 +477,7 @@ export function Dashboard({
                     transition={{ delay: idx * 0.05 }}
                     key={comp.id}
                     onClick={() => handleComponentClick(comp, "didactic")}
-                    className="group text-left w-full bg-white dark:bg-[#162032] hover:bg-gray-200 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-start gap-5 active:scale-[0.98]"
+                    className="group text-left w-full bg-white dark:bg-[#1A2235] hover:bg-gray-200 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-start gap-5 active:scale-[0.98]"
                   >
                     <div
                       className={`p-3.5 rounded-2xl border transition-transform group-hover:scale-110 ${comp.type === "sensor" ? "bg-red-600/10 text-red-600 border-red-600/20" : "bg-orange-600/10 text-orange-600 border-orange-600/20"}`}
@@ -526,7 +526,7 @@ export function Dashboard({
                   <div className="flex items-center gap-4 mb-8">
                     <button
                       onClick={() => setActiveTab("oscilloscope_menu")}
-                      className="bg-gray-50 dark:bg-[#162032] hover:bg-gray-100 dark:bg-[#162032] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#273654]/60 shadow-sm"
+                      className="bg-gray-50 dark:bg-[#1A2235] hover:bg-gray-100 dark:bg-[#1A2235] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm"
                     >
                       <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                     </button>
@@ -545,7 +545,7 @@ export function Dashboard({
                         transition={{ delay: idx * 0.05 }}
                         key={comp.id}
                         onClick={() => handleComponentClick(comp, "real")}
-                        className="group text-left w-full bg-white dark:bg-[#162032] hover:bg-gray-200 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-center justify-between active:scale-[0.98]"
+                        className="group text-left w-full bg-white dark:bg-[#1A2235] hover:bg-gray-200 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-center justify-between active:scale-[0.98]"
                       >
                         <div className="flex items-center gap-5">
                           <div
@@ -586,7 +586,7 @@ export function Dashboard({
               <div className="flex items-center gap-4 mb-8">
                 <button
                   onClick={() => setActiveTab("home")}
-                  className="bg-gray-50 dark:bg-[#162032] hover:bg-gray-100 dark:bg-[#162032] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#273654]/60 shadow-sm"
+                  className="bg-gray-50 dark:bg-[#1A2235] hover:bg-gray-100 dark:bg-[#1A2235] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm"
                 >
                   <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                 </button>
@@ -605,7 +605,7 @@ export function Dashboard({
                     transition={{ delay: idx * 0.05 }}
                     key={comp.id}
                     onClick={() => handleComponentClick(comp, "multimeter")}
-                    className="group text-left w-full bg-white dark:bg-[#162032] hover:bg-gray-200 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-center justify-between active:scale-[0.98]"
+                    className="group text-left w-full bg-white dark:bg-[#1A2235] hover:bg-gray-200 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-center justify-between active:scale-[0.98]"
                   >
                     <div className="flex items-center gap-5">
                       <div className="p-3.5 rounded-2xl border border-orange-600/20 bg-orange-600/10 text-orange-600 transition-transform group-hover:scale-110">
@@ -640,7 +640,7 @@ export function Dashboard({
               <div className="flex items-center gap-4 mb-8">
                 <button
                   onClick={() => setActiveTab("home")}
-                  className="bg-gray-50 dark:bg-[#162032] hover:bg-gray-100 dark:bg-[#162032] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#273654]/60 shadow-sm"
+                  className="bg-gray-50 dark:bg-[#1A2235] hover:bg-gray-100 dark:bg-[#1A2235] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm"
                 >
                   <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                 </button>
@@ -663,9 +663,9 @@ export function Dashboard({
                         transition={{ delay: idx * 0.05 }}
                         key={brand}
                         onClick={() => setSelectedBrandWorksheet(brand)}
-                        className={`group relative text-left w-full bg-white dark:bg-[#162032] hover:bg-gray-200 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-emerald-500/30 rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
+                        className={`group relative text-left w-full bg-white dark:bg-[#1A2235] hover:bg-gray-200 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-emerald-500/30 rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
                       >
-                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-gray-50 dark:bg-[#162032] p-1 border border-black/10 group-hover:scale-105 transition-transform">
+                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-gray-50 dark:bg-[#1A2235] p-1 border border-black/10 group-hover:scale-105 transition-transform">
                           <BrandLogo brand={brand} className="w-full h-full object-contain" />
                         </div>
                         <div className="flex-1">
@@ -694,7 +694,7 @@ export function Dashboard({
               <div className="flex items-center gap-4 mb-8">
                 <button
                   onClick={() => setActiveTab("home")}
-                  className="bg-gray-50 dark:bg-[#162032] hover:bg-gray-100 dark:bg-[#162032] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#273654]/60 shadow-sm"
+                  className="bg-gray-50 dark:bg-[#1A2235] hover:bg-gray-100 dark:bg-[#1A2235] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm"
                 >
                   <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                 </button>
@@ -717,9 +717,9 @@ export function Dashboard({
                         transition={{ delay: idx * 0.05 }}
                         key={brand}
                         onClick={() => setSelectedBrandParameters(brand)}
-                        className={`group relative text-left w-full bg-white dark:bg-[#162032] hover:bg-gray-200 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
+                        className={`group relative text-left w-full bg-white dark:bg-[#1A2235] hover:bg-gray-200 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
                       >
-                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-gray-50 dark:bg-[#162032] p-1 border border-black/10 group-hover:scale-105 transition-transform">
+                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-gray-50 dark:bg-[#1A2235] p-1 border border-black/10 group-hover:scale-105 transition-transform">
                           <BrandLogo brand={brand} className="w-full h-full object-contain" />
                         </div>
                         <div className="flex-1">
@@ -732,7 +732,7 @@ export function Dashboard({
                         </div>
                         {user.role === "admin" && (
                           <div 
-                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-gray-200 dark:bg-[#1C283F] hover:bg-gray-300 transition-colors z-10"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-gray-200 dark:bg-[#232F46] hover:bg-gray-300 transition-colors z-10"
                             onClick={(e) => toggleBrandVisibility(brand, e)}
                           >
                             {isHidden ? (
@@ -758,7 +758,7 @@ export function Dashboard({
               <div className="flex items-center gap-4 mb-8">
                 <button
                   onClick={() => setActiveTab("home")}
-                  className="bg-gray-50 dark:bg-[#162032] hover:bg-gray-100 dark:bg-[#162032] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#273654]/60 shadow-sm"
+                  className="bg-gray-50 dark:bg-[#1A2235] hover:bg-gray-100 dark:bg-[#1A2235] p-2.5 rounded-xl transition-colors active:scale-95 border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm"
                 >
                   <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                 </button>
@@ -781,9 +781,9 @@ export function Dashboard({
                         transition={{ delay: idx * 0.05 }}
                         key={brand}
                         onClick={() => setSelectedBrandPinouts(brand)}
-                        className={`group relative text-left w-full bg-white dark:bg-[#162032] hover:bg-gray-200 dark:hover:bg-[#1C283F] border border-gray-200 dark:border-[#273654] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
+                        className={`group relative text-left w-full bg-white dark:bg-[#1A2235] hover:bg-gray-200 dark:hover:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C] shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg rounded-2xl p-5 transition-all flex items-center gap-4 active:scale-[0.98] ${isHidden ? 'opacity-50' : ''}`}
                       >
-                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-gray-50 dark:bg-[#162032] p-1 border border-black/10 group-hover:scale-105 transition-transform">
+                        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-gray-50 dark:bg-[#1A2235] p-1 border border-black/10 group-hover:scale-105 transition-transform">
                           <BrandLogo brand={brand} className="w-full h-full object-contain" />
                         </div>
                         <div className="flex-1">
@@ -796,7 +796,7 @@ export function Dashboard({
                         </div>
                         {user.role === "admin" && (
                           <div 
-                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-gray-200 dark:bg-[#1C283F] hover:bg-gray-300 transition-colors z-10"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-gray-200 dark:bg-[#232F46] hover:bg-gray-300 transition-colors z-10"
                             onClick={(e) => toggleBrandVisibility(brand, e)}
                           >
                             {isHidden ? (
@@ -821,7 +821,7 @@ export function Dashboard({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-white dark:bg-[#162032] z-50 flex items-end sm:items-center justify-center sm:p-4"
+              className="fixed inset-0 bg-white dark:bg-[#1A2235] z-50 flex items-end sm:items-center justify-center sm:p-4"
               onClick={() => setShowVariantModal(null)}
             >
               <motion.div
@@ -829,7 +829,7 @@ export function Dashboard({
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: "100%", opacity: 0 }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] w-full sm:w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-12 sm:pb-6 shadow-2xl"
+                className="bg-white dark:bg-[#1A2235] border border-gray-300 dark:border-[#3D5280] w-full sm:w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 pb-12 sm:pb-6 shadow-2xl"
                 onClick={e => e.stopPropagation()}
               >
                 <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-6 sm:hidden"></div>
@@ -841,7 +841,7 @@ export function Dashboard({
                     <button 
                       key={variant.id}
                       onClick={() => handleVariantSelection(variant.id)}
-                      className="w-full bg-white dark:bg-[#162032] hover:bg-gray-200 dark:bg-[#1C283F] border border-gray-300 dark:border-[#3A4D71] p-4 rounded-xl text-left transition-colors flex items-center gap-4"
+                      className="w-full bg-white dark:bg-[#1A2235] hover:bg-gray-200 dark:bg-[#232F46] border border-gray-300 dark:border-[#3D5280] p-4 rounded-xl text-left transition-colors flex items-center gap-4"
                     >
                       <div className={`p-2 rounded-lg ${showVariantModal.groupComp.type === "sensor" ? "bg-red-100 dark:bg-red-900/30 text-red-600" : "bg-orange-100 dark:bg-orange-900/30 text-orange-600"}`}>
                         <Activity className="w-5 h-5" />
@@ -870,7 +870,7 @@ export function Dashboard({
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white dark:bg-[#162032] rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]"
+                className="bg-white dark:bg-[#1A2235] rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]"
               >
                 <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50/50">
                   <div className="flex items-center gap-2">
@@ -879,7 +879,7 @@ export function Dashboard({
                   </div>
                   <button
                     onClick={() => setShowUserSettings(false)}
-                    className="p-2 hover:bg-gray-200 dark:bg-[#1C283F] rounded-lg transition-colors text-gray-500"
+                    className="p-2 hover:bg-gray-200 dark:bg-[#232F46] rounded-lg transition-colors text-gray-500"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -906,7 +906,7 @@ export function Dashboard({
                         type="text"
                         value={newUsername}
                         onChange={(e) => setNewUsername(e.target.value)}
-                        className="w-full px-4 py-2 bg-gray-50 dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                        className="w-full px-4 py-2 bg-gray-50 dark:bg-[#1A2235] border border-gray-300 dark:border-[#3D5280] rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
                       />
                     </div>
                     <div>
@@ -918,7 +918,7 @@ export function Dashboard({
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="Deixe em branco para manter a atual"
-                        className="w-full px-4 py-2 bg-gray-50 dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all dark:bg-[#162032] dark:border-[#273654] dark:text-gray-100"
+                        className="w-full px-4 py-2 bg-gray-50 dark:bg-[#1A2235] border border-gray-300 dark:border-[#3D5280] rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all dark:bg-[#1A2235] dark:border-[#2A3B5C] dark:text-gray-100"
                       />
                     </div>
                     
@@ -926,7 +926,7 @@ export function Dashboard({
                   </div><div className="mt-8 flex gap-3">
                     <button
                       onClick={() => setShowUserSettings(false)}
-                      className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-[#162032] hover:bg-gray-200 dark:bg-[#1C283F] text-gray-700 dark:text-gray-300 font-medium rounded-xl transition-colors"
+                      className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-[#1A2235] hover:bg-gray-200 dark:bg-[#232F46] text-gray-700 dark:text-gray-300 font-medium rounded-xl transition-colors"
                     >
                       Cancelar
                     </button>
