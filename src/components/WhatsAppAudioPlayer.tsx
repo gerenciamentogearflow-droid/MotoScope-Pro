@@ -173,7 +173,7 @@ export function WhatsAppAudioPlayer({ audioId, textToSpeak, autoPlay, playTrigge
   }
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 rounded-full p-2 flex items-center gap-3 shadow-sm border border-gray-100 dark:border-gray-700 mt-4 mb-2">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-full p-2 flex items-center gap-3 shadow-sm border border-gray-100 dark:border-[#273654] mt-4 mb-2">
       {src && !hasError && (
         <audio
           ref={audioRef}
@@ -201,7 +201,7 @@ export function WhatsAppAudioPlayer({ audioId, textToSpeak, autoPlay, playTrigge
           value={progress}
           onChange={handleSeek}
           disabled={hasError || !src}
-          className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-red-600 disabled:opacity-50"
+          className="w-full h-1.5 bg-gray-200 dark:bg-[#1C283F] rounded-lg appearance-none cursor-pointer accent-red-600 disabled:opacity-50"
         />
         <div className="flex justify-between mt-1 px-1">
           <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">

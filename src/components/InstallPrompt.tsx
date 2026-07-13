@@ -58,11 +58,11 @@ export function InstallPrompt() {
             </p>
             <ol className="space-y-2.5">
               <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center font-mono text-[10px] text-red-600 border border-gray-200 dark:border-gray-700/60 shadow-sm">1</span>
+                <span className="w-5 h-5 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center font-mono text-[10px] text-red-600 border border-gray-200 dark:border-[#273654]/60 shadow-sm">1</span>
                 <span>Toque em <Share className="w-3.5 h-3.5 inline text-blue-600 mx-1" /> Compartilhar</span>
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center font-mono text-[10px] text-red-600 border border-gray-200 dark:border-gray-700/60 shadow-sm">2</span>
+                <span className="w-5 h-5 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center font-mono text-[10px] text-red-600 border border-gray-200 dark:border-[#273654]/60 shadow-sm">2</span>
                 <span>Selecione <PlusSquare className="w-3.5 h-3.5 inline text-gray-600 dark:text-gray-400 mx-1" /> Adicionar à Tela de Início</span>
               </li>
             </ol>

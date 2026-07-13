@@ -101,7 +101,7 @@ export default function App() {
       <InstallPrompt />
       <OfflineStatus />
       {syncProgress !== null && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg rounded-full px-4 py-2 flex items-center gap-3">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-white/90 dark:bg-[#162032]/90 backdrop-blur-sm border border-gray-200 dark:border-[#273654] shadow-lg rounded-full px-4 py-2 flex items-center gap-3">
           <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
           <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
             {syncProgress < 100 

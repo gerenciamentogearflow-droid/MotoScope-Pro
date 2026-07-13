@@ -75,7 +75,7 @@ export function MultimeterVisual({ setting, displayValue }: MultimeterVisualProp
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-300 dark:border-gray-600/80 my-4 shadow-sm w-full max-w-sm mx-auto">
+    <div className="flex flex-col items-center justify-center p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-300 dark:border-[#3A4D71]/80 my-4 shadow-sm w-full max-w-sm mx-auto">
       <div className="mb-4 text-center">
         <h4 className="text-gray-600 dark:text-gray-400 font-medium text-xs mb-1 uppercase tracking-wider">Ajuste do Multímetro</h4>
         <p className="text-blue-600 font-bold text-base">

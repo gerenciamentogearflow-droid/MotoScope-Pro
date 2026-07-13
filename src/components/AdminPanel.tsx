@@ -177,11 +177,11 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
 
   return (
     <div className="min-h-screen bg-transparent text-gray-900 dark:text-gray-100 flex flex-col">
-      <header className="px-4 pt-12 pb-4 bg-white dark:bg-gray-900 border-b border-gray-300 dark:border-gray-600 z-10 shadow-sm">
+      <header className="px-4 pt-12 pb-4 bg-white dark:bg-[#162032] border-b border-gray-300 dark:border-[#3A4D71] z-10 shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="p-2 -ml-2 rounded-full hover:bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 transition-colors"
+            className="p-2 -ml-2 rounded-full hover:bg-gray-200 dark:bg-[#1C283F] text-gray-600 dark:text-gray-400 transition-colors"
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
@@ -198,7 +198,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-5 shadow-sm"
+          className="bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-xl p-5 shadow-sm"
         >
           <div className="flex items-center gap-2 mb-4 text-red-700">
             <Settings className="w-5 h-5" />
@@ -216,7 +216,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                 type="text"
                 value={editUsername}
                 onChange={(e) => setEditUsername(e.target.value)}
-                className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-red-600 shadow-sm"
+                className="w-full bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-red-600 shadow-sm"
                 required
               />
             </div>
@@ -229,7 +229,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                 value={editPassword}
                 onChange={(e) => setEditPassword(e.target.value)}
                 placeholder="Deixe em branco para manter a atual"
-                className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:border-red-600 shadow-sm"
+                className="w-full bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:border-red-600 shadow-sm"
               />
             </div>
 
@@ -258,7 +258,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
-              className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-5 shadow-sm mb-6"
+              className="bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-xl p-5 shadow-sm mb-6"
             >
               <div className="flex items-center gap-2 mb-4 text-indigo-600">
                 <Settings className="w-5 h-5" />
@@ -276,7 +276,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                   onClick={toggleCourseVisibility}
                   className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${showCourse ? 'bg-emerald-500' : 'bg-gray-300'}`}
                 >
-                  <div className={`w-4 h-4 rounded-full bg-white dark:bg-gray-900 shadow-sm transition-transform ${showCourse ? 'translate-x-6' : 'translate-x-0'}`} />
+                  <div className={`w-4 h-4 rounded-full bg-white dark:bg-[#162032] shadow-sm transition-transform ${showCourse ? 'translate-x-6' : 'translate-x-0'}`} />
                 </button>
               </div>
             </motion.div>
@@ -286,7 +286,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-5 shadow-sm"
+              className="bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-xl p-5 shadow-sm"
             >
               <div className="flex items-center gap-2 mb-4 text-emerald-600">
                 <UserPlus className="w-5 h-5" />
@@ -304,7 +304,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                     type="text"
                     value={newUsername}
                     onChange={(e) => setNewUsername(e.target.value)}
-                    className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm"
+                    className="w-full bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm"
                     required
                   />
                 </div>
@@ -316,7 +316,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm"
+                    className="w-full bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm"
                     required
                   />
                 </div>
@@ -342,7 +342,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl p-5 shadow-sm"
+              className="bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-xl p-5 shadow-sm"
             >
               <div className="flex items-center gap-2 mb-4 text-blue-600">
                 <Users className="w-5 h-5" />
@@ -353,7 +353,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                 {users.map((u, i) => (
                   <div
                     key={i}
-                    className="flex justify-between items-center p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-300 dark:border-gray-600"
+                    className="flex justify-between items-center p-3 bg-white dark:bg-[#162032] rounded-lg border border-gray-300 dark:border-[#3A4D71]"
                   >
                     <div className="flex flex-col">
                       <span className="font-semibold text-gray-900 dark:text-gray-100 text-base">{u.username}</span>
@@ -413,11 +413,11 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-2xl p-6 shadow-2xl relative"
+              className="w-full max-w-md bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-2xl p-6 shadow-2xl relative"
             >
               <button
                 onClick={() => setEditingUser(null)}
-                className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 transition-colors"
+                className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-gray-200 dark:bg-[#1C283F] text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -435,7 +435,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                     type="text"
                     value={editUserUsername}
                     onChange={(e) => setEditUserUsername(e.target.value)}
-                    className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-red-600 shadow-sm text-sm"
+                    className="w-full bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-red-600 shadow-sm text-sm"
                     required
                   />
                 </div>
@@ -450,7 +450,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                       value={editUserPassword}
                       onChange={(e) => setEditUserPassword(e.target.value)}
                       placeholder="Deixe em branco para manter a atual"
-                      className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg pl-3 pr-10 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:border-red-600 shadow-sm text-sm"
+                      className="w-full bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-lg pl-3 pr-10 py-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:border-red-600 shadow-sm text-sm"
                     />
                     <button
                       type="button"
@@ -470,7 +470,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                     <select
                       value={editUserRole}
                       onChange={(e: any) => setEditUserRole(e.target.value)}
-                      className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-red-600 shadow-sm text-sm"
+                      className="w-full bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-red-600 shadow-sm text-sm"
                     >
                       <option value="mechanic">Mecânico</option>
                       <option value="admin">Administrador</option>
@@ -490,7 +490,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                   <button
                     type="button"
                     onClick={() => setEditingUser(null)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:bg-gray-700 rounded-lg transition-colors border border-gray-300 dark:border-gray-600"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:bg-[#1C283F] rounded-lg transition-colors border border-gray-300 dark:border-[#3A4D71]"
                   >
                     Cancelar
                   </button>
@@ -515,7 +515,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-2xl p-6 shadow-2xl relative"
+              className="w-full max-w-sm bg-white dark:bg-[#162032] border border-gray-300 dark:border-[#3A4D71] rounded-2xl p-6 shadow-2xl relative"
             >
               <div className="flex flex-col items-center text-center">
                 <div className="bg-red-50 p-3 rounded-full border border-red-100 mb-4 text-red-600">
@@ -530,7 +530,7 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                   <button
                     type="button"
                     onClick={() => setUserToDelete(null)}
-                    className="flex-1 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:bg-gray-700 rounded-lg transition-colors border border-gray-300 dark:border-gray-600"
+                    className="flex-1 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:bg-[#1C283F] rounded-lg transition-colors border border-gray-300 dark:border-[#3A4D71]"
                   >
                     Não, cancelar
                   </button>

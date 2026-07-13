@@ -38,12 +38,12 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
 
   return (
     <div className="min-h-screen bg-transparent text-gray-900 dark:text-gray-100 flex flex-col">
-      <header className="px-6 pt-12 pb-5 border-b border-gray-200 dark:border-gray-700/80">
+      <header className="px-6 pt-12 pb-5 border-b border-gray-200 dark:border-[#273654]/80">
         <div className="max-w-5xl mx-auto w-full">
           <div className="flex items-center gap-4">
             <button
               onClick={onBack}
-              className="p-2.5 rounded-xl hover:bg-gray-100 dark:bg-gray-800 border border-transparent hover:border-gray-200 dark:border-gray-700/80 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-all"
+              className="p-2.5 rounded-xl hover:bg-gray-100 dark:bg-[#1C283F] border border-transparent hover:border-gray-200 dark:border-[#273654]/80 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 transition-all"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -60,16 +60,16 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
           </div>
 
           {/* Tabs */}
-          <div className="flex mt-8 bg-white dark:bg-gray-900 p-1.5 rounded-2xl border border-gray-200 dark:border-gray-700/60 shadow-sm">
+          <div className="flex mt-8 bg-white dark:bg-[#162032] p-1.5 rounded-2xl border border-gray-200 dark:border-[#273654]/60 shadow-sm">
             <button
               onClick={() => setActiveTab("overview")}
-              className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === "overview" ? "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-md shadow-black/50" : "text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-800"}`}
+              className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === "overview" ? "bg-gray-200 dark:bg-[#1C283F] text-gray-900 dark:text-gray-100 shadow-md shadow-black/50" : "text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-[#1C283F]"}`}
             >
               <Info className="w-4 h-4" /> Funcionamento
             </button>
             <button
               onClick={() => setActiveTab("oscilloscope")}
-              className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === "oscilloscope" ? "bg-red-600/10 text-red-600 shadow-md shadow-black/50 border border-red-600/20" : "text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-800"}`}
+              className={`flex-1 flex justify-center items-center gap-2 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === "oscilloscope" ? "bg-red-600/10 text-red-600 shadow-md shadow-black/50 border border-red-600/20" : "text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-[#1C283F]"}`}
             >
               <Activity className="w-4 h-4" /> Osciloscópio
             </button>
@@ -88,7 +88,7 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
               transition={{ duration: 0.2 }}
               className="p-5 space-y-6 pb-12"
             >
-              <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-3xl p-6 md:p-8">
+              <section className="bg-white dark:bg-[#162032] border border-gray-200 dark:border-[#273654]/60 shadow-sm rounded-3xl p-6 md:p-8">
                 <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-400 mb-4 uppercase tracking-widest">
                   <Info className="w-4 h-4" /> Descrição Técnica
                 </h3>
@@ -132,8 +132,8 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
               )}
 
 
-              <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-3xl overflow-hidden backdrop-blur-sm">
-                <div className="bg-white dark:bg-gray-900 px-6 py-4 flex items-center gap-3 border-b border-gray-200 dark:border-gray-700/80">
+              <section className="bg-white dark:bg-[#162032] border border-gray-200 dark:border-[#273654]/60 shadow-sm rounded-3xl overflow-hidden backdrop-blur-sm">
+                <div className="bg-white dark:bg-[#162032] px-6 py-4 flex items-center gap-3 border-b border-gray-200 dark:border-[#273654]/80">
                   <Settings2 className="w-5 h-5 text-red-600" />
                   <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                     Setup de Captura Base
@@ -202,7 +202,7 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
                     {component.waveformPhases.map((phase) => (
                       <div
                         key={phase.id}
-                        className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg transition-colors rounded-3xl p-6 flex gap-5 items-start"
+                        className="bg-white dark:bg-[#162032] border border-gray-200 dark:border-[#273654]/60 shadow-sm hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg transition-colors rounded-3xl p-6 flex gap-5 items-start"
                       >
                         <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-red-600/10 border border-red-600/20 flex items-center justify-center text-red-600 font-bold">
                           {phase.id}
@@ -218,14 +218,14 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
                       </div>
                     ))}
 
-                    <div className="mt-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-3xl p-6">
-                      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed italic border-l-2 border-gray-300 dark:border-gray-600 pl-4">
+                    <div className="mt-4 bg-white dark:bg-[#162032] border border-gray-200 dark:border-[#273654]/60 shadow-sm rounded-3xl p-6">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed italic border-l-2 border-gray-300 dark:border-[#3A4D71] pl-4">
                         {component.waveformExplanation}
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-3xl p-6 md:p-8">
+                  <div className="bg-white dark:bg-[#162032] border border-gray-200 dark:border-[#273654]/60 shadow-sm rounded-3xl p-6 md:p-8">
                     <p className="text-gray-700 dark:text-gray-300 text-base leading-relaxed whitespace-pre-line">
                       {component.waveformExplanation}
                     </p>
@@ -233,8 +233,8 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
                 )}
               </section>
 
-              <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-3xl overflow-hidden mt-8">
-                <div className="bg-gray-50 dark:bg-gray-800 px-6 py-4 border-b border-gray-200 dark:border-gray-700/80">
+              <section className="bg-white dark:bg-[#162032] border border-gray-200 dark:border-[#273654]/60 shadow-sm rounded-3xl overflow-hidden mt-8">
+                <div className="bg-gray-50 dark:bg-[#1C283F] px-6 py-4 border-b border-gray-200 dark:border-[#273654]/80">
                   <h3 className="flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100">
                     <Activity className="w-5 h-5 text-red-600" /> Parâmetros de Medição (Menu Parameter)
                   </h3>
@@ -315,7 +315,7 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
                         
                         const params = getParameterDetails(component.waveType, component.name);
                         return params.map(param => (
-                          <div key={param.id} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                          <div key={param.id} className="bg-white dark:bg-[#162032] border border-gray-200 dark:border-[#273654] rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
                             <div className="flex items-center gap-3 mb-3">
                               <span className="bg-red-600/10 text-red-700 border border-red-600/20 px-3 py-1.5 rounded-lg text-sm font-bold tracking-wide">
                                 {param.name}
@@ -357,9 +357,9 @@ export function ComponentDetail({ component, onBack }: ComponentDetailProps) {
                       { button: "Vrms", meaning: "Tensão RMS", desc: <>O mesmo valor lido num multímetro (tensão eficaz). Muito usado ao testar tensão alternada de saída do <strong className="text-gray-900 dark:text-gray-100">Estator</strong>.</>, color: "text-gray-900 dark:text-gray-100" },
                       { button: "Avg", meaning: "Tensão Média", desc: <>Usado para ver a tensão constante em sinais lentos/analógicos (<strong className="text-gray-900 dark:text-gray-100">TPS, Sonda Lambda, MAP</strong>).</>, color: "text-gray-900 dark:text-gray-100" }
                     ].map((item) => (
-                      <div key={item.button} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-4 rounded-xl shadow-sm flex flex-col md:flex-row md:items-center gap-2 md:gap-6 hover:shadow-md transition-shadow">
+                      <div key={item.button} className="bg-white dark:bg-[#162032] border border-gray-200 dark:border-[#273654] p-4 rounded-xl shadow-sm flex flex-col md:flex-row md:items-center gap-2 md:gap-6 hover:shadow-md transition-shadow">
                         <div className="md:w-32 flex-shrink-0">
-                          <span className={`font-mono font-bold ${item.color} bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded border border-gray-100`}>
+                          <span className={`font-mono font-bold ${item.color} bg-gray-50 dark:bg-[#1C283F] px-2 py-1 rounded border border-gray-100`}>
                             {item.button}
                           </span>
                         </div>

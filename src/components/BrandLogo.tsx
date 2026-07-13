@@ -31,14 +31,14 @@ export function BrandLogo({ brand, className = "" }: BrandLogoProps) {
 
   if (brand === "Shineray") {
     return (
-      <div className={`flex flex-col items-center justify-center bg-[#050505] rounded-lg w-full h-full border border-gray-300 dark:border-gray-600 ${className}`}>
+      <div className={`flex flex-col items-center justify-center bg-[#050505] rounded-lg w-full h-full border border-gray-300 dark:border-[#3A4D71] ${className}`}>
         <span className="text-white font-black text-[9px] tracking-wider leading-none">SHINERAY</span>
       </div>
     );
   }
 
   return (
-    <div className={`flex items-center justify-center bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-bold rounded-lg w-full h-full ${className}`}>
+    <div className={`flex items-center justify-center bg-gray-200 dark:bg-[#1C283F] text-gray-600 dark:text-gray-400 font-bold rounded-lg w-full h-full ${className}`}>
       {brand.slice(0, 3).toUpperCase()}
     </div>
   );

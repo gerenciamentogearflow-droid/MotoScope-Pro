@@ -29,7 +29,7 @@ export function SensorDifferencesModal({ onClose }: SensorDifferencesModalProps)
           </div>
           <button
             onClick={onClose}
-            className="p-2.5 hover:bg-gray-200 dark:bg-gray-700 rounded-xl transition-colors text-gray-500 bg-white dark:bg-gray-900 shadow-sm border border-gray-200 dark:border-gray-700"
+            className="p-2.5 hover:bg-gray-200 dark:bg-[#1C283F] rounded-xl transition-colors text-gray-500 bg-white dark:bg-gray-900 shadow-sm border border-gray-200 dark:border-[#273654]"
           >
             <X className="w-5 h-5" />
           </button>
@@ -150,7 +150,7 @@ export function SensorDifferencesModal({ onClose }: SensorDifferencesModalProps)
             </div>
           </div>
           
-          <div className="mt-8 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 text-center">
+          <div className="mt-8 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-[#273654] rounded-2xl p-5 text-center">
              <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-2">Resumo na Prática para o Mecânico</h4>
              <p className="text-gray-700 dark:text-gray-300">
                Se a onda for <strong>quadrada</strong> e a voltagem for <strong>fixa</strong>, é <strong>Hall</strong>. Se a onda for <strong>arredondada (sobe e desce)</strong> e a voltagem <strong>aumentar muito com a aceleração</strong>, é <strong>Indutivo</strong>.

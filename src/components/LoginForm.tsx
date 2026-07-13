@@ -52,7 +52,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-[360px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700/60 shadow-sm rounded-[2rem] p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden"
+        className="w-full max-w-[360px] bg-white dark:bg-[#162032] border border-gray-200 dark:border-[#273654]/60 shadow-sm rounded-[2rem] p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-48 h-48 bg-red-600/10 rounded-full blur-[3rem] -z-10" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-red-600/10 rounded-full blur-[3rem] -z-10" />
@@ -79,7 +79,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-white dark:bg-gray-900 border border-black/10 rounded-2xl px-5 py-4 text-base text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all shadow-inner"
+              className="w-full bg-white dark:bg-[#162032] border border-black/10 rounded-2xl px-5 py-4 text-base text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all shadow-inner"
               placeholder="Digite seu usuário"
               required
             />
@@ -93,7 +93,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white dark:bg-gray-900 border border-black/10 rounded-2xl pl-5 pr-12 py-4 text-base text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all shadow-inner"
+                className="w-full bg-white dark:bg-[#162032] border border-black/10 rounded-2xl pl-5 pr-12 py-4 text-base text-gray-900 dark:text-gray-100 placeholder:text-gray-600 dark:text-gray-400 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition-all shadow-inner"
                 placeholder="••••••••"
                 required
               />
@@ -113,7 +113,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
               id="remember"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="w-5 h-5 rounded border-black/10 bg-white dark:bg-gray-900 text-red-600 focus:ring-red-600 focus:ring-offset-0"
+              className="w-5 h-5 rounded border-black/10 bg-white dark:bg-[#162032] text-red-600 focus:ring-red-600 focus:ring-offset-0"
             />
             <label htmlFor="remember" className="ml-3 text-sm font-medium text-gray-600 dark:text-gray-400">
               Manter conectado
