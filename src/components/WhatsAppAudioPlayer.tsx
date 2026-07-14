@@ -65,38 +65,20 @@ export function WhatsAppAudioPlayer({ audioId, textToSpeak, autoPlay, playTrigge
       .then((uri) => {
         if (!mounted) return;
 
-        // List of pre-recorded audio files that actually exist in /public/audio
-        const knownStatics = [
-          'ckp-hall-phase-1', 'ckp-hall-phase-2', 'ckp-hall-phase-3', 'ckp-hall-phase-4',
-          'ckp-indutivo-phase-4', 'ckp-pulso-carburada-phase-1', 'ckp-pulso-carburada-phase-2',
-          'injector-phase-1', 'injector-phase-2', 'injector-phase-3', 'injector-phase-4', 'injector-phase-5',
-          'multimeter/ckp-hall', 'multimeter/ckp-indutivo', 'multimeter/ckp-pulso-carburada'
-        ];
-
-        const isKnownStatic = knownStatics.includes(audioId) || audioId.startsWith('multimeter/ckp-') || audioId.startsWith('ckp-');
-
-        if (uri && !uri.endsWith('.mp3')) {
-          // This is a cached blob or dataUri from IndexedDB (or freshly fetched/generated)
+        if (uri) {
+          // This is a valid audio URI (blob, dataUri, or static file) - play with HTML5
           let fixedUri = uri;
           if (uri.startsWith('data:application/octet-stream;base64,')) {
             fixedUri = uri.replace('data:application/octet-stream;base64,', 'data:audio/mp3;base64,');
           }
           setSrc(fixedUri);
           setPlaybackMode('html5');
-        } else if (isKnownStatic && uri) {
-          // It's a relative path but it's a known static file that exists on disk
-          setSrc(uri);
-          setPlaybackMode('html5');
         } else if (textToSpeak) {
-          // It's a non-static file, and we don't have it cached. Switch to high-quality Speech Synthesis!
+          // No physical audio file available (404 offline / custom component) - use speech synthesis fallback
           setPlaybackMode('synthesis');
           const words = textToSpeak.split(/\s+/).length;
           const estimatedDuration = Math.max(3, words * 0.4);
           setDuration(estimatedDuration);
-        } else if (uri) {
-          // Fallback static route
-          setSrc(uri);
-          setPlaybackMode('html5');
         } else {
           console.error(`Audio URI missing for ${audioId}`);
           setErrorMsg("Sem Áudio");

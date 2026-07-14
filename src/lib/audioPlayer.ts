@@ -119,33 +119,21 @@ class AudioPlayer {
     window.dispatchEvent(new CustomEvent('motoscope:global-play'));
 
     try {
-      // List of pre-recorded static audio files
-      const knownStatics = [
-        'ckp-hall-phase-1', 'ckp-hall-phase-2', 'ckp-hall-phase-3', 'ckp-hall-phase-4',
-        'ckp-indutivo-phase-4', 'ckp-pulso-carburada-phase-1', 'ckp-pulso-carburada-phase-2',
-        'injector-phase-1', 'injector-phase-2', 'injector-phase-3', 'injector-phase-4', 'injector-phase-5',
-        'multimeter/ckp-hall', 'multimeter/ckp-indutivo', 'multimeter/ckp-pulso-carburada'
-      ];
-
-      const isKnownStatic = knownStatics.includes(audioId) || audioId.startsWith('multimeter/ckp-') || audioId.startsWith('ckp-');
-
-      if (!isKnownStatic && textToSpeak) {
-        // Fallback to speech synthesis immediately for non-static audio files
-        this.playSynthesis(textToSpeak);
-        return;
-      }
-
       let sound = this.cache[audioId];
 
       if (!sound) {
-        let srcUrl = `/audio/${audioId}.mp3`;
+        let srcUrl: string | undefined = undefined;
         try {
-          const dataUri = await getAudioDataUri(audioId, textToSpeak);
-          if (dataUri) {
-            srcUrl = dataUri;
-          }
+          srcUrl = await getAudioDataUri(audioId, textToSpeak);
         } catch (err) {
           console.error("Failed to get audio data URI", err);
+        }
+
+        if (!srcUrl) {
+          if (textToSpeak) {
+            this.playSynthesis(textToSpeak);
+          }
+          return;
         }
 
         sound = new Audio(srcUrl);
@@ -266,10 +254,17 @@ export async function getAudioDataUri(audioId: string, textToSpeak?: string): Pr
       }
     }
     
-    // 4. Absolute final fallback: return relative path just in case
+    // 4. Fallback final: se temos texto para falar, retornamos undefined para acionar a síntese de voz nativa.
+    // Caso contrário, tentamos o path relativo original.
+    if (textToSpeak) {
+      return undefined;
+    }
     return `/audio/${audioId}.mp3`;
   } catch (err) {
     console.error("Failed to get audio data URI:", err);
+    if (textToSpeak) {
+      return undefined;
+    }
     return `/audio/${audioId}.mp3`;
   }
 }
