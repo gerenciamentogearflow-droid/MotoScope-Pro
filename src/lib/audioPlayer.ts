@@ -159,29 +159,7 @@ export async function getAudioDataUri(audioId: string, textToSpeak?: string): Pr
     const localDb = await getAudioDB();
     const cachedData = await localDb.get(STORE_NAME, audioId);
     
-    // 1. Prioritize native static file streaming if available
-    try {
-      const headRes = await fetch(`/audio/${audioId}.mp3`, { method: 'HEAD' });
-      if (headRes.ok && !headRes.headers.get('content-type')?.includes('text/html')) {
-        // Asynchronously cache it if it's missing from IndexedDB
-        if (!cachedData) {
-          fetch(`/audio/${audioId}.mp3`)
-            .then(r => {
-              if (r.ok && !r.headers.get('content-type')?.includes('text/html')) {
-                return r.blob();
-              }
-              throw new Error("Invalid content type");
-            })
-            .then(b => localDb.put(STORE_NAME, b, audioId))
-            .catch(() => {});
-        }
-        return `/audio/${audioId}.mp3`;
-      }
-    } catch (e) {
-      // Ignore network errors, proceed to fallback
-    }
-
-    // 2. Fallback to IndexedDB cache
+    // 1. Check if we already have a valid audio stored in IndexedDB cache (Local-First/Offline-First)
     if (cachedData) {
       if (typeof cachedData === 'string' && cachedData.startsWith('data:')) {
         let dataUri = cachedData;
@@ -193,32 +171,53 @@ export async function getAudioDataUri(audioId: string, textToSpeak?: string): Pr
         if (cachedData.size > 0 && !cachedData.type.includes('text/html')) {
           return URL.createObjectURL(new Blob([cachedData], { type: 'audio/mpeg' }));
         } else {
+          // If cached data is empty or invalid HTML error, clean it up
           await localDb.delete(STORE_NAME, audioId);
         }
       }
     }
 
-    // 3. Fallback to generating via TTS API
-    if (textToSpeak) {
-      console.warn(`Audio ${audioId} not found statically. Generating via TTS API...`);
-      const ttsRes = await fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: audioId, text: textToSpeak })
-      });
-      
-      if (ttsRes.ok) {
-        const blob = await ttsRes.blob();
+    // 2. If not in IndexedDB, fetch the static file using standard GET.
+    // Converting it to a Blob and saving it to IndexedDB eliminates the Safari HTTP Range requests bug.
+    try {
+      const res = await fetch(`/audio/${audioId}.mp3`);
+      if (res.ok && !res.headers.get('content-type')?.includes('text/html')) {
+        const blob = await res.blob();
         if (blob.size > 0 && !blob.type.includes('text/html')) {
           await localDb.put(STORE_NAME, blob, audioId);
           return URL.createObjectURL(new Blob([blob], { type: 'audio/mpeg' }));
         }
       }
+    } catch (e) {
+      console.warn(`Static audio fetch failed for ${audioId} (possibly offline or dynamic file):`, e);
+    }
+
+    // 3. Fallback: generate via server-side TTS API
+    if (textToSpeak) {
+      console.warn(`Audio ${audioId} not found statically. Generating via TTS API...`);
+      try {
+        const ttsRes = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: audioId, text: textToSpeak })
+        });
+        
+        if (ttsRes.ok) {
+          const blob = await ttsRes.blob();
+          if (blob.size > 0 && !blob.type.includes('text/html')) {
+            await localDb.put(STORE_NAME, blob, audioId);
+            return URL.createObjectURL(new Blob([blob], { type: 'audio/mpeg' }));
+          }
+        }
+      } catch (e) {
+        console.error(`TTS generation failed for ${audioId}:`, e);
+      }
     }
     
-    return undefined;
+    // 4. Absolute final fallback: return relative path just in case
+    return `/audio/${audioId}.mp3`;
   } catch (err) {
     console.error("Failed to get audio data URI:", err);
-    return undefined;
+    return `/audio/${audioId}.mp3`;
   }
 }
