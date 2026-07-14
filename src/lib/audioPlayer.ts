@@ -112,12 +112,29 @@ export async function syncAudiosForOffline(onProgress?: (progress: number) => vo
 class AudioPlayer {
   private currentAudio: HTMLAudioElement | null = null;
   private cache: Record<string, HTMLAudioElement> = {};
+  private activeUtterance: SpeechSynthesisUtterance | null = null;
 
   public async play(audioId: string, textToSpeak?: string) {
     this.stop();
     window.dispatchEvent(new CustomEvent('motoscope:global-play'));
 
     try {
+      // List of pre-recorded static audio files
+      const knownStatics = [
+        'ckp-hall-phase-1', 'ckp-hall-phase-2', 'ckp-hall-phase-3', 'ckp-hall-phase-4',
+        'ckp-indutivo-phase-4', 'ckp-pulso-carburada-phase-1', 'ckp-pulso-carburada-phase-2',
+        'injector-phase-1', 'injector-phase-2', 'injector-phase-3', 'injector-phase-4', 'injector-phase-5',
+        'multimeter/ckp-hall', 'multimeter/ckp-indutivo', 'multimeter/ckp-pulso-carburada'
+      ];
+
+      const isKnownStatic = knownStatics.includes(audioId) || audioId.startsWith('multimeter/ckp-') || audioId.startsWith('ckp-');
+
+      if (!isKnownStatic && textToSpeak) {
+        // Fallback to speech synthesis immediately for non-static audio files
+        this.playSynthesis(textToSpeak);
+        return;
+      }
+
       let sound = this.cache[audioId];
 
       if (!sound) {
@@ -136,9 +153,38 @@ class AudioPlayer {
       }
 
       this.currentAudio = sound;
-      await sound.play();
+      
+      try {
+        await sound.play();
+      } catch (playErr) {
+        console.warn(`AudioPlayer: play failed for ${audioId}. Trying SpeechSynthesis:`, playErr);
+        if (textToSpeak) {
+          this.playSynthesis(textToSpeak);
+        }
+      }
     } catch (err) {
       console.error("Audio play error:", err);
+      if (textToSpeak) {
+        this.playSynthesis(textToSpeak);
+      }
+    }
+  }
+
+  private playSynthesis(text: string) {
+    try {
+      window.speechSynthesis.cancel();
+      const cleanText = text.replace(/\*\*/g, '').replace(/\*/g, '');
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = 'pt-BR';
+      const voices = window.speechSynthesis.getVoices();
+      const ptVoice = voices.find(v => v.lang.startsWith('pt-BR')) || voices.find(v => v.lang.startsWith('pt'));
+      if (ptVoice) {
+        utterance.voice = ptVoice;
+      }
+      this.activeUtterance = utterance;
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.error("AudioPlayer SpeechSynthesis failed:", e);
     }
   }
 
@@ -147,6 +193,12 @@ class AudioPlayer {
       this.currentAudio.pause();
       this.currentAudio.currentTime = 0;
       this.currentAudio = null;
+    }
+    try {
+      window.speechSynthesis.cancel();
+      this.activeUtterance = null;
+    } catch (e) {
+      // Ignore
     }
   }
 }
