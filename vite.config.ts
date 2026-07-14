@@ -34,8 +34,8 @@ export default defineConfig(() => {
           ]
         },
         workbox: { // configure workbox
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff,woff2}'],
-          maximumFileSizeToCacheInBytes: 10485760, // 10MB to ensure large JS/data chunks are cached offline
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff,woff2,mp3}'],
+          maximumFileSizeToCacheInBytes: 31457280, // 30MB
         }
       })
     ],

@@ -340,6 +340,12 @@ Use EXATAMENTE este formato nas últimas linhas (sem formatação markdown ao re
       const fileName = `${id}.mp3`;
       const filePath = path.join(outputDir, fileName);
 
+      // Ensure any subdirectories inside the cache directory exist
+      const fileDir = path.dirname(filePath);
+      if (!fs.existsSync(fileDir)) {
+        fs.mkdirSync(fileDir, { recursive: true });
+      }
+
       if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) {
         // Return cached file
         return res.sendFile(filePath);
@@ -356,32 +362,7 @@ Use EXATAMENTE este formato nas últimas linhas (sem formatação markdown ao re
         outputFormat: 'audio-24khz-48kbitrate-mono-mp3'
       });
       
-      // chunk text to avoid timeout
-      const chunks = text.match(/[^.!?]+[.!?]+/g) || [text];
-      let currentChunk = "";
-      let finalChunks = [];
-      for (let c of chunks) {
-        if (currentChunk.length + c.length > 500) {
-           finalChunks.push(currentChunk);
-           currentChunk = c;
-        } else {
-           currentChunk += c;
-        }
-      }
-      if (currentChunk.trim().length > 0) finalChunks.push(currentChunk);
-      
-      let finalBuffer = Buffer.alloc(0);
-      for (let i = 0; i < finalChunks.length; i++) {
-         const tmpFile = `${filePath}.part${i}`;
-         await tts.ttsPromise(finalChunks[i], tmpFile);
-         if (fs.existsSync(tmpFile)) {
-           const b = fs.readFileSync(tmpFile);
-           finalBuffer = Buffer.concat([finalBuffer, b]);
-           fs.unlinkSync(tmpFile);
-         }
-      }
-      
-      fs.writeFileSync(filePath, finalBuffer);
+      await tts.ttsPromise(text, filePath);
 
 
       if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) {
@@ -410,6 +391,12 @@ Use EXATAMENTE este formato nas últimas linhas (sem formatação markdown ao re
       const fileName = `${id}.mp3`;
       const filePath = path.join(outputDir, fileName);
 
+      // Ensure any subdirectories inside the cache directory exist
+      const fileDir = path.dirname(filePath);
+      if (!fs.existsSync(fileDir)) {
+        fs.mkdirSync(fileDir, { recursive: true });
+      }
+
       if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) {
         // Return cached file
         return res.sendFile(filePath);
@@ -426,32 +413,7 @@ Use EXATAMENTE este formato nas últimas linhas (sem formatação markdown ao re
         outputFormat: 'audio-24khz-48kbitrate-mono-mp3'
       });
       
-      // chunk text to avoid timeout
-      const chunks = text.match(/[^.!?]+[.!?]+/g) || [text];
-      let currentChunk = "";
-      let finalChunks = [];
-      for (let c of chunks) {
-        if (currentChunk.length + c.length > 500) {
-           finalChunks.push(currentChunk);
-           currentChunk = c;
-        } else {
-           currentChunk += c;
-        }
-      }
-      if (currentChunk.trim().length > 0) finalChunks.push(currentChunk);
-      
-      let finalBuffer = Buffer.alloc(0);
-      for (let i = 0; i < finalChunks.length; i++) {
-         const tmpFile = `${filePath}.part${i}`;
-         await tts.ttsPromise(finalChunks[i], tmpFile);
-         if (fs.existsSync(tmpFile)) {
-           const b = fs.readFileSync(tmpFile);
-           finalBuffer = Buffer.concat([finalBuffer, b]);
-           fs.unlinkSync(tmpFile);
-         }
-      }
-      
-      fs.writeFileSync(filePath, finalBuffer);
+      await tts.ttsPromise(text, filePath);
 
 
       if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) {

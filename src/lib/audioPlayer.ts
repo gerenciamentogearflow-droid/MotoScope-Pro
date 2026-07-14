@@ -4,7 +4,7 @@ import { db } from './firebase';
 import { openDB } from 'idb';
 import { componentsDB } from '../data/componentsDB';
 
-const DB_NAME = 'motoscope-audio-db-v18';
+const DB_NAME = 'motoscope-audio-db-v21';
 const STORE_NAME = 'audios';
 
 async function getAudioDB() {
@@ -89,7 +89,9 @@ export async function syncAudiosForOffline(onProgress?: (progress: number) => vo
             });
             if (ttsRes.ok) {
               const blob = await ttsRes.blob();
-              await localDb.put(STORE_NAME, blob, audioId);
+              if (blob.size > 0 && !blob.type.includes('text/html')) {
+                await localDb.put(STORE_NAME, blob, audioId);
+              }
             }
           }
         }
@@ -164,7 +166,12 @@ export async function getAudioDataUri(audioId: string, textToSpeak?: string): Pr
         // Asynchronously cache it if it's missing from IndexedDB
         if (!cachedData) {
           fetch(`/audio/${audioId}.mp3`)
-            .then(r => r.blob())
+            .then(r => {
+              if (r.ok && !r.headers.get('content-type')?.includes('text/html')) {
+                return r.blob();
+              }
+              throw new Error("Invalid content type");
+            })
             .then(b => localDb.put(STORE_NAME, b, audioId))
             .catch(() => {});
         }
@@ -183,7 +190,11 @@ export async function getAudioDataUri(audioId: string, textToSpeak?: string): Pr
         }
         return dataUri;
       } else if (cachedData instanceof Blob) {
-        return URL.createObjectURL(new Blob([cachedData], { type: 'audio/mpeg' }));
+        if (cachedData.size > 0 && !cachedData.type.includes('text/html')) {
+          return URL.createObjectURL(new Blob([cachedData], { type: 'audio/mpeg' }));
+        } else {
+          await localDb.delete(STORE_NAME, audioId);
+        }
       }
     }
 
@@ -198,8 +209,10 @@ export async function getAudioDataUri(audioId: string, textToSpeak?: string): Pr
       
       if (ttsRes.ok) {
         const blob = await ttsRes.blob();
-        await localDb.put(STORE_NAME, blob, audioId);
-        return URL.createObjectURL(new Blob([blob], { type: 'audio/mpeg' }));
+        if (blob.size > 0 && !blob.type.includes('text/html')) {
+          await localDb.put(STORE_NAME, blob, audioId);
+          return URL.createObjectURL(new Blob([blob], { type: 'audio/mpeg' }));
+        }
       }
     }
     
