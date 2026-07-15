@@ -22,13 +22,48 @@ export default function App() {
     };
     runInit();
 
-    // Sincroniza áudios para uso offline
-    syncAudiosForOffline((progress) => {
-      setSyncProgress(progress);
-      if (progress >= 100) {
-        setTimeout(() => setSyncProgress(null), 3000);
+    // Sincroniza áudios para uso offline e limpa bancos antigos
+    const cleanOldDbsAndSync = async () => {
+      try {
+        if ('indexedDB' in window && window.indexedDB.databases) {
+          const dbs = await window.indexedDB.databases();
+          for (const dbInfo of dbs) {
+            if (dbInfo.name && dbInfo.name.startsWith('motoscope-audio-db-') && dbInfo.name !== 'motoscope-audio-db-v22') {
+              console.log(`Deleting old database: ${dbInfo.name}`);
+              window.indexedDB.deleteDatabase(dbInfo.name);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Error cleaning up old databases:', e);
       }
-    });
+
+      syncAudiosForOffline((progress) => {
+        setSyncProgress(progress);
+        if (progress >= 100) {
+          setTimeout(() => setSyncProgress(null), 3000);
+        }
+      });
+    };
+    cleanOldDbsAndSync();
+
+    // Força o Service Worker a checar por atualizações imediatamente no carregamento do app
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (let registration of registrations) {
+          registration.update().catch(err => console.warn('Failed to update SW registration:', err));
+        }
+      });
+
+      // Se um novo Service Worker tomar controle, recarrega a página para carregar o novo bundle
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
+    }
 
     // Verifica se há um acesso lembrado
     const remembered = localStorage.getItem("motostore_remembered_user");
