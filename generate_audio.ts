@@ -50,8 +50,8 @@ async function run() {
 
   for (const { id, text } of expectedAudios) {
     if (!text) continue;
-    const filePath = path.join(process.cwd(), 'public', 'audio', `${id}.mp3`);
-    const distFilePath = path.join(process.cwd(), 'dist', 'audio', `${id}.mp3`);
+    const filePath = path.join(process.cwd(), 'public', 'audio_masculino', `${id}.mp3`);
+    const distFilePath = path.join(process.cwd(), 'dist', 'audio_masculino', `${id}.mp3`);
     
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.mkdirSync(path.dirname(distFilePath), { recursive: true });

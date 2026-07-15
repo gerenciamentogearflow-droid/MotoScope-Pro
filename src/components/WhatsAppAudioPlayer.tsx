@@ -130,9 +130,15 @@ export function WhatsAppAudioPlayer({ audioId, textToSpeak, autoPlay, playTrigge
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'pt-BR';
     
-    // Attempt to set a Brazilian Portuguese voice
+    // Attempt to set a Brazilian Portuguese male voice
     const voices = window.speechSynthesis.getVoices();
-    const ptVoice = voices.find(v => v.lang.startsWith('pt-BR')) || voices.find(v => v.lang.startsWith('pt'));
+    const ptVoices = voices.filter(v => v.lang.startsWith('pt-BR') || v.lang.startsWith('pt'));
+    const maleNames = ['daniel', 'ricardo', 'felipe', 'antonio', 'tiago', 'jonas', 'lucas', 'masculino', 'male', 'man', 'homem'];
+    const maleVoice = ptVoices.find(v => 
+      maleNames.some(name => v.name.toLowerCase().includes(name))
+    );
+    const ptVoice = maleVoice || ptVoices[0];
+    
     if (ptVoice) {
       utterance.voice = ptVoice;
     }

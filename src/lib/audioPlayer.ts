@@ -53,8 +53,8 @@ export async function syncAudiosForOffline(onProgress?: (progress: number) => vo
 
     for (const audioId of missingAudios) {
       try {
-        // Fetch from local public/audio directory
-        const res = await fetch(`/audio/${audioId}.mp3`);
+        // Fetch from local public/audio_masculino directory
+        const res = await fetch(`/audio_masculino/${audioId}.mp3`);
         if (res.ok && !res.headers.get('content-type')?.includes('text/html')) {
           const blob = await res.blob();
           await localDb.put(STORE_NAME, blob, audioId);
@@ -164,8 +164,15 @@ class AudioPlayer {
       const cleanText = text.replace(/\*\*/g, '').replace(/\*/g, '');
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = 'pt-BR';
+      
       const voices = window.speechSynthesis.getVoices();
-      const ptVoice = voices.find(v => v.lang.startsWith('pt-BR')) || voices.find(v => v.lang.startsWith('pt'));
+      const ptVoices = voices.filter(v => v.lang.startsWith('pt-BR') || v.lang.startsWith('pt'));
+      const maleNames = ['daniel', 'ricardo', 'felipe', 'antonio', 'tiago', 'jonas', 'lucas', 'masculino', 'male', 'man', 'homem'];
+      const maleVoice = ptVoices.find(v => 
+        maleNames.some(name => v.name.toLowerCase().includes(name))
+      );
+      const ptVoice = maleVoice || ptVoices[0];
+
       if (ptVoice) {
         utterance.voice = ptVoice;
       }
@@ -220,7 +227,7 @@ export async function getAudioDataUri(audioId: string, textToSpeak?: string): Pr
     // 2. If not in IndexedDB, fetch the static file using standard GET.
     // Converting it to a Blob and saving it to IndexedDB eliminates the Safari HTTP Range requests bug.
     try {
-      const res = await fetch(`/audio/${audioId}.mp3`);
+      const res = await fetch(`/audio_masculino/${audioId}.mp3`);
       if (res.ok && !res.headers.get('content-type')?.includes('text/html')) {
         const blob = await res.blob();
         if (blob.size > 0 && !blob.type.includes('text/html')) {
@@ -259,12 +266,12 @@ export async function getAudioDataUri(audioId: string, textToSpeak?: string): Pr
     if (textToSpeak) {
       return undefined;
     }
-    return `/audio/${audioId}.mp3`;
+    return `/audio_masculino/${audioId}.mp3`;
   } catch (err) {
     console.error("Failed to get audio data URI:", err);
     if (textToSpeak) {
       return undefined;
     }
-    return `/audio/${audioId}.mp3`;
+    return `/audio_masculino/${audioId}.mp3`;
   }
 }
