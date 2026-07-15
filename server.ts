@@ -323,6 +323,22 @@ Use EXATAMENTE este formato nas últimas linhas (sem formatação markdown ao re
     }
   });
 
+  function cleanTextForPronunciation(text: string): string {
+    let cleaned = text.replace(/\*\*/g, '').replace(/\*/g, '');
+    cleaned = cleaned.replace(/Dwell/gi, 'Duél');
+    cleaned = cleaned.replace(/\bCKP\b/gi, 'Cê Ka Pê');
+    cleaned = cleaned.replace(/\bTPS\b/gi, 'Tê Pê Ésse');
+    cleaned = cleaned.replace(/\bMAP\b/gi, 'Mê Á Pê');
+    cleaned = cleaned.replace(/\bCDI\b/gi, 'Cê Dê Í');
+    cleaned = cleaned.replace(/\bABS\b/gi, 'Á Bê Ésse');
+    cleaned = cleaned.replace(/\bAC\b/gi, 'A Cê');
+    cleaned = cleaned.replace(/\bDC\b/gi, 'Dê Cê');
+    cleaned = cleaned.replace(/\b1F\b/gi, 'monofásico');
+    cleaned = cleaned.replace(/\b2F\b/gi, 'bifásico');
+    cleaned = cleaned.replace(/\b3F\b/gi, 'trifásico');
+    return cleaned;
+  }
+
   // Generate TTS Audio on the fly using node-edge-tts
   app.get("/api/tts", async (req, res) => {
     try {
@@ -352,8 +368,6 @@ Use EXATAMENTE este formato nas últimas linhas (sem formatação markdown ao re
       }
 
       // We use import to load it dynamically
-      
-      // We use import to load it dynamically
       const { EdgeTTS } = await import('node-edge-tts');
       
       const tts = new EdgeTTS({
@@ -362,7 +376,8 @@ Use EXATAMENTE este formato nas últimas linhas (sem formatação markdown ao re
         outputFormat: 'audio-24khz-48kbitrate-mono-mp3'
       });
       
-      await tts.ttsPromise(text, filePath);
+      const textToSpeak = cleanTextForPronunciation(text);
+      await tts.ttsPromise(textToSpeak, filePath);
 
 
       if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) {
@@ -403,8 +418,6 @@ Use EXATAMENTE este formato nas últimas linhas (sem formatação markdown ao re
       }
 
       // We use import to load it dynamically
-      
-      // We use import to load it dynamically
       const { EdgeTTS } = await import('node-edge-tts');
       
       const tts = new EdgeTTS({
@@ -413,7 +426,8 @@ Use EXATAMENTE este formato nas últimas linhas (sem formatação markdown ao re
         outputFormat: 'audio-24khz-48kbitrate-mono-mp3'
       });
       
-      await tts.ttsPromise(text, filePath);
+      const textToSpeak = cleanTextForPronunciation(text);
+      await tts.ttsPromise(textToSpeak, filePath);
 
 
       if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) {

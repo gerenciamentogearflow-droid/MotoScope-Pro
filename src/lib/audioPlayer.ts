@@ -4,7 +4,7 @@ import { db } from './firebase';
 import { openDB } from 'idb';
 import { componentsDB } from '../data/componentsDB';
 
-const DB_NAME = 'motoscope-audio-db-v21';
+const DB_NAME = 'motoscope-audio-db-v22';
 const STORE_NAME = 'audios';
 
 async function getAudioDB() {
