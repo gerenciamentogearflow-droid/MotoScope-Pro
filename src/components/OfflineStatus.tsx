@@ -43,13 +43,13 @@ export function OfflineStatus() {
             )}
             
             <div>
-              <p className="text-gray-900 dark:text-gray-100 font-medium text-sm">
+              <p className="text-white font-medium text-sm">
                 {offlineReady ? 'Dados Offline Prontos' : 'Nova atualização disponível'}
               </p>
-              <p className="text-slate-600 text-xs mt-0.5">
+              <p className="text-slate-300 text-xs mt-0.5 font-sans">
                 {offlineReady 
                   ? 'O app agora funciona sem internet.' 
-                  : 'Atualize para baixar os dados mais recentes.'}
+                  : 'Atualize para baixar os dados e voz masculina mais recente.'}
               </p>
             </div>
           </div>
@@ -57,15 +57,18 @@ export function OfflineStatus() {
           <div className="flex gap-2">
             {needRefresh && (
               <button
-                onClick={() => updateServiceWorker(true)}
-                className="bg-red-600 hover:bg-red-500 text-black px-4 py-2 rounded-lg text-xs font-bold transition-colors"
+                onClick={() => {
+                  console.log('Force upgrading SW...');
+                  updateServiceWorker(true);
+                }}
+                className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors shadow-md"
               >
                 Atualizar
               </button>
             )}
             <button
               onClick={close}
-              className="px-3 py-2 text-slate-600 hover:text-gray-900 dark:text-gray-100 transition-colors"
+              className="px-3 py-2 text-slate-300 hover:text-white transition-colors text-xs font-medium"
             >
               Fechar
             </button>
