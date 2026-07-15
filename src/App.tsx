@@ -28,7 +28,7 @@ export default function App() {
         if ('indexedDB' in window && window.indexedDB.databases) {
           const dbs = await window.indexedDB.databases();
           for (const dbInfo of dbs) {
-            if (dbInfo.name && dbInfo.name.startsWith('motoscope-audio-db-') && dbInfo.name !== 'motoscope-audio-db-v22') {
+            if (dbInfo.name && dbInfo.name.startsWith('motoscope-audio-db-') && dbInfo.name !== 'motoscope-audio-db-v23') {
               console.log(`Deleting old database: ${dbInfo.name}`);
               window.indexedDB.deleteDatabase(dbInfo.name);
             }
