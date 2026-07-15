@@ -2,7 +2,7 @@ import { useBackButton } from "../hooks/useBackButton";
 import React, { useState, useEffect } from "react";
 import { User } from "../types";
 import { registerUser, getAllUsers, updateUserCredentials, deleteUser, adminUpdateUser } from "../lib/auth";
-import { ArrowLeft, UserPlus, Users, Settings, KeyRound, Pencil, Trash2, Eye, EyeOff, AlertTriangle, X, FileText, Upload, CheckCircle2, Loader2, Copy } from "lucide-react";
+import { ArrowLeft, UserPlus, Users, Settings, KeyRound, Pencil, Trash2, Eye, EyeOff, AlertTriangle, X, FileText, Upload, CheckCircle2, Loader2, Copy, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { db } from "../lib/firebase";
 import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
@@ -174,6 +174,23 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
     }
   };
 
+  const formatLastAccess = (timestamp?: any) => {
+    if (!timestamp) return "Nenhum acesso registrado";
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) return "Nenhum acesso registrado";
+      return date.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+    } catch (e) {
+      return "Nenhum acesso registrado";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-transparent text-gray-900 dark:text-gray-100 flex flex-col">
@@ -355,15 +372,21 @@ export function AdminPanel({ adminUser, onBack, onUserUpdate }: AdminPanelProps)
                     key={i}
                     className="flex justify-between items-center p-3 bg-white dark:bg-[#1A2235] rounded-lg border border-gray-300 dark:border-[#3D5280]"
                   >
-                    <div className="flex flex-col">
+                    <div className="flex flex-col gap-1 max-w-[70%]">
                       <span className="font-semibold text-gray-900 dark:text-gray-100 text-base">{u.username}</span>
-                      <span
-                        className={`text-[10px] w-max px-2 py-0.5 mt-1 rounded-full font-bold ${
-                          u.role === "admin" ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"
-                        }`}
-                      >
-                        {u.role.toUpperCase()}
-                      </span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                            u.role === "admin" ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"
+                          }`}
+                        >
+                          {u.role.toUpperCase()}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 bg-gray-50 dark:bg-gray-800/50 px-2 py-0.5 rounded-md border border-gray-100 dark:border-gray-800">
+                          <Clock className="w-3.5 h-3.5 text-gray-400" />
+                          <span className="font-medium">Acesso:</span> {formatLastAccess(u.lastAccess)}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-2">

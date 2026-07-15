@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { User, ComponentData } from "./types";
-import { initAuth } from "./lib/auth";
+import { initAuth, updateLastAccess } from "./lib/auth";
 import { LoginForm } from "./components/LoginForm";
 import { Dashboard } from "./components/Dashboard";
 import { AdminPanel } from "./components/AdminPanel";
@@ -73,6 +73,8 @@ export default function App() {
         if (parsedUser && parsedUser.username) {
           setUser(parsedUser);
           setView("dashboard");
+          // Atualiza o último acesso em background
+          updateLastAccess(parsedUser.username).catch(() => {});
         }
       } catch (e) {
         console.error("Erro ao carregar usuário salvo", e);

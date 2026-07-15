@@ -20,6 +20,33 @@ const saveLocalUsers = (users: any[]) => {
   }
 };
 
+export const updateLastAccess = async (username: string): Promise<void> => {
+  const cleanUsername = username ? username.trim() : "";
+  if (!cleanUsername) return;
+
+  const now = Date.now();
+  
+  // 1. Atualiza no Firestore
+  try {
+    const userDocRef = doc(db, "users", cleanUsername);
+    await setDoc(userDocRef, { lastAccess: now }, { merge: true });
+  } catch (error) {
+    console.warn("Erro ao atualizar último acesso no Firestore:", error);
+  }
+
+  // 2. Atualiza localmente para consistência offline
+  try {
+    const localUsers = getLocalUsers();
+    const existingIdx = localUsers.findIndex((u: any) => u.username.trim().toLowerCase() === cleanUsername.toLowerCase());
+    if (existingIdx >= 0) {
+      localUsers[existingIdx] = { ...localUsers[existingIdx], lastAccess: now };
+      saveLocalUsers(localUsers);
+    }
+  } catch (e) {
+    console.warn("Erro ao salvar último acesso localmente:", e);
+  }
+};
+
 export const initAuth = async (): Promise<void> => {
   // Sempre garante que o usuário Mafran existe no localStorage como fallback inicial
   const localUsers = getLocalUsers();
@@ -87,6 +114,9 @@ export const login = async (username: string, password: string): Promise<User | 
         }
         saveLocalUsers(localUsers);
 
+        // Atualiza o último acesso em background
+        updateLastAccess(finalUsername).catch(() => {});
+
         return { username: finalUsername, role: firestoreUser.role };
       }
     }
@@ -101,6 +131,7 @@ export const login = async (username: string, password: string): Promise<User | 
   );
   if (matchedLocal) {
     console.log("Autenticação efetuada com sucesso via Fallback Local.");
+    updateLastAccess(matchedLocal.username).catch(() => {});
     return { username: matchedLocal.username, role: matchedLocal.role };
   }
 
@@ -120,6 +151,8 @@ export const login = async (username: string, password: string): Promise<User | 
         role: "admin"
       }).catch(() => {});
     } catch (e) {}
+
+    updateLastAccess("Mafran").catch(() => {});
 
     return { username: "Mafran", role: "admin" };
   }
