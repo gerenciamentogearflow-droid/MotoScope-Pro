@@ -1,9 +1,11 @@
 import { useBackButton } from "../hooks/useBackButton";
 import React, { useState, useEffect } from "react";
 import { DiagnosticModel, ComponentData } from "../types";
-import { ArrowLeft, ChevronDown, CheckCircle2, AlertCircle, FileText, Download, X, Info, Activity } from "lucide-react";
+import { ArrowLeft, ChevronDown, CheckCircle2, AlertCircle, FileText, Download, X, Info, Activity, Share2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { OscilloscopeDisplay } from "./OscilloscopeDisplay";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface DiagnosticWorksheetViewProps {
   brand: string;
@@ -394,6 +396,10 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
   const [selectedAbbr, setSelectedAbbr] = useState<{ key: string; description: string } | null>(null);
   const [selectedTutorial, setSelectedTutorial] = useState<{ key: string; title: string; steps: string[] } | null>(null);
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+  const [technicianName, setTechnicianName] = useState("");
+  const [exactModelName, setExactModelName] = useState("");
+  const [pdfObservations, setPdfObservations] = useState("");
   
   // State to store findings: rowKey -> value
   const [findings, setFindings] = useState<Record<string, { value: string; status: 'ok' | 'nok' | 'pending' }>>({});
@@ -416,6 +422,14 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
   };
 
   const selectedModel = models.find(m => m.id === selectedModelId);
+
+  useEffect(() => {
+    if (selectedModel) {
+      setExactModelName(selectedModel.name);
+    } else {
+      setExactModelName("");
+    }
+  }, [selectedModelId, selectedModel]);
 
   const handleValueChange = (rowKey: string, value: string, padrao: string) => {
     const autoStatus = evaluateStatus(padrao, value);
@@ -454,30 +468,322 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
     }
   };
 
+  const handleGeneratePDF = async (techName: string, exactModel: string, observations: string, shouldShare: boolean = false) => {
+    try {
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+      });
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+
+      // Header band
+      doc.setFillColor(15, 23, 42); // slate-900
+      doc.rect(0, 0, pageWidth, 38, "F");
+
+      // App brand / Header text
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(20);
+      doc.text("GEARFLOW MOTOSCOPE", 15, 14);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(148, 163, 184); // slate-400
+      doc.text("SISTEMA DE DIAGNÓSTICO INTELIGENTE DE MOTOCICLETAS", 15, 19);
+
+      // Accent bar under header text
+      doc.setFillColor(220, 38, 38); // red-600
+      doc.rect(15, 22, 45, 1, "F");
+
+      // Badge/Status "RELATÓRIO TÉCNICO"
+      doc.setFillColor(220, 38, 38); // red-600
+      doc.rect(pageWidth - 65, 8, 50, 8, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.text("RELATÓRIO TÉCNICO", pageWidth - 40, 13.5, { align: "center" });
+
+      // Info Block (Card Style)
+      doc.setFillColor(248, 250, 252); // slate-50
+      doc.setDrawColor(226, 232, 240); // slate-200
+      doc.rect(15, 45, pageWidth - 30, 36, "FD");
+
+      doc.setTextColor(15, 23, 42);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text("DADOS DA MOTOCICLETA", 20, 52);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      doc.setTextColor(71, 85, 105); // slate-600
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Marca:", 20, 60);
+      doc.setFont("helvetica", "normal");
+      doc.text(brand.toUpperCase(), 35, 60);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Modelo Base:", 20, 67);
+      doc.setFont("helvetica", "normal");
+      doc.text(selectedModel.name.toUpperCase(), 44, 67);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Modelo Exato:", 20, 74);
+      doc.setFont("helvetica", "normal");
+      doc.text((exactModel || selectedModel.name).toUpperCase(), 46, 74);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Data:", pageWidth - 90, 60);
+      doc.setFont("helvetica", "normal");
+      doc.text(new Date().toLocaleString("pt-BR"), pageWidth - 78, 60);
+
+      // Calculate statistics
+      let okCount = 0;
+      let nokCount = 0;
+      let pendingCount = 0;
+
+      const tablesToInclude = selectedModel.tables.filter(table => table.name !== "LUBRIFICANTES E FLUIDOS");
+      tablesToInclude.forEach((table, tIdx) => {
+        table.rows.forEach((row, rIdx) => {
+          const rowKey = `${tIdx}-${rIdx}`;
+          const current = findings[rowKey];
+          if (current?.status === "ok") okCount++;
+          else if (current?.status === "nok") nokCount++;
+          else pendingCount++;
+        });
+      });
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Status Geral:", pageWidth - 90, 67);
+      
+      const statText = `${okCount} Aprovado(s)  |  ${nokCount} Defeito(s)`;
+      doc.setFont("helvetica", "normal");
+      doc.text(statText, pageWidth - 65, 67);
+
+      let currentY = 88;
+
+      // Render tables
+      tablesToInclude.forEach((table, tIdx) => {
+        // Check space before printing title & table
+        if (currentY + 30 > pageHeight) {
+          doc.addPage();
+          currentY = 20;
+        }
+
+        // Section header with left red bar
+        doc.setFillColor(220, 38, 38); // red-600
+        doc.rect(15, currentY, 3, 6, "F");
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(15, 23, 42);
+        doc.text(table.name, 21, currentY + 4.5);
+        currentY += 8;
+
+        const tableRows: any[] = [];
+        table.rows.forEach((row, rIdx) => {
+          const rowKey = `${tIdx}-${rIdx}`;
+          const current = findings[rowKey];
+          
+          let statusText = "Pendente";
+          let valueText = current?.value || "-";
+          if (current?.status === "ok") {
+            statusText = "APROVADO";
+          } else if (current?.status === "nok") {
+            statusText = "REJEITADO / FALHA";
+          }
+
+          tableRows.push([
+            row.localizacao,
+            row.tipo,
+            row.padrao,
+            valueText,
+            statusText
+          ]);
+        });
+
+        autoTable(doc, {
+          startY: currentY,
+          head: [["Componente / Localização", "Tipo", "Padrão de Fábrica", "Valor Encontrado", "Resultado"]],
+          body: tableRows,
+          theme: "striped",
+          headStyles: {
+            fillColor: [30, 41, 59], // Slate 800
+            textColor: 255,
+            fontSize: 8.5,
+            fontStyle: "bold",
+            halign: "left"
+          },
+          bodyStyles: {
+            fontSize: 8,
+            textColor: [51, 65, 85], // Slate 700
+            cellPadding: 3
+          },
+          columnStyles: {
+            0: { cellWidth: 50 },
+            1: { cellWidth: 15 },
+            2: { cellWidth: 60 },
+            3: { cellWidth: 30 },
+            4: { cellWidth: 25, fontStyle: "bold", halign: "center" }
+          },
+          didParseCell: (data) => {
+            if (data.section === "body" && data.column.index === 4) {
+              const val = data.cell.text[0];
+              if (val === "APROVADO") {
+                data.cell.styles.textColor = [22, 163, 74]; // green-600
+              } else if (val === "REJEITADO / FALHA") {
+                data.cell.styles.textColor = [220, 38, 38]; // red-600
+              } else {
+                data.cell.styles.textColor = [100, 116, 139]; // slate-500
+              }
+            }
+          },
+          margin: { left: 15, right: 15 },
+          styles: { font: "helvetica" }
+        });
+
+        currentY = (doc as any).lastAutoTable.finalY + 10;
+      });
+
+      // Notes and signature
+      if (currentY + 40 > pageHeight) {
+        doc.addPage();
+        currentY = 20;
+      }
+
+      doc.setDrawColor(226, 232, 240);
+      doc.line(15, currentY, pageWidth - 15, currentY);
+      currentY += 8;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(100, 116, 139);
+      doc.text("OBSERVAÇÕES ADICIONAIS / PARECER TÉCNICO:", 15, currentY);
+      
+      // Draw a neat comments block
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(226, 232, 240);
+      doc.rect(15, currentY + 3, pageWidth - 30, 24, "FD");
+      
+      // Print observations inside the block
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(51, 65, 85);
+      if (observations.trim()) {
+        const splitText = doc.splitTextToSize(observations.trim(), pageWidth - 40);
+        doc.text(splitText, 20, currentY + 9);
+      } else {
+        doc.setTextColor(148, 163, 184); // light gray
+        doc.text("Nenhuma observação adicional registrada.", 20, currentY + 9);
+      }
+
+      currentY += 40;
+
+      // Signature area
+      if (currentY + 25 > pageHeight) {
+        doc.addPage();
+        currentY = 20;
+      }
+
+      doc.setDrawColor(203, 213, 225);
+      doc.line(pageWidth / 2 - 45, currentY + 15, pageWidth / 2 + 45, currentY + 15);
+      
+      // Print Technician Name if provided
+      if (techName.trim()) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(51, 65, 85);
+        doc.text(techName.trim().toUpperCase(), pageWidth / 2, currentY + 13.5, { align: "center" });
+      }
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Técnico Responsável", pageWidth / 2, currentY + 19, { align: "center" });
+
+      // Footer page numbering and copyright on all pages
+      const totalPages = doc.internal.pages.length - 1;
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(148, 163, 184);
+        
+        doc.setDrawColor(241, 245, 249);
+        doc.line(15, pageHeight - 12, pageWidth - 15, pageHeight - 12);
+        
+        doc.text("GearFlow Motoscope - Ficha de Diagnóstico Inteligente", 15, pageHeight - 7);
+        doc.text(`Página ${i} de ${totalPages}`, pageWidth - 15, pageHeight - 7, { align: "right" });
+      }
+
+      const finalModelName = exactModel.trim() || selectedModel.name;
+      const fileName = `diagnostico_${finalModelName.toLowerCase().replace(/\s+/g, "_")}.pdf`;
+      
+      if (shouldShare) {
+        const pdfBlob = doc.output("blob");
+        const file = new File([pdfBlob], fileName, { type: "application/pdf" });
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: `Relatório de Diagnóstico - ${finalModelName}`,
+              text: `Relatório Técnico de Diagnóstico da motocicleta ${finalModelName}`
+            });
+          } catch (err: any) {
+            if (err.name !== 'AbortError') {
+              console.error("Erro ao compartilhar:", err);
+              doc.save(fileName);
+            }
+          }
+        } else {
+          doc.save(fileName);
+          alert("O compartilhamento nativo de arquivos não é compatível com o seu navegador. O PDF foi baixado automaticamente para que você possa compartilhá-lo manualmente.");
+        }
+      } else {
+        doc.save(fileName);
+      }
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+      alert("Houve um erro ao gerar o PDF. Verifique os dados e tente novamente.");
+    }
+  };
+
   if (selectedModel) {
     return (
       <div className="min-h-screen bg-transparent text-gray-900 dark:text-gray-100 flex flex-col">
-        <header className="px-6 pt-12 pb-5 border-b border-gray-200 dark:border-[#2A3B5C]/80 sticky top-0 bg-gray-50/80 backdrop-blur-xl z-30">
-          <div className="flex items-center justify-between max-w-5xl mx-auto w-full gap-4">
-            <div className="flex items-center gap-4">
+        <header className="px-4 sm:px-6 pt-12 pb-5 border-b border-gray-200 dark:border-[#2A3B5C]/80 sticky top-0 bg-gray-50/95 dark:bg-[#080C14]/95 backdrop-blur-md z-30 shadow-sm">
+          <div className="flex items-center justify-between max-w-5xl mx-auto w-full gap-3 sm:gap-4">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
               <button
                 onClick={() => setSelectedModelId(null)}
-                className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#232F46] hover:bg-gray-100 dark:bg-[#232F46] border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 transition-all active:scale-95"
+                className="p-2 sm:p-2.5 rounded-xl bg-white dark:bg-[#1A2235] hover:bg-gray-100 dark:hover:bg-[#232F46]/80 border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-all active:scale-95 shrink-0"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight line-clamp-1">
-                  Relatório Técnico: {selectedModel.name}
+              <div className="min-w-0 flex-1">
+                <h1 className="text-sm sm:text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-tight truncate">
+                  Relatório: <span className="text-red-600 dark:text-red-400">{selectedModel.name}</span>
                 </h1>
-                <p className="text-[10px] uppercase tracking-widest text-emerald-500 font-bold mt-0.5">Diagnóstico em Andamento</p>
+                <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-emerald-500 dark:text-emerald-400 font-bold mt-0.5">
+                  Diagnóstico em Andamento
+                </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setIsPdfModalOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all shadow-sm active:scale-95 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Gerar PDF
+              </button>
               <button
                 onClick={clearForm}
-                className="px-4 py-2 text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-white bg-white dark:bg-[#1A2235] border border-gray-300 dark:border-[#3D5280] rounded-lg transition-colors"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-[#1A2235] border border-gray-300 dark:border-[#3D5280] rounded-lg transition-colors shadow-sm active:scale-95"
               >
                 Limpar
               </button>
@@ -489,16 +795,18 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
           <div className="max-w-5xl mx-auto space-y-10 pb-12">
             
             <div className="bg-emerald-600/10 border border-emerald-600/20 p-5 rounded-2xl flex items-start gap-4">
-              <FileText className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
+              <FileText className="w-6 h-6 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-sm font-bold text-emerald-600 uppercase tracking-widest mb-1">Instruções do Relatório</h3>
-                <p className="text-sm text-emerald-900/80 font-medium">
+                <h3 className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1">Instruções do Relatório</h3>
+                <p className="text-sm text-emerald-900/80 dark:text-emerald-200/90 font-medium">
                   Meça os componentes listados abaixo na motocicleta. Compare o valor encontrado com o Padrão do Manual. Digite o valor real medido no campo "Valor Encontrado" e marque se a peça foi Aprovada (OK) ou Condenada (FALHA).
                 </p>
               </div>
             </div>
 
-            {selectedModel.tables.map((table, tIdx) => (
+            {selectedModel.tables
+              .filter(table => table.name !== "LUBRIFICANTES E FLUIDOS")
+              .map((table, tIdx) => (
               <div key={tIdx} className="space-y-4">
                 <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center justify-between uppercase tracking-widest border-b border-gray-200 dark:border-[#2A3B5C]/80 pb-2">
                   <span>{table.name}</span>
@@ -545,7 +853,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                           {parts[0]}
                           <button 
                             onClick={(e) => { e.stopPropagation(); handleAbbrClick(matchKey); }}
-                            className="text-red-600 underline decoration-red-600/50 underline-offset-2 active:text-cyan-700 inline-block"
+                            className="text-red-600 dark:text-red-400 underline decoration-red-600/50 dark:decoration-red-400/50 underline-offset-2 active:text-cyan-700 inline-block font-bold"
                           >
                             {matchKey}
                           </button>
@@ -555,7 +863,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                     }
                     
                     return (
-                      <div key={rowKey} className="flex flex-col sm:flex-row gap-4 p-4 sm:p-5 bg-white dark:bg-[#1A2235] border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm rounded-2xl transition-all hover:bg-white dark:bg-[#1A2235] hover:border-red-600/30 hover:shadow-red-600/10 hover:shadow-lg">
+                      <div key={rowKey} className="flex flex-col sm:flex-row gap-4 p-4 sm:p-5 bg-white dark:bg-[#1A2235] border border-gray-200 dark:border-[#2A3B5C]/60 shadow-sm rounded-2xl transition-all hover:bg-white dark:bg-[#1A2235] hover:border-red-600/30 dark:hover:border-red-500/30 hover:shadow-red-600/10 hover:shadow-lg">
                         {/* Info Section */}
                         <div className="flex-1 space-y-2">
                           <div className="flex items-start justify-between">
@@ -564,15 +872,15 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                             </h4>
                             <button 
                               onClick={() => handleAbbrClick(row.tipo)}
-                              className="inline-block px-2 py-0.5 bg-gray-200 dark:bg-[#232F46] hover:bg-gray-200 dark:bg-[#232F46] border border-gray-400 rounded text-gray-600 dark:text-gray-400 font-mono font-bold text-[10px] transition-colors active:scale-95"
+                              className="inline-block px-2 py-0.5 bg-gray-200 dark:bg-[#232F46] hover:bg-gray-200 dark:bg-[#232F46] border border-gray-400 dark:border-[#3D5280] rounded text-gray-600 dark:text-gray-300 font-mono font-bold text-[10px] transition-colors active:scale-95"
                             >
                               {row.tipo}
                             </button>
                           </div>
                           
-                          <div className="bg-gray-50/50 rounded-lg p-3 border border-black/20">
-                            <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold block mb-1">Padrão de Fábrica</span>
-                            <div className="font-mono text-red-600 text-xs sm:text-sm whitespace-pre-line">
+                          <div className="bg-gray-50 dark:bg-[#111827]/40 rounded-lg p-3 border border-gray-200 dark:border-[#2A3B5C]/40">
+                            <span className="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold block mb-1">Padrão de Fábrica</span>
+                            <div className="font-mono text-red-600 dark:text-red-400 text-xs sm:text-sm whitespace-pre-line font-bold">
                               {padraoDisplay}
                             </div>
                           </div>
@@ -580,7 +888,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                           {getTutorialSteps(row.tipo, row.localizacao).length > 0 && (
                             <button
                               onClick={() => setSelectedTutorial({ key: row.tipo, title: row.localizacao, steps: getTutorialSteps(row.tipo, row.localizacao) })}
-                              className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-600/10 hover:bg-red-600/20 text-red-600 rounded-lg text-xs font-bold transition-colors border border-red-600/20"
+                              className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-600/10 hover:bg-red-600/20 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg text-xs font-bold transition-colors border border-red-600/20 dark:border-red-500/30"
                             >
                               <Info className="w-3.5 h-3.5" />
                               Como testar
@@ -591,7 +899,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                         {/* Input Section */}
                         <div className="w-full sm:w-64 flex flex-col justify-between gap-3 shrink-0">
                           <div>
-                            <label className="text-[10px] uppercase tracking-widest text-gray-500 font-bold block mb-1">
+                            <label className="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold block mb-1">
                               Valor Encontrado
                             </label>
                             <input
@@ -599,7 +907,7 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                               value={currentValue}
                               onChange={(e) => handleValueChange(rowKey, e.target.value, row.padrao)}
                               placeholder={placeholderText}
-                              className="w-full bg-gray-50/80 border border-gray-300 dark:border-[#3D5280] rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-all placeholder:text-gray-500 font-mono"
+                              className="w-full bg-gray-50 dark:bg-[#111827]/50 border border-gray-300 dark:border-[#3D5280] rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500 font-mono"
                             />
                           </div>
 
@@ -608,8 +916,8 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                               onClick={() => handleStatusChange(rowKey, 'ok')}
                               className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
                                 currentStatus === 'ok' 
-                                  ? 'bg-emerald-500/20 text-emerald-600 border-emerald-500/50' 
-                                  : 'bg-white dark:bg-[#1A2235] text-gray-500 border-gray-300 dark:border-[#3D5280] hover:bg-gray-200 dark:bg-[#232F46]'
+                                  ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/50' 
+                                  : 'bg-white dark:bg-[#1A2235] text-gray-500 dark:text-gray-400 border-gray-300 dark:border-[#3D5280] hover:bg-gray-200 dark:hover:bg-[#232F46]'
                               }`}
                             >
                               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -619,8 +927,8 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                               onClick={() => handleStatusChange(rowKey, 'nok')}
                               className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
                                 currentStatus === 'nok' 
-                                  ? 'bg-red-500/20 text-red-600 border-red-500/50' 
-                                  : 'bg-white dark:bg-[#1A2235] text-gray-500 border-gray-300 dark:border-[#3D5280] hover:bg-gray-200 dark:bg-[#232F46]'
+                                  ? 'bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/50' 
+                                  : 'bg-white dark:bg-[#1A2235] text-gray-500 dark:text-gray-400 border-gray-300 dark:border-[#3D5280] hover:bg-gray-200 dark:hover:bg-[#232F46]'
                               }`}
                             >
                               <AlertCircle className="w-3.5 h-3.5" />
@@ -761,6 +1069,111 @@ export function DiagnosticWorksheetView({ brand, models, onBack }: DiagnosticWor
                       </div>
                     );
                   })}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {isPdfModalOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+              onClick={() => setIsPdfModalOpen(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white dark:bg-[#1A2235] border border-gray-300 dark:border-[#3D5280] rounded-2xl p-6 max-w-md w-full shadow-2xl flex flex-col"
+              >
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100 dark:border-gray-800">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-red-600 dark:text-red-400" />
+                    Gerar Relatório PDF
+                  </h3>
+                  <button
+                    onClick={() => setIsPdfModalOpen(false)}
+                    className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                      Técnico Responsável
+                    </label>
+                    <input
+                      type="text"
+                      value={technicianName}
+                      onChange={(e) => setTechnicianName(e.target.value)}
+                      placeholder="Nome do profissional"
+                      className="w-full bg-gray-50 dark:bg-[#111827]/50 border border-gray-300 dark:border-[#3D5280] rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                      Modelo Exato da Motocicleta
+                    </label>
+                    <input
+                      type="text"
+                      value={exactModelName}
+                      onChange={(e) => setExactModelName(e.target.value)}
+                      placeholder="Ex: CB 300F Twister 2024"
+                      className="w-full bg-gray-50 dark:bg-[#111827]/50 border border-gray-300 dark:border-[#3D5280] rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                      Observações / Parecer Técnico
+                    </label>
+                    <textarea
+                      value={pdfObservations}
+                      onChange={(e) => setPdfObservations(e.target.value)}
+                      placeholder="Adicione observações, falhas encontradas ou recomendações..."
+                      rows={4}
+                      className="w-full bg-gray-50 dark:bg-[#111827]/50 border border-gray-300 dark:border-[#3D5280] rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 mt-6">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={async () => {
+                        await handleGeneratePDF(technicianName, exactModelName, pdfObservations, false);
+                        setIsPdfModalOpen(false);
+                      }}
+                      className="flex-1 py-2.5 px-4 bg-gray-100 dark:bg-[#232F46] hover:bg-gray-200 dark:hover:bg-[#2A3B5C] text-gray-900 dark:text-gray-100 rounded-lg text-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Download className="w-4 h-4" />
+                      Baixar PDF
+                    </button>
+                    <button
+                      onClick={async () => {
+                        await handleGeneratePDF(technicianName, exactModelName, pdfObservations, true);
+                        setIsPdfModalOpen(false);
+                      }}
+                      className="flex-1 py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Share2 className="w-4 h-4" />
+                      Compartilhar
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setIsPdfModalOpen(false)}
+                    className="w-full py-2 px-4 border border-gray-300 dark:border-[#3D5280] rounded-lg text-xs font-semibold text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-center"
+                  >
+                    Cancelar
+                  </button>
                 </div>
               </motion.div>
             </motion.div>
